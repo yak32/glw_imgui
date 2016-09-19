@@ -1,0 +1,1055 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"load_",
+				"load_rollout"
+			],
+			[
+				"toolbar",
+				"toolbar_t"
+			],
+			[
+				"toolb",
+				"toolbar_t"
+			],
+			[
+				"tabbed",
+				"tabbed_rollouts"
+			],
+			[
+				"TEXT_co",
+				"text_color_hot"
+			],
+			[
+				"text_",
+				"text_color_hot"
+			],
+			[
+				"text_color",
+				"text_color_hot"
+			],
+			[
+				"text_col",
+				"text_color_hot"
+			],
+			[
+				"button_c",
+				"button_color"
+			],
+			[
+				"text_c",
+				"text_color"
+			],
+			[
+				"start",
+				"start_control"
+			],
+			[
+				"seri",
+				"serialization"
+			],
+			[
+				"container",
+				"containter_type"
+			],
+			[
+				"obj",
+				"obj_start"
+			],
+			[
+				"serial",
+				"serialize_prop"
+			],
+			[
+				"base_props",
+				"base_props_current"
+			],
+			[
+				"Ser",
+				"serialize"
+			],
+			[
+				"seria",
+				"serialize"
+			],
+			[
+				"len",
+				"length"
+			],
+			[
+				"strings",
+				"stringstream"
+			],
+			[
+				"type",
+				"typename"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "src/render.cpp",
+			"settings":
+			{
+				"buffer_size": 15379,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "demo/renderer_sdl.cpp",
+			"settings":
+			{
+				"buffer_size": 8127,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "Package Control Messages\n========================\n\nPackage Control\n---------------\n\n  Version 3.2 Release Notes\n  \n  This version of Package Control focuses on bug-fixes, with notable changes\n  including:\n  \n   - OS X TLS trust roots are exported using APIs to prevent the error message\n     displayed to some El Capitan users\n  \n   - Theme, syntax and color scheme upgrades have been improved and should result\n     in fewer popup messages when filenames change\n  \n   - Various bugs related to installing dependencies have been resolved\n  \n   - Windows and OS X trust roots are exported in a way that valid/invalid purpose\n     information is now communicated to the OpenSSL-based Python ssl module\n  \n   - Further improvements have been made to handling of git/hg package upgrades\n  \n   - The Windows WinINet downloader has improved compatibility with Windows 10\n",
+			"settings":
+			{
+				"buffer_size": 865,
+				"line_ending": "Windows",
+				"name": "Package Control Messages",
+				"read_only": true,
+				"scratch": true
+			}
+		}
+	],
+	"build_system": "imgui",
+	"build_system_choices":
+	[
+		[
+			[
+				[
+					"imgui",
+					""
+				],
+				[
+					"imgui",
+					"run"
+				]
+			],
+			[
+				"imgui",
+				"run"
+			]
+		]
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 375.0,
+		"last_filter": "CLAN",
+		"selected_items":
+		[
+			[
+				"CLAN",
+				"Clang Format: Format Selection"
+			],
+			[
+				"cmake",
+				"Set Syntax: CMake"
+			],
+			[
+				"packa",
+				"Package Control: Install Package"
+			],
+			[
+				"",
+				"Clang Format: Format Selection"
+			],
+			[
+				"clan",
+				"Clang Format: Format Selection"
+			],
+			[
+				"clangf",
+				"Clang Format: Format Selection"
+			],
+			[
+				"di",
+				"Git: Diff"
+			],
+			[
+				"git diff",
+				"Git: Diff"
+			],
+			[
+				"diff",
+				"Git: Diff"
+			],
+			[
+				"log",
+				"Git: Log"
+			],
+			[
+				"forma",
+				"Clang Format: Format Selection"
+			],
+			[
+				"status",
+				"Git: Status"
+			],
+			[
+				"form",
+				"Clang Format: Format Selection"
+			],
+			[
+				"format",
+				"Clang Format: Format Selection"
+			],
+			[
+				"brows",
+				"Preferences: Browse Packages"
+			],
+			[
+				"browse",
+				"Preferences: Browse Packages"
+			],
+			[
+				"sta",
+				"Stackoverflow: Search from Input"
+			],
+			[
+				"stac",
+				"Stackoverflow: Search from Input"
+			],
+			[
+				"git di",
+				"Git: Diff"
+			],
+			[
+				"checkou",
+				"Git: Checkout"
+			],
+			[
+				"menu",
+				"View: Toggle Menu"
+			],
+			[
+				"git stat",
+				"Git: Status"
+			],
+			[
+				"projects",
+				"Project: Close"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"package",
+				"Package Control: Remove Package"
+			],
+			[
+				"font",
+				"Preferences: Package Control Settings – User"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"ctags",
+				"CTags: Show Symbols (all)"
+			],
+			[
+				"clang",
+				"Clang Format: Format Selection"
+			],
+			[
+				"clanf",
+				"Clang Format: Select Style"
+			]
+		],
+		"width": 386.0
+	},
+	"console":
+	{
+		"height": 167.0,
+		"history":
+		[
+			"sublime.log_commands(False)",
+			"sublime.log_commands(True)",
+			"sublime.log_commands(true)",
+			"c:\\Apps\\ctags.exe",
+			"/c/Apps/ctags.exe",
+			"\\c\\Apps\\ctags.exe",
+			"c:\\Apps\\ctags.exe",
+			"ctags.exe",
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"sublime.log_commands(True)",
+			"cd c:\\\\projects\\\\glow\\\\build\\\\cmake",
+			"cd c:\\projects\\glow\\build\\cmake",
+			"cd c:/projects/glow/build/cmake"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/E/projects/imgui",
+		"/E/projects/imgui/demo",
+		"/E/projects/imgui/include",
+		"/E/projects/imgui/src"
+	],
+	"file_history":
+	[
+		"/C/projects/imgui/sdl/CMakeLists.txt",
+		"/C/projects/imgui/renderer_sdl.cpp",
+		"/C/projects/imgui/renderer_sdl.h",
+		"/E/projects/imgui/sdl/CMakeLists.txt",
+		"/E/projects/imgui/ui.cpp",
+		"/E/projects/imgui/irenderer.h",
+		"/E/projects/imgui/render.h",
+		"/E/projects/imgui/render_queue.cpp",
+		"/E/projects/imgui/render_queue.h",
+		"/E/projects/imgui/rollout.cpp",
+		"/E/projects/imgui/rollout.h",
+		"/E/projects/imgui/renderer_sdl.cpp",
+		"/E/projects/imgui/io.cpp",
+		"/E/projects/imgui/io.h",
+		"/E/projects/imgui/ui.h",
+		"/E/projects/imgui/toolbars.h",
+		"/E/projects/imgui/toolbars.cpp",
+		"/E/projects/imgui/render.cpp",
+		"/C/projects/imgui/rolllout.cpp",
+		"/C/projects/imgui/rollout.cpp",
+		"/C/projects/imgui/io.cpp",
+		"/C/projects/imgui/imgui.cpp",
+		"/C/projects/imgui/ui.cpp",
+		"/C/projects/imgui/toolbars.h",
+		"/C/projects/imgui/CMakeLists.txt",
+		"/C/projects/imgui/imgui.h",
+		"/C/projects/imgui/toolbars.cpp",
+		"/C/projects/imgui/rollout.h",
+		"/C/projects/imgui/render_queue.cpp",
+		"/C/projects/imgui/render_queue.h",
+		"/C/projects/imgui/io.h",
+		"/C/projects/imgui/render.cpp",
+		"/C/projects/imgui/render.h",
+		"/C/projects/imgui/imgui.sublime-project",
+		"/C/Users/sumygini/dev/ignitiondepooverrides/overrides.json",
+		"/C/projects/imgui/sound.h",
+		"/C/projects/imgui/sound.cpp",
+		"/C/projects/imgui/.clang-format",
+		"/C/projects/glow/source/kernel/job_manager_boost.cpp",
+		"/C/projects/glow/source/core/platform/platform_windows.cpp",
+		"/C/projects/glow/include/types/type_material.h",
+		"/C/projects/glow/include/types/type_landscape.h",
+		"/C/projects/glow/source/core/serialization/glw_json.h",
+		"/C/projects/glow/include/types/type_light.h",
+		"/c/projects/glow/source/core/serialization/glw_json.h",
+		"/C/projects/glow/source/core/script/script_lua.cpp",
+		"/C/projects/glow/source/core/core/core.cpp",
+		"/C/projects/glow/source/editor/importer_fbx.cpp",
+		"/c/projects/glow/include/kernel/mathematics.h",
+		"/C/projects/glow/source/core/serialization/engine_json.cpp",
+		"/C/projects/glow/source/core/serialization/engine_json.h",
+		"/C/projects/glow/include/kernel/serialization.h",
+		"/c/projects/glow/include/kernel/type_base.h",
+		"/c/projects/glow/source/editor/property_renderer.h",
+		"/C/projects/glow/include/types/type_model.h",
+		"/C/projects/glow/source/core/manager/manager_cinematic.cpp",
+		"/C/projects/glow/include/types/type_trigger.h",
+		"/C/projects/glow/include/kernel/params.h",
+		"/C/projects/glow/include/types/type_scene.h",
+		"/C/projects/glow/include/types/type_sound.h",
+		"/C/projects/glow/include/types/type_physics.h",
+		"/C/projects/glow/include/types/type_particle.h",
+		"/C/projects/glow/include/types/type_entity.h",
+		"/C/projects/glow/include/types/type_ai.h",
+		"/C/projects/glow/targets/Debug/test2.json",
+		"/C/projects/glow/build/CMakeLists.txt",
+		"/C/projects/glow/source/core/serialization/json.cpp",
+		"/C/projects/glow/source/core/serialization/json_engine_types.cpp",
+		"/c/projects/glow/source/core/serialization/json_engine_types.h",
+		"/C/projects/glow/source/core/serialization/json.h",
+		"/C/projects/glow/targets/Debug/village_data/test.json",
+		"/C/projects/glow/patch",
+		"/C/projects/glow/targets/Debug/test.json",
+		"/C/Users/sumygini/dev/deployment/platform/ps4/sce_sys/changeinfo/changeinfo.xml",
+		"/C/Users/sumygini/Dropbox/temp/changeinfo.xml",
+		"/C/projects/glow/source/core/serialization/json_types.h",
+		"/C/projects/glow/targets/Debug/village_data/config.json",
+		"/C/projects/glow/targets/Debug/village_data/package/types/ai.types",
+		"/C/projects/glow/source/core/serialization/json_engine_types.h",
+		"/C/projects/glow/source/core/serialization/types_serialization.h",
+		"/C/projects/glow/json_engine_types.h",
+		"/C/projects/glow/test",
+		"/C/projects/glow/source/core/serialisation/json.cpp",
+		"/C/projects/glow/source/core/serialisation/json.h",
+		"/C/projects/glow/source/core/serialisation/json_types.h",
+		"/C/projects/glow/source/shader/renderer_base.cpp",
+		"/C/projects/glow/projects/voxel_game/game_player.cpp",
+		"/C/projects/glow/source/entities/entity/entity_movable.cpp",
+		"/C/projects/glow/source/editor/core.cpp",
+		"/C/projects/glow/source/render_directx/dx_nvidia_game_works.cpp",
+		"/C/projects/glow/source/editor/editor_tools.cpp",
+		"/C/projects/glow/source/editor/entity_factory.cpp",
+		"/C/projects/glow/source/editor/gizmo.cpp",
+		"/C/projects/glow/source/editor/ui_entity_render.cpp",
+		"/C/projects/glow/source/shader/deferred_shader.cpp",
+		"/C/projects/glow/source/shader/dynamic_shader.cpp",
+		"/C/projects/glow/source/shader/manager_material.cpp",
+		"/C/projects/glow/source/shader/lightmap_shader.cpp",
+		"/C/projects/glow/source/shader/manager_lighting.cpp",
+		"/C/projects/glow/source/shader/manager_oculus.cpp",
+		"/C/projects/glow/source/shader/view.cpp",
+		"/C/projects/glow/source/shader/view_entity/light_sun.cpp",
+		"/C/projects/glow/source/shader/view_entity/tree_particles.cpp",
+		"/C/projects/glow/source/shader/view_entity/light.cpp",
+		"/C/projects/glow/source/shader/view_entity/light_index.cpp",
+		"/C/projects/glow/source/shader/view_entity/landscape.cpp",
+		"/C/projects/glow/projects/mercury/editor.cpp",
+		"/C/projects/glow/projects/mercury/environment.cpp",
+		"/C/projects/glow/projects/pied_piper/app.cpp",
+		"/C/projects/glow/projects/sample/sample.cpp",
+		"/C/projects/glow/projects/space_sample/sample.cpp",
+		"/C/projects/glow/projects/tarta/editor.cpp",
+		"/C/projects/glow/projects/tarta/environment.cpp",
+		"/C/projects/glow/projects/voxel_game/voxel_editor.cpp",
+		"/C/projects/glow/source/core/core/world.cpp",
+		"/C/projects/glow/projects/voxel_engine/cluster_light.cpp",
+		"/C/projects/glow/projects/voxel_engine/cube_cluster.cpp",
+		"/C/projects/glow/projects/voxel_engine/cube_world.cpp",
+		"/C/projects/glow/projects/voxel_game/environment.cpp",
+		"/C/projects/glow/thirdparty_cmake/fbx/include/fbxsdk/core/fbxproperty.h",
+		"/C/projects/glow/thirdparty_cmake/fbx/include/fbxsdk/core/fbxobject.h",
+		"/C/projects/glow/source/core/serialization/glow_types_serialization.h",
+		"/C/projects/glow/source/core/script/script_lua.h",
+		"/C/projects/glow/glow.sublime-project",
+		"/C/projects/glow/targets/Debug/log.txt",
+		"/C/projects/glow/projects/tarta/environment.cpp.bak.bak",
+		"/C/projects/glow/source/ai/core.cpp",
+		"/C/projects/glow/source/shader/view_entity/skybox.cpp"
+	],
+	"find":
+	{
+		"height": 38.0
+	},
+	"find_in_files":
+	{
+		"height": 117.0,
+		"where_history":
+		[
+			"",
+			"<open files>",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"render_quads",
+			"draw_rect",
+			"drawSimple_polygons",
+			"ADD_LIBRARY",
+			"new_coords",
+			"::create_rollout(",
+			"create_rollout",
+			"create_rollout(",
+			"m_rollouts.",
+			"detach_tabbed_rollout",
+			"FLOATING_ROLLOUT_DEPTH",
+			"visit_rollout_node",
+			"rollouts_t",
+			"visit_rollout_node",
+			"m_rollouts",
+			"tabs",
+			"visit_rollout_node",
+			"tabs",
+			"begin_rollout(",
+			"tabs",
+			"json::",
+			"save_object_to_file",
+			"load_object_from_file",
+			"tabbed_rollouts",
+			"save_toolbar",
+			"tabbed_rollouts",
+			"tabbed_roll",
+			"tabbed_rollouts",
+			"m_focused_rollout_id",
+			"m_dragged_rollout_id",
+			"idpr",
+			"m_dragged_rollout_id",
+			"m_rollouts",
+			"RolloutMap",
+			"m_rollouts",
+			"int id",
+			"insert_toolbar",
+			"g_scrollBottom",
+			"g_scroll_top",
+			"g_scrollTop",
+			"g_insideScrollArea",
+			"g_scrollId",
+			"g_focus_bottom\ng_focus_bottom\ng_focus_bottom\ng_focus_bottom",
+			"g_focusBottom",
+			"g_focusTop",
+			"g_scrollVal",
+			"g_scrollAreaTop",
+			"g_scrollRight",
+			"tabbed_rollouts",
+			"CHECK_ITEM_RECT",
+			"start_control(enabled, enabled, ",
+			"start_control",
+			"start_control(",
+			"bool over",
+			"edit_color",
+			"color",
+			"BUTTON_COLOR_ACTIVE",
+			"button_color",
+			"m_colors[BUTTON_COLOR_ACTIVE]",
+			"button_color",
+			"m_colors[BUTTON_COLOR_ACTIVE]",
+			"is_item_hot(id)",
+			"start_control",
+			"unsigned int",
+			"toolbar_t",
+			"text_color",
+			"m_colors[TEXT_COLOR_HOT]",
+			"unsigned int",
+			"start_control",
+			"buttoncollapse",
+			"widget_",
+			"width",
+			"Widget_wi",
+			"rollout_move",
+			"rollout_move_rect",
+			"rollout_move",
+			"doublem_left_released",
+			"_detach_tabbed_rollout",
+			"hide_rollout(",
+			"hide_rollour(",
+			"is_item_focuseded",
+			"is_item_focus",
+			"set_root_toolbar",
+			"setroot_toolbar",
+			"system",
+			"m_drag",
+			"m_([a-z]+)([A-Z])",
+			"m_([a-z]+)[A-Z]",
+			"m_dragX",
+			"m_([a-z]+)[A-Z]",
+			"NULL",
+			"add_gfx_",
+			"RESIZE_AREA",
+			"_search_rollout_node",
+			"RESIZE_AREA",
+			"r->m_options",
+			"GLW_",
+			"GLW_NEW",
+			"system_drag",
+			"textPool",
+			"textPoolSize",
+			"m_buffer->",
+			"insert_toolbar",
+			"r.m_options",
+			"m_([a-z]+)([A-Z])([a-z]+)([A-Z])",
+			"m_rollout([A-Z])",
+			"m_padding([A-Z])",
+			"m_rolloutLast",
+			"TEXT_POOL_SIZE",
+			"m_widgetId",
+			"m_areaId",
+			"m_rolloutLeft",
+			"m_rollotLef",
+			"m_rolloou",
+			"m_rolloutLeft",
+			"m_rollout_left",
+			"m_rolloutLeft",
+			"m_rollouLeft",
+			"m_rolloutLeft",
+			"m_rolloutWidth",
+			"MBUT_LEFT",
+			"m_leftPressed",
+			"buttons",
+			"system",
+			"systembutton",
+			"input",
+			"U",
+			"update_input"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"",
+			"tabs",
+			"rollouts_t",
+			"Rollout* r",
+			"insert_rollout",
+			"m_scroll_bottom",
+			"m_scroll_top",
+			"g_scroll_top",
+			"m_inside_scroll_area",
+			"m_scroll_id",
+			"m_focus_bottom\nm_scroll_id",
+			"m_scroll_id\ng_focus_bottom",
+			"m_focus_bottom\ng_focus_bottom",
+			"g_focus_bottom",
+			"m_focus_top",
+			"m_scroll_val",
+			"m_scroll_area_top",
+			"m_scroll_right",
+			"start_control(enabled, ",
+			"uint",
+			"button_collapse",
+			"double_left_released",
+			"detach_tabbed_rollout",
+			"is_item_focused",
+			"m_\\L$1_\\L$2",
+			"m_\\L$1\\L$2",
+			"m_/L$1_/L$2",
+			"nullptr",
+			"add_",
+			"search_rollout_node",
+			"r->options",
+			"new",
+			"new ",
+			"m_text_pool",
+			"m_text_pool_size",
+			"",
+			"r.options",
+			"m_\\L$1_\\L$2\\L$3_\\L$4",
+			"m_\\L$1_\\L$2_\\L$3\\L$4",
+			"m_rollout_\\L$1",
+			"m_padding_\\L$1",
+			"m_rollout_last",
+			"m_widget_id",
+			"m_area_id",
+			"m_rollout_left",
+			"m_rollout_left\nm_rollout_left",
+			"m_rollout_left\n",
+			"m_rollout_width",
+			"m_left_pressed",
+			"system_button",
+			"",
+			"m_queue",
+			"m_size",
+			"RenderQueue::add_",
+			"m_rqueue.add_",
+			"m_rqueue.",
+			"m_target_rollout",
+			"m_target_side",
+			"m_is_hot",
+			"m_key",
+			"m_is_active",
+			"m_edit_buffer_id",
+			"m_edit_buffer",
+			"m_search_next_focus",
+			"m_options",
+			"m_is_hot",
+			"m_left_released",
+			"m_is_active",
+			"m_left_pressed",
+			"left_pressed",
+			"m_hot_to_be",
+			"m_went_active",
+			"m_wentActive",
+			"m_dragged_rollout_id",
+			"m_double_left_released",
+			"m_left_released",
+			"m_inside_current_scroll",
+			"inside_current_scroll",
+			"m_toolbar_root",
+			"toolbar_root",
+			"delete ",
+			"delete[] ",
+			"m_",
+			", m_",
+			", bool ",
+			"",
+			"div_drag",
+			"frect",
+			"ColorScheme",
+			"frect",
+			"",
+			"Ui::",
+			"m_focused_rollout_id",
+			"",
+			"on_render_finished",
+			"draw_rounded_rect",
+			"visit_rollout_node",
+			"rollout_move_rect",
+			"bool Ui::\\L$1(",
+			"system_drag",
+			"system_tab",
+			"bool Ui::\\L$1(",
+			"bool \\L$1(",
+			"bool \\$1(",
+			"is_item_focused",
+			"is_item_hot",
+			"is_item_active",
+			"add_gfx_cmd_",
+			"bool ",
+			"item_dropped",
+			"\\L$1(",
+			"add_gfx_",
+			"",
+			"void ",
+			"bool Ui::",
+			"void Ui::",
+			"",
+			"m_",
+			", m_",
+			"m_",
+			"get_render_queue_\\L$1",
+			"get_render_queue\\L$1",
+			"get_",
+			"\\L$1\\L$2_\\L$3\\L$4(",
+			"_\\L$1\\L$2_\\L$3\\L$4(",
+			"_\\L$1\\L$2_\\L$3\\L$4_\\L$5\\L$6(",
+			"_\\L$1\\L$2_\\L$3\\L$4_L$5\\L$6(",
+			"_\\L$1\\L$2_\\L$3\\L$4_L$5("
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": true,
+		"wrap": false
+	},
+	"groups":
+	[
+		{
+			"selected": 2,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "src/render.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 15379,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1904.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "demo/renderer_sdl.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8127,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6779,
+								6779
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 4874.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 865,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								865,
+								865
+							]
+						],
+						"settings":
+						{
+							"auto_indent": false,
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_width": 2,
+							"word_wrap": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 38.0
+	},
+	"input":
+	{
+		"height": 42.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": false,
+	"output.exec":
+	{
+		"height": 319.0
+	},
+	"output.find_results":
+	{
+		"height": 157.0
+	},
+	"pinned_build_system": "imgui",
+	"project": "imgui.sublime-project",
+	"replace":
+	{
+		"height": 83.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"glw_json",
+				"source\\core\\serialization\\glw_json.h"
+			],
+			[
+				"engine_j",
+				"source\\core\\serialization\\engine_json.cpp"
+			],
+			[
+				"serializ",
+				"include\\kernel\\serialization.h"
+			],
+			[
+				"engine_json",
+				"source\\core\\serialization\\engine_json.h"
+			],
+			[
+				"core.cpp",
+				"source\\core\\core\\core.cpp"
+			],
+			[
+				"json",
+				"source\\core\\serialization\\json.h"
+			],
+			[
+				"type_ai",
+				"include\\types\\type_ai.h"
+			],
+			[
+				"params.h",
+				"include\\kernel\\params.h"
+			],
+			[
+				"params",
+				"include\\kernel\\params.h"
+			],
+			[
+				"type_a",
+				"include\\types\\type_ai.h"
+			],
+			[
+				"params.",
+				"include\\kernel\\params.h"
+			],
+			[
+				"cmakel",
+				"build\\CMakeLists.txt"
+			],
+			[
+				"json.cpp",
+				"source\\core\\serialization\\json.cpp"
+			],
+			[
+				"cscriptl",
+				"source\\core\\script\\script_lua.cpp"
+			],
+			[
+				"core.",
+				"source\\ai\\core.cpp"
+			],
+			[
+				"game_para",
+				"projects\\voxel_game\\game_params.h"
+			],
+			[
+				"param",
+				"source\\kernel\\params.cpp"
+			],
+			[
+				"game_param",
+				"projects\\voxel_game\\game_params.h"
+			],
+			[
+				"par",
+				"include\\kernel\\params.h"
+			],
+			[
+				"types.",
+				"include\\kernel\\types.h"
+			],
+			[
+				"type_ser",
+				"source\\core\\type_serialization.h"
+			],
+			[
+				"membu",
+				"source\\kernel\\memory_buffer.h"
+			],
+			[
+				"type_ini",
+				"source\\core\\type_serialization.h"
+			],
+			[
+				"type_seri",
+				"source\\core\\type_serialization.h"
+			],
+			[
+				"scene.cpp",
+				"source\\core\\manager\\manager_scene.cpp"
+			],
+			[
+				"scene",
+				"include\\types\\type_scene.h"
+			],
+			[
+				"cmakelists",
+				"projects\\voxel_game\\CMakeLists.txt"
+			],
+			[
+				"types.h",
+				"include\\kernel\\types.h"
+			],
+			[
+				"quad_tr",
+				"include\\kernel\\quad_tree.h"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 625.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"E:\\projects\\glow\\glow.sublime-project"
+			]
+		],
+		"width": 475.0
+	},
+	"select_symbol":
+	{
+		"height": 469.0,
+		"last_filter": "vec3",
+		"selected_items":
+		[
+			[
+				"vec3",
+				"vec3"
+			],
+			[
+				"json_load",
+				"json_load_types"
+			],
+			[
+				"json_save",
+				"json_save_types"
+			],
+			[
+				"json_",
+				"json_load_types"
+			],
+			[
+				"type_base",
+				"type_base_t"
+			],
+			[
+				"JSON",
+				"JSON_SaveTypes"
+			]
+		],
+		"width": 1224.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 182.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
