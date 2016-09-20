@@ -7,7 +7,7 @@ if(UNIX)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=gnu++0x")
 endif()
 
-INCLUDE_DIRECTORIES(include)
+INCLUDE_DIRECTORIES(include thirdparty)
 
 SET (IMGUI_SOURCE_FILES
 	src/ui.cpp
