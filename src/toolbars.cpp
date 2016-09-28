@@ -8,7 +8,7 @@
 #include <cstdlib>
 
 namespace imgui {
-toolbar_t* toolbar_t::add_rollout(Rollout* r, float _div, bool _horz) {
+Toolbar* Toolbar::add_rollout(Rollout* r, float _div, bool _horz) {
 	div = _div;
 	horz = _horz;
 	if (div == 1.0f) {
@@ -16,15 +16,15 @@ toolbar_t* toolbar_t::add_rollout(Rollout* r, float _div, bool _horz) {
 		return this;
 	}
 	if (div > 0) {
-		left = new toolbar_t(r);
-		right = new toolbar_t(nullptr);
+		left = new Toolbar(r);
+		right = new Toolbar(nullptr);
 		return right;
 	}
-	right = new toolbar_t(r);
-	left = new toolbar_t(nullptr);
+	right = new Toolbar(r);
+	left = new Toolbar(nullptr);
 	return left;
 }
-void visit_rollout_node(std::vector<Rollout*>& rollouts, toolbar_t* n, int x, int y, int w, int h) {
+void visit_rollout_node(std::vector<Rollout*>& rollouts, Toolbar* n, int x, int y, int w, int h) {
 	if (!n)
 		return;
 	if (n->rollout) {
@@ -59,7 +59,7 @@ void visit_rollout_node(std::vector<Rollout*>& rollouts, toolbar_t* n, int x, in
 		visit_rollout_node(rollouts, n->right, x, y + div + sep, w, h - div - sep);
 	}
 }
-div_drag find_div(int mx, int my, toolbar_t* n, int x, int y, int w, int h) {
+div_drag find_div(int mx, int my, Toolbar* n, int x, int y, int w, int h) {
 	div_drag res;
 	res.div = nullptr;
 	if (!n || mx < x || mx > x + w || my < y || my > y + h)
@@ -101,7 +101,7 @@ div_drag find_div(int mx, int my, toolbar_t* n, int x, int y, int w, int h) {
 	}
 	return res;
 }
-toolbar_t* search_rollout_node(toolbar_t* n, const Rollout* search, bool check_tabs) {
+Toolbar* search_rollout_node(Toolbar* n, const Rollout* search, bool check_tabs) {
 	if (!n)
 		return nullptr;
 	if (n->rollout == search)
@@ -110,7 +110,7 @@ toolbar_t* search_rollout_node(toolbar_t* n, const Rollout* search, bool check_t
 		for (auto i : n->rollout->tabs)
 			if (i == search->id)
 				return n;
-	toolbar_t* r = search_rollout_node(n->left, search, check_tabs);
+	Toolbar* r = search_rollout_node(n->left, search, check_tabs);
 	if (r)
 		return r;
 	r = search_rollout_node(n->right, search, check_tabs);
@@ -118,14 +118,14 @@ toolbar_t* search_rollout_node(toolbar_t* n, const Rollout* search, bool check_t
 		return r;
 	return nullptr;
 }
-toolbar_t* search_rollout_parent_node(toolbar_t* n, const Rollout* search) {
+Toolbar* search_rollout_parent_node(Toolbar* n, const Rollout* search) {
 	if (!n)
 		return nullptr;
 	if (n->left && n->left->rollout == search)
 		return n;
 	if (n->right && n->right->rollout == search)
 		return n;
-	toolbar_t* r = search_rollout_parent_node(n->left, search);
+	Toolbar* r = search_rollout_parent_node(n->left, search);
 	if (r)
 		return r;
 	r = search_rollout_parent_node(n->right, search);
@@ -136,7 +136,7 @@ toolbar_t* search_rollout_parent_node(toolbar_t* n, const Rollout* search) {
 void div_drag::shift(int shift) {
 	*div += (fabs(*div) >= 1.0f) ? (float)shift : (float)shift / size;
 }
-void clear_toolbars(toolbar_t* n) {
+void clear_toolbars(Toolbar* n) {
 	if (!n)
 		return;
 	clear_toolbars(n->left);

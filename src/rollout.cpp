@@ -129,7 +129,7 @@ bool Ui::insert_rollout(Rollout* r, float div, bool horz, Rollout* rollout) {
 	if (!r)
 		return false;
 	// insert into toolbar binary tree
-	toolbar_t* lastNode = m_rollout_last;
+	Toolbar* lastNode = m_rollout_last;
 	if (rollout) {
 		if (div == 0.0f) {
 			assert(rollout->is_visible()); // rollout to attach should be visible
@@ -150,7 +150,7 @@ bool Ui::insert_rollout(Rollout* r, float div, bool horz, Rollout* rollout) {
 			LOG_ERROR("failed to find rollout node");
 			return 0;
 		}
-		toolbar_t* mem_n = lastNode->add_rollout(lastNode->rollout, -div,
+		Toolbar* mem_n = lastNode->add_rollout(lastNode->rollout, -div,
 												 horz); // minus to move prev rollout to the right
 		lastNode->rollout = nullptr;
 		lastNode->div = div;
@@ -171,7 +171,7 @@ Rollout* Ui::create_rollout(const char* name, int m_options) {
 	return r;
 }
 bool Ui::remove_rollout(Rollout* r) {
-	rollouts_t::iterator i = std::find(m_rollouts.begin(), m_rollouts.end(), r);
+	Rollouts::iterator i = std::find(m_rollouts.begin(), m_rollouts.end(), r);
 	if (i == m_rollouts.end()) {
 		LOG_ERROR("failed to remove rollout");
 		return true;
@@ -202,7 +202,7 @@ bool Ui::detach_rollout(Rollout* r) {
 
 	if (!r->tabs.empty()) {
 		if (r->tabs.at(0) == r->id) {
-			toolbar_t* n = search_rollout_node(m_toolbar_root, r);
+			Toolbar* n = search_rollout_node(m_toolbar_root, r);
 			if (n) {
 				// move second tabbed rollout to the node
 				std::swap(r->tabs.at(0), r->tabs.at(1));
@@ -214,14 +214,14 @@ bool Ui::detach_rollout(Rollout* r) {
 		return true;
 	}
 
-	toolbar_t* n = search_rollout_parent_node(m_toolbar_root, r);
+	Toolbar* n = search_rollout_parent_node(m_toolbar_root, r);
 	if (!n)
 		return false; // no issue, rollout can be detached
 	if (n->left && n->left->rollout == r) {
 		delete (n->left);
 		n->left = nullptr;
 		if (n->right) {
-			toolbar_t* mem = n->right;
+			Toolbar* mem = n->right;
 			*n = *n->right;
 			delete (mem);
 		}
@@ -230,7 +230,7 @@ bool Ui::detach_rollout(Rollout* r) {
 		delete (n->right);
 		n->right = nullptr;
 		if (n->left) {
-			toolbar_t* mem = n->left;
+			Toolbar* mem = n->left;
 			*n = *n->left;
 			delete (mem);
 		}

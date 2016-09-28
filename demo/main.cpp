@@ -7,6 +7,7 @@
 
 #include "renderer_sdl.h"
 #include "ui.h"
+#include "io.h"
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -81,7 +82,11 @@ bool init() {
 	vert_rollout = ui.create_rollout("vert", 0);
 	ui.insert_rollout(vert_rollout, -200, true, nullptr);
 
-	ui.font("E:\\projects\\imgui\\DroidSans.ttf", 15);
+	ui.font("C:\\projects\\glw_imgui\\DroidSans.ttf", 15);
+
+    if ( save_layout(ui, "C:\\projects\\glw_imgui\\test.imgui") )
+        if (!load_layout(ui, "C:\\projects\\glw_imgui\\test.imgui"))
+            printf("failed to load");
     return success;
 }
 

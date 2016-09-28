@@ -18,7 +18,7 @@ template <typename T> bool serialize(T& t, Rollout& v) {
 	r &= SERIALIZE(tabs);
 	return r;
 }
-template <typename T> bool serialize(T& t, toolbar_t& v) {
+template <typename T> bool serialize(T& t, Toolbar& v) {
 	bool r = true;
 	r &= SERIALIZE(div);
 	r &= SERIALIZE(h);
@@ -38,7 +38,7 @@ bool save_layout(Ui& ui, const char* filename) {
 	return true;
 }
 bool load_layout(Ui& ui, const char* filename) {
-	toolbar_t* root = new toolbar_t(nullptr);
+	Toolbar* root = new Toolbar(nullptr);
 	int res = load_object_from_file(filename, *root);
 	if (res != JSON_OK) {
 		LOG_ERROR("Opening layout file failed, error: %d", res);

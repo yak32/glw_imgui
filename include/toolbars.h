@@ -7,17 +7,17 @@
 
 namespace imgui {
 struct Rollout;
-struct toolbar_t {
-	toolbar_t(Rollout* r = nullptr)
+struct Toolbar {
+	Toolbar(Rollout* r = nullptr)
 		: rollout(r), left(nullptr), right(nullptr), div(0), horz(false) {}
-	~toolbar_t() {}
-	toolbar_t* left;
-	toolbar_t* right;
+	~Toolbar() {}
+	Toolbar* left;
+	Toolbar* right;
 	float	  div;
 	bool	   horz;
 	int		   w, h; // temporary information
 	Rollout*   rollout;
-	toolbar_t* add_rollout(Rollout* r, float _div, bool _horz);
+	Toolbar* add_rollout(Rollout* r, float _div, bool _horz);
 };
 struct div_drag {
 	div_drag() {}
@@ -26,9 +26,9 @@ struct div_drag {
 	int	size;
 	void shift(int shift);
 };
-void visit_rollout_node(std::vector<Rollout*>& rollouts, toolbar_t* n, int x, int y, int w, int h);
-div_drag find_div(int mx, int my, toolbar_t* n, int x, int y, int w, int h);
-toolbar_t* search_rollout_node(toolbar_t* n, const Rollout* search, bool check_tabs = false);
-toolbar_t* search_rollout_parent_node(toolbar_t* n, const Rollout* search);
-void clear_toolbars(toolbar_t* n);
+void visit_rollout_node(std::vector<Rollout*>& rollouts, Toolbar* n, int x, int y, int w, int h);
+div_drag find_div(int mx, int my, Toolbar* n, int x, int y, int w, int h);
+Toolbar* search_rollout_node(Toolbar* n, const Rollout* search, bool check_tabs = false);
+Toolbar* search_rollout_parent_node(Toolbar* n, const Rollout* search);
+void clear_toolbars(Toolbar* n);
 }

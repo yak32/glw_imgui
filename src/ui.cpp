@@ -65,7 +65,7 @@ Ui::Ui()
 	m_colors[ROLLOUT_CAPTION_COLOR] = RGBA(0, 0, 0, 0); // non visible by default
 	m_colors[DRAG_COLOR] = RGBA(80, 80, 80, 40);
 	m_colors[SLIDER_BG] = RGBA(0, 0, 0, 126);
-	m_toolbar_root = new toolbar_t(nullptr);
+	m_toolbar_root = new Toolbar(nullptr);
 	m_rollout_last = m_toolbar_root;
 }
 Ui::~Ui() {
@@ -1578,16 +1578,16 @@ const gfx_cmd* Ui::get_render_queue(int& size) {
 	size = m_rqueue.get_size();
 	return m_rqueue.get_queue();
 }
-toolbar_t* Ui::get_root_toolbar() {
+Toolbar* Ui::get_root_toolbar() {
 	return m_toolbar_root;
 }
-void Ui::set_root_toolbar(toolbar_t* t) {
+void Ui::set_root_toolbar(Toolbar* t) {
 	clear_toolbars(m_toolbar_root); // remove current root toolbars
 	delete (m_toolbar_root);
 	m_toolbar_root = t;
 	m_rollout_last = m_toolbar_root;
 }
-Ui::rollouts_t& Ui::get_rollouts() {
+Ui::Rollouts& Ui::get_rollouts() {
 	return m_rollouts;
 }
 }

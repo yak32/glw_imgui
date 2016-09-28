@@ -108,46 +108,84 @@
 			}
 		},
 		{
-			"contents": "Package Control Messages\n========================\n\nPackage Control\n---------------\n\n  Version 3.2 Release Notes\n  \n  This version of Package Control focuses on bug-fixes, with notable changes\n  including:\n  \n   - OS X TLS trust roots are exported using APIs to prevent the error message\n     displayed to some El Capitan users\n  \n   - Theme, syntax and color scheme upgrades have been improved and should result\n     in fewer popup messages when filenames change\n  \n   - Various bugs related to installing dependencies have been resolved\n  \n   - Windows and OS X trust roots are exported in a way that valid/invalid purpose\n     information is now communicated to the OpenSSL-based Python ssl module\n  \n   - Further improvements have been made to handling of git/hg package upgrades\n  \n   - The Windows WinINet downloader has improved compatibility with Windows 10\n",
+			"file": "demo/main.cpp",
 			"settings":
 			{
-				"buffer_size": 865,
+				"buffer_size": 4946,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "test.imgui",
+			"settings":
+			{
+				"buffer_size": 757,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "include/toolbars.h",
+			"settings":
+			{
+				"buffer_size": 965,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "include/ui.h",
+			"settings":
+			{
+				"buffer_size": 9136,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/io.cpp",
+			"settings":
+			{
+				"buffer_size": 1129,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/rollout.cpp",
+			"settings":
+			{
+				"buffer_size": 7855,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/toolbars.cpp",
+			"settings":
+			{
+				"buffer_size": 3833,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/ui.cpp",
+			"settings":
+			{
+				"buffer_size": 46414,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "Searching 402 files for \"m_rollouts\" (case sensitive)\n\nC:\\projects\\glw_imgui\\include\\ui.h:\n  290  \tbool\t\tm_inside_scroll_area;\n  291  \n  292: \tRollouts m_rollouts;\n  293  \n  294  \tRenderQueue m_rqueue;\n\nC:\\projects\\glw_imgui\\src\\rollout.cpp:\n  140  \t\t\t// add rollout to tabs of parent rollout\n  141  \t\t\trollout->tabs.push_back(r->id);\n  142: \t\t\tfor (int rollout_id : rollout->tabs) m_rollouts[rollout_id]->alpha = 0;\n  143  \n  144  \t\t\tr->tabs = rollout->tabs;\n  ...\n  164  Rollout* Ui::create_rollout(const char* name, int m_options) {\n  165  \tRollout* r = new Rollout;\n  166: \tr->id = m_rollouts.size();\n  167  \n  168: \tm_rollouts.push_back(r);\n  169  \tr->name = name;\n  170  \tr->options = m_options;\n  ...\n  172  }\n  173  bool Ui::remove_rollout(Rollout* r) {\n  174: \tRollouts::iterator i = std::find(m_rollouts.begin(), m_rollouts.end(), r);\n  175: \tif (i == m_rollouts.end()) {\n  176  \t\tLOG_ERROR(\"failed to remove rollout\");\n  177  \t\treturn true;\n  ...\n  188  \tauto& tabs = r->tabs;\n  189  \ttabs.erase(std::remove(tabs.begin(), tabs.end(), r->id), tabs.end());\n  190: \tm_rollouts[tabs[0]]->alpha = 255;\n  191  \tif (tabs.size() == 1){\n  192  \t\tRollout::tabs_array_t temp;\n  ...\n  207  \t\t\t\t// move second tabbed rollout to the node\n  208  \t\t\t\tstd::swap(r->tabs.at(0), r->tabs.at(1));\n  209: \t\t\t\tn->rollout = m_rollouts[r->tabs.at(0)];\n  210  \t\t\t\tn->rollout->alpha = 255;\n  211  \t\t\t}\n  ...\n  278  }\n  279  bool Ui::hit_test(int x, int y) {\n  280: \tsize_t size = m_rollouts.size();\n  281  \tfor (size_t i = 0; i < size; ++i) {\n  282: \t\tRollout& r = *m_rollouts[i];\n  283  \t\tif (!(r.options & ROLLOUT_HOLLOW) && r.is_visible() && x >= r.x && x <= r.x + r.w &&\n  284  \t\t\ty >= r.y && y <= r.y + r.h)\n\nC:\\projects\\glw_imgui\\src\\ui.cpp:\n  349  \n  350  \t// recalculate rollouts based on size of frame\n  351: \tvisit_rollout_node(m_rollouts, m_toolbar_root, 0, 0, width, height);\n  352  \n  353  \t// if we have dragged rollout, setup depth testing\n  ...\n  357  \tif (m_dragged_rollout_id) {\n  358  \t\t// user is dragging rollout, display move symbol\n  359: \t\tsize_t size = m_rollouts.size();\n  360  \t\tfor (size_t i = 0; i < size; ++i) {\n  361: \t\t\tRollout* r = m_rollouts[i];\n  362  \t\t\tif (r == m_dragged_rollout_id || !(r->options & ROLLOUT_ATTACHED))\n  363  \t\t\t\tcontinue;\n  ...\n  378  }\n  379  void Ui::cleanup() {\n  380: \tm_rollouts.clear();\n  381  \tclear_toolbars(m_toolbar_root);\n  382  \tm_rollout_last = m_toolbar_root;\n  ...\n  642  \t\t\t\tint xx = m_widget_x;\n  643  \t\t\t\tfor (int rollout_id : r.tabs) {\n  644: \t\t\t\t\tRollout* tr = m_rollouts[rollout_id];\n  645  \t\t\t\t\tif (system_tab(tr->name.c_str(), xx, caption_y, width - 2, caption_height,\n  646  \t\t\t\t\t\t\t\t   tr == &r, xdiff, ydiff)) {\n  647  \t\t\t\t\t\tif (tr != &r) {\n  648  \t\t\t\t\t\t\tfor (int r_id : r.tabs)\n  649: \t\t\t\t\t\t\t\tm_rollouts[r_id]->alpha = 0;\n  650  \t\t\t\t\t\t\ttr->alpha = 255;\n  651  \t\t\t\t\t\t}\n  ...\n 1589  }\n 1590  Ui::rollouts_t& Ui::get_rollouts() {\n 1591: \treturn m_rollouts;\n 1592  }\n 1593  }\n\n18 matches across 3 files\n",
+			"settings":
+			{
+				"buffer_size": 2965,
 				"line_ending": "Windows",
-				"name": "Package Control Messages",
-				"read_only": true,
+				"name": "Find Results",
 				"scratch": true
-			}
-		},
-		{
-			"file": "CMakeLists.txt",
-			"settings":
-			{
-				"buffer_size": 643,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "demo/CMakeLists.txt",
-			"settings":
-			{
-				"buffer_size": 567,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "imgui.sublime-project",
-			"settings":
-			{
-				"buffer_size": 952,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "thirdparty/glw_json.h",
-			"settings":
-			{
-				"buffer_size": 11901,
-				"line_ending": "Windows"
 			}
 		}
 	],
@@ -332,10 +370,15 @@
 	},
 	"expanded_folders":
 	[
-		"/E/projects/glw_imgui/thirdparty"
+		"/C/projects/glw_imgui",
+		"/C/projects/glw_imgui/demo",
+		"/C/projects/glw_imgui/include"
 	],
 	"file_history":
 	[
+		"/C/projects/glw_imgui/CMakeLists.txt",
+		"/C/projects/glw_imgui/demo/CMakeLists.txt",
+		"/C/projects/glw_imgui/imgui.sublime-project",
 		"/C/projects/imgui/sdl/CMakeLists.txt",
 		"/C/projects/imgui/renderer_sdl.cpp",
 		"/C/projects/imgui/renderer_sdl.h",
@@ -460,14 +503,11 @@
 		"/C/projects/glow/source/core/serialization/glow_types_serialization.h",
 		"/C/projects/glow/source/core/script/script_lua.h",
 		"/C/projects/glow/glow.sublime-project",
-		"/C/projects/glow/targets/Debug/log.txt",
-		"/C/projects/glow/projects/tarta/environment.cpp.bak.bak",
-		"/C/projects/glow/source/ai/core.cpp",
-		"/C/projects/glow/source/shader/view_entity/skybox.cpp"
+		"/C/projects/glow/targets/Debug/log.txt"
 	],
 	"find":
 	{
-		"height": 38.0
+		"height": 46.0
 	},
 	"find_in_files":
 	{
@@ -484,6 +524,19 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"main",
+			"rollouts_t",
+			"toolbar_t",
+			"rollouts_t",
+			"m_rollouts",
+			"rollouts_t",
+			"_t",
+			"rollouts_t",
+			"toolbar_t",
+			"Toolbar",
+			"ttf",
+			"ttg",
+			"open",
 			"render_quads",
 			"draw_rect",
 			"drawSimple_polygons",
@@ -598,20 +651,7 @@
 			"m_rolloutLeft",
 			"m_rollotLef",
 			"m_rolloou",
-			"m_rolloutLeft",
-			"m_rollout_left",
-			"m_rolloutLeft",
-			"m_rollouLeft",
-			"m_rolloutLeft",
-			"m_rolloutWidth",
-			"MBUT_LEFT",
-			"m_leftPressed",
-			"buttons",
-			"system",
-			"systembutton",
-			"input",
-			"U",
-			"update_input"
+			"m_rolloutLeft"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -619,6 +659,10 @@
 		"regex": false,
 		"replace_history":
 		[
+			"Rollouts",
+			"Toolbar",
+			"Rollouts",
+			"Toolbar",
 			"",
 			"tabs",
 			"rollouts_t",
@@ -742,11 +786,7 @@
 			"get_render_queue_\\L$1",
 			"get_render_queue\\L$1",
 			"get_",
-			"\\L$1\\L$2_\\L$3\\L$4(",
-			"_\\L$1\\L$2_\\L$3\\L$4(",
-			"_\\L$1\\L$2_\\L$3\\L$4_\\L$5\\L$6(",
-			"_\\L$1\\L$2_\\L$3\\L$4_L$5\\L$6(",
-			"_\\L$1\\L$2_\\L$3\\L$4_L$5("
+			"\\L$1\\L$2_\\L$3\\L$4("
 		],
 		"reverse": false,
 		"show_context": true,
@@ -757,7 +797,7 @@
 	"groups":
 	[
 		{
-			"selected": 6,
+			"selected": 2,
 			"sheets":
 			[
 				{
@@ -786,7 +826,7 @@
 						"translation.y": 1904.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 10,
 					"type": "text"
 				},
 				{
@@ -802,8 +842,8 @@
 						"selection":
 						[
 							[
-								6779,
-								6779
+								6936,
+								6936
 							]
 						],
 						"settings":
@@ -812,137 +852,136 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 4874.0,
+						"translation.y": 5624.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
 					"buffer": 2,
+					"file": "demo/main.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 865,
+						"buffer_size": 4946,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								865,
-								865
+								2478,
+								2478
 							]
 						],
 						"settings":
 						{
-							"auto_indent": false,
-							"syntax": "Packages/Text/Plain text.tmLanguage",
-							"tab_size": 2,
-							"tab_width": 2,
-							"translate_tabs_to_spaces": true,
-							"word_wrap": true
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1853.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "CMakeLists.txt",
+					"file": "test.imgui",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 643,
+						"buffer_size": 757,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								197,
-								197
+								737,
+								737
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/CMake/CMake.tmLanguage",
+							"syntax": "Packages/Text/Plain text.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "demo/CMakeLists.txt",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 567,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								322,
-								322
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/CMake/CMake.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "imgui.sublime-project",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 952,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								268,
-								268
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JSON.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 675.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
-					"file": "thirdparty/glw_json.h",
-					"semi_transient": true,
+					"buffer": 4,
+					"file": "include/toolbars.h",
+					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 11901,
+						"buffer_size": 965,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								965,
+								965
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "include/ui.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 9136,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1995,
+								1995
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1918.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "src/io.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1129,
 						"regions":
 						{
 						},
@@ -962,7 +1001,212 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "src/rollout.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7855,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5221,
+								5221
+							],
+							[
+								5298,
+								5298
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 3978.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "src/toolbars.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3833,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "src/ui.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 46414,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2007,
+								2007
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1106.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2965,
+						"regions":
+						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										152,
+										162
+									],
+									[
+										382,
+										392
+									],
+									[
+										586,
+										596
+									],
+									[
+										621,
+										631
+									],
+									[
+										803,
+										813
+									],
+									[
+										823,
+										833
+									],
+									[
+										862,
+										872
+									],
+									[
+										1074,
+										1084
+									],
+									[
+										1311,
+										1321
+									],
+									[
+										1464,
+										1474
+									],
+									[
+										1550,
+										1560
+									],
+									[
+										1822,
+										1832
+									],
+									[
+										2062,
+										2072
+									],
+									[
+										2149,
+										2159
+									],
+									[
+										2313,
+										2323
+									],
+									[
+										2521,
+										2531
+									],
+									[
+										2759,
+										2769
+									],
+									[
+										2908,
+										2918
+									]
+								],
+								"scope": ""
+							}
+						},
+						"selection":
+						[
+							[
+								155,
+								155
+							]
+						],
+						"settings":
+						{
+							"detect_indentation": false,
+							"line_numbers": false,
+							"output_tag": 1,
+							"result_base_dir": "",
+							"result_file_regex": "^([^ \t].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
 					"type": "text"
 				}
 			]
@@ -1001,7 +1245,7 @@
 	"menu_visible": false,
 	"output.exec":
 	{
-		"height": 319.0
+		"height": 581.0
 	},
 	"output.find_results":
 	{
@@ -1147,7 +1391,7 @@
 		[
 			[
 				"",
-				"E:\\projects\\glow\\glow.sublime-project"
+				"C:\\Users\\sumygini\\dev\\ignition-ps4.sublime-project"
 			]
 		],
 		"width": 475.0

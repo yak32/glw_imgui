@@ -152,18 +152,20 @@ inline bool compare_props(const property& p1, const property& p2) {
 inline const char* load(const char* str, size_t len, int& v, int options) {
 	GLW_UNUSED(options);
 	char* pEnd;
+	errno = 0;
 	long int l = strtol(str, &pEnd, 10);
 	if (pEnd < str + len)
 		l = strtol(str, &pEnd, 16);
 	v = (int)l;
-	return (pEnd < str + len) || (l <= INT_MIN || l >= INT_MAX) ? str : pEnd;
+	return (pEnd < str + len) || (errno == ERANGE) ? str : pEnd;
 }
 inline const char* load(const char* str, size_t len, unsigned int& v, int options) {
 	GLW_UNUSED(options);
 	char* pEnd;
+	errno = 0;
 	unsigned long l = strtoul(str, &pEnd, 10);
 	v = (unsigned int)l;
-	return l < INT_MAX && pEnd == str + len ? pEnd : str;
+	return errno != ERANGE && pEnd == str + len ? pEnd : str;
 }
 template <typename c, typename t, typename a>
 const char* load(const char* str, size_t len, std::basic_string<c, t, a>& v, int options) {
@@ -206,6 +208,10 @@ template <typename V> const char* load(const char* in, size_t len, V& t, int opt
 
 // overrides for embedded objects and pointers to object
 template <typename V> const char* load(const char* obj_start, size_t len, V*& value, int options) {
+	if (len == 4 && strncmp(obj_start, "null", len) == 0){
+		value = nullptr;
+		return obj_start + len;
+	}
 	value = new V;
 	return load(obj_start, len, *value, options);
 }
@@ -364,7 +370,10 @@ void save(std::ostream& out, std::basic_string<c, tr, a>& t, int tabs) {
 
 template <typename T> bool save(std::ostream& out, T& t, int tabs);
 template <typename T> bool save(std::ostream& out, T*& t, int tabs){
-	return save(out, *t, tabs);
+	if (t)
+		return save(out, *t, tabs);
+	out << "null";
+	return true;
 }
 template <typename iterator>
 bool save_container(std::ostream& out, iterator begin, iterator end, int tabs) {
@@ -417,8 +426,7 @@ template <typename T> int save_object_to_stream(T& t, std::ostream& out) {
 template <typename T> int save_object_to_file(const char* filename, T& t) {
 	try {
 		std::ofstream out(filename);
-		if (!json::save_object_to_stream(t, out))
-			return JSON_FAIL;
+		return json::save_object_to_stream(t, out);
 	}
 	catch (std::exception& e) {
 		GLW_UNUSED(e);

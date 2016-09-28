@@ -35,7 +35,7 @@ enum Options {
 enum BlendMode{
 	BLEND_NONE = 0,
 	BLEND_RECT,
-	BLEND_TEXT	
+	BLEND_TEXT
 };
 
 struct Rollout;
@@ -48,7 +48,7 @@ inline uint RGBA(uint rgb, unsigned char a) {
 	return rgb | (a << 24);
 }
 static const int SCROLL_DISABLED = INT_MAX;
-struct toolbar_t;
+struct Toolbar;
 
 // direct correspondence with ColorScheme, check iui.h
 enum ColorScheme {
@@ -97,7 +97,7 @@ static const int MAX_UI_LAYER_COUNT = 10;
 
 class Ui {
 public:
-	typedef std::vector<Rollout*> rollouts_t;
+	typedef std::vector<Rollout*> Rollouts;
 
 	Ui();
 	~Ui();
@@ -126,7 +126,7 @@ public:
 	bool show_rollout(Rollout* r);
 	bool hide_rollout(Rollout* r);
 
-	rollouts_t& get_rollouts();
+	Rollouts& get_rollouts();
 
 	bool get_rollout_rect(Rollout* r, int& x, int& y, int& w, int& h);
 	bool set_rollout_rect(Rollout* r, int x, int y, int w, int h);
@@ -193,8 +193,8 @@ public:
 
 	const gfx_cmd* get_render_queue(int& size);
 
-	toolbar_t* get_root_toolbar();
-	void set_root_toolbar(toolbar_t* t);
+	Toolbar* get_root_toolbar();
+	void set_root_toolbar(Toolbar* t);
 
 	bool system_tab(const char* text, int x, int y, int w, int h, bool checked, int& xmove,
 					int& ymove);
@@ -275,7 +275,7 @@ private:
 	div_drag		m_rollout_drag_div;
 	Rollout*		m_dragged_rollout_id;
 	Rollout*		m_focused_rollout_id;
-	toolbar_t 		*m_toolbar_root, *m_rollout_last;
+	Toolbar 		*m_toolbar_root, *m_rollout_last;
 	int		   		m_cursor;
 	bool	   		m_cursor_over_drag;
 
@@ -289,7 +289,7 @@ private:
 	uint 		m_scroll_id;
 	bool		m_inside_scroll_area;
 
-	rollouts_t m_rollouts;
+	Rollouts m_rollouts;
 
 	RenderQueue m_rqueue;
 
