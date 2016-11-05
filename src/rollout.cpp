@@ -161,13 +161,13 @@ bool Ui::insert_rollout(Rollout* r, float div, bool horz, Rollout* rollout) {
 	m_rollout_last = lastNode->add_rollout(r, div, horz);
 	return true;
 }
-Rollout* Ui::create_rollout(const char* name, int m_options) {
+Rollout* Ui::create_rollout(const char* name, int options) {
 	Rollout* r = new Rollout;
 	r->id = m_rollouts.size();
 
 	m_rollouts.push_back(r);
 	r->name = name;
-	r->options = m_options;
+	r->options = options;
 	return r;
 }
 bool Ui::remove_rollout(Rollout* r) {

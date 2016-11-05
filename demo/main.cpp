@@ -5,12 +5,12 @@
 #include <SDL_opengl.h>
 #include <stdio.h>
 
-#include "renderer_sdl.h"
+#include "platform_sdl.h"
 #include "ui.h"
 #include "io.h"
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 1024;
+const int SCREEN_HEIGHT = 768;
 
 bool init();
 bool initGL();
@@ -19,24 +19,24 @@ void update();
 void render();
 void close();
 
-bool          quit = false;
-SDL_Window*   gWindow = NULL;
-SDL_GLContext gContext;
-bool          gRenderQuad = true;
+bool            quit = false;
+char            last_char = 0;
+SDL_Window*     gWindow = NULL;
+SDL_GLContext   gContext;
+SDL_Renderer*   gRenderer;
+bool            gRenderQuad = true;
+int				mouse_wheel = 0;
 
 using namespace imgui;
 
-Ui        ui;
-Rollout*  rollout, *vert_rollout;
+PlatformSDL	gPlatform;
+Ui        ui(gPlatform);
+Rollout  *root_rollout, *rollout, *vert_rollout;
 RenderSDL renderer;
 
 bool init() {
     bool success = true;
 
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
-        return false;
-    }
     // Use OpenGL 3.2 core
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
@@ -45,7 +45,8 @@ bool init() {
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
     gWindow = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                               SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+                               SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN |
+                               SDL_WINDOW_RESIZABLE|SDL_WINDOW_ALLOW_HIGHDPI );
     if (gWindow == NULL) {
         printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
         return false;
@@ -56,6 +57,8 @@ bool init() {
         printf("OpenGL context could not be created! SDL Error: %s\n", SDL_GetError());
         return false;
     }
+
+	gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
 
     //Initialize GLEW
     glewExperimental = GL_TRUE;
@@ -76,17 +79,21 @@ bool init() {
         success = false;
     }
 	ui.render_init(&renderer);
-    rollout = ui.create_rollout("test", 0);
-    ui.insert_rollout(rollout, 0.2f, true, nullptr);
 
-	vert_rollout = ui.create_rollout("vert", 0);
-	ui.insert_rollout(vert_rollout, -200, true, nullptr);
+	root_rollout = ui.create_rollout("root", ROLLOUT_HOLLOW | WND_STYLE);
+	ui.insert_rollout(root_rollout, 1, true, nullptr);
 
-	ui.font("C:\\projects\\glw_imgui\\DroidSans.ttf", 15);
+	rollout = ui.create_rollout("TEST", WND_STYLE);
+	ui.insert_rollout(rollout, 0.2f, true, root_rollout);
 
-    if ( save_layout(ui, "C:\\projects\\glw_imgui\\test.imgui") )
-        if (!load_layout(ui, "C:\\projects\\glw_imgui\\test.imgui"))
-            printf("failed to load");
+	vert_rollout = ui.create_rollout("VERT", WND_STYLE);
+	ui.insert_rollout(vert_rollout, -200, true, root_rollout);
+
+	ui.font("E:\\projects\\glw_imgui\\DroidSans.ttf", 15);
+
+    //if ( save_layout(ui, "C:\\projects\\glw_imgui\\test.imgui") )
+    //    if (!load_layout(ui, "C:\\projects\\glw_imgui\\test.imgui"))
+    //        printf("failed to load");
     return success;
 }
 
@@ -94,10 +101,11 @@ bool initGL() {
     glClearColor(0.f, 0.f, 0.f, 1.f);
     return renderer.create();
 }
-void handleKeys(unsigned char key, int x, int y) {
+void handleKeys(unsigned char key) {
     if (key == 'q') {
         quit = true;
     }
+    last_char = key;
 }
 void update() {
 	int x, y;
@@ -107,51 +115,86 @@ void update() {
 		mouse_buttons = MBUT_LEFT;
 	}
 
-	ui.begin_frame(SCREEN_WIDTH, SCREEN_HEIGHT, x, SCREEN_HEIGHT-y, mouse_buttons, 0, 0);
+    int w, h;
+    SDL_GetRendererOutputSize(gRenderer, &w, &h);
+
+	ui.begin_frame(w, h, x, h - y, mouse_buttons, -mouse_wheel, last_char);
+	last_char = 0;
+	mouse_wheel = 0;
 
     ui.begin_rollout(rollout);
 	static bool collapsed = false;
 	if (ui.collapse("collapse", collapsed))
 		collapsed = !collapsed;
 
-	if (!collapsed){
-		ui.indent();
-		if (ui.button("Test")) {
-			// do something
-		}
-		if (ui.button("Test2")) {
-			// do something
-		}
-		ui.separator(true);
-		if (ui.button("Test")) {
-			// do something
-		}
-		if (ui.button("Test2")) {
-			// do something
-		}
-		ui.unindent();
-	}
-	ui.end_rollout();
+    if (!collapsed){
 
-	ui.begin_rollout(vert_rollout);
-	if (ui.button("Test")) {
-		// do something
-	}
-	if (ui.button("Test2")) {
-		// do something
-	}
-	ui.separator(true);
-	if (ui.button("Test")) {
-		// do something
-	}
-	if (ui.button("Test2")) {
-		// do something
-	}
-	char buf[256];
-	if (ui.property("Edit",buf, sizeof(buf),NULL)) {
-		// do something
-	}
-	ui.end_rollout();
+        ui.indent();
+        ui.button("button1");
+
+        static char combo_value[100] = {0};
+        if ( ui.combo("combo", combo_value) )
+        {
+            if ( ui.combo_item("combo item1") )
+                strcpy(combo_value, "combo item1");
+            if ( ui.combo_item("combo item2") )
+                strcpy(combo_value, "combo item2");
+            if ( ui.combo_item("combo item3") )
+                strcpy(combo_value, "combo item3");
+            if ( ui.combo_item("combo item4") )
+                strcpy(combo_value, "combo item4");
+        }
+
+        static bool checked = false;
+        if (ui.check("checkbox", checked))
+            checked = !checked;
+
+        static bool button_checked = false;
+        if (ui.button_check("button checked", button_checked))
+            button_checked = !button_checked;
+
+        ui.label("label");
+        ui.value("value");
+        static float val = 1.0f;
+        ui.slider("slider", &val, 0.0f, 10.0f, 1.0f);
+
+        static float progress = 1.0f;
+        ui.progress(progress, 0.0f, 10.0f, 1.0f);
+
+        static char str[100];
+        ui.edit(str, 100, NULL);
+
+        ui.row(3);
+        ui.button("row1");ui.button("row2");ui.button("row3");
+        ui.end_row();
+
+        static char str_property[100] = "property val";
+        ui.property("property", str_property, 100, NULL);
+
+        if (ui.button_collapse("button collapse", true))
+        {
+            ui.item("item1");
+            ui.item("item2");
+            ui.item("item3");
+        }
+
+        ui.draw_text(5, 5, 0, "draw item", 0xffffffff);
+
+        ui.unindent();
+    }
+    ui.end_rollout();
+
+    ui.begin_rollout(vert_rollout);
+
+    char str[100];
+    static int selected = -1;
+    for (int i=0;i<100;++i){
+        sprintf(str, "item %d", i);
+        if (ui.item(str, i == selected))
+            selected = i;
+    }
+
+    ui.end_rollout();
 
     ui.end_frame();
 }
@@ -165,8 +208,6 @@ void close() {
     SDL_GL_DeleteContext(gContext);
     SDL_DestroyWindow(gWindow);
     gWindow = NULL;
-
-    SDL_Quit();
 }
 
 int main(int argc, char* args[]) {
@@ -186,12 +227,18 @@ int main(int argc, char* args[]) {
                 else if (e.type == SDL_KEYDOWN) {
                     if (e.key.keysym.sym == SDLK_ESCAPE)
                         quit = true;
+					handleKeys(e.key.keysym.sym);
                 }
                 else if (e.type == SDL_TEXTINPUT) {
                     int x = 0, y = 0;
                     SDL_GetMouseState(&x, &y);
-                    handleKeys(e.text.text[0], x, y);
+                    handleKeys(e.text.text[0]);
                 }
+				else if (e.type == SDL_MOUSEWHEEL) {
+					int x = 0, y = 0;
+					SDL_GetMouseState(&x, &y);
+					mouse_wheel = e.wheel.y;
+				}
             }
             update();
             render();

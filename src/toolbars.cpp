@@ -59,43 +59,49 @@ void visit_rollout_node(std::vector<Rollout*>& rollouts, Toolbar* n, int x, int 
 		visit_rollout_node(rollouts, n->right, x, y + div + sep, w, h - div - sep);
 	}
 }
-div_drag find_div(int mx, int my, Toolbar* n, int x, int y, int w, int h) {
+div_drag find_div(int mx, int my, Toolbar* toolbar, int x, int y, int w, int h) {
 	div_drag res;
 	res.div = nullptr;
-	if (!n || mx < x || mx > x + w || my < y || my > y + h)
+	if (!toolbar || mx < x || mx > x + w || my < y || my > y + h)
 		return res;
 
 	int div = 0;
-	int dist = n->horz ? w : h;
-	if (n->div > 0)
-		div = n->div < 1.0f ? (int)(dist * n->div) : (int)(n->div);
+	int dist = toolbar->horz ? w : h;
+	if (toolbar->div > 0)
+		div = toolbar->div < 1.0f ? (int)(dist * toolbar->div) : (int)(toolbar->div);
 	else
-		div = n->div > -1.0f ? dist + (int)(dist * n->div) : dist + (int)(n->div);
+		div = toolbar->div > -1.0f ? dist + (int)(dist * toolbar->div) : dist + (int)(toolbar->div);
 
 	int sep = 1;
-	if (n->horz) {
-		if ((!n->left || !n->left->rollout || n->left->rollout->options & RESIZE_AREA) &&
-			(!n->right || !n->right->rollout || n->right->rollout->options & RESIZE_AREA) &&
+	if (toolbar->horz) {
+		if ((!toolbar->left || !toolbar->left->rollout || 
+			 toolbar->left->rollout->options & RESIZE_AREA) &&
+			(!toolbar->right || !toolbar->right->rollout || 
+			toolbar->right->rollout->options & RESIZE_AREA) &&
 			std::abs(mx - (x + div)) < DEFAULT_PADDING * 2) {
-			return div_drag(&n->div, n->w);
+
+			return div_drag(&toolbar->div, toolbar->w);
 		}
-		res = find_div(mx, my, n->left, x, y, div, h);
+		res = find_div(mx, my, toolbar->left, x, y, div, h);
 		if (res.div)
 			return res;
-		res = find_div(mx, my, n->right, x + div + sep, y, w - div - sep, h);
+		res = find_div(mx, my, toolbar->right, x + div + sep, y, w - div - sep, h);
 		if (res.div)
 			return res;
 	}
 	else {
-		if ((!n->left || !n->left->rollout || n->left->rollout->options & RESIZE_AREA) &&
-			(!n->right || !n->right->rollout || n->right->rollout->options & RESIZE_AREA) &&
+		if ((!toolbar->left || !toolbar->left->rollout || 
+			toolbar->left->rollout->options & RESIZE_AREA) &&
+			(!toolbar->right || !toolbar->right->rollout || 
+			toolbar->right->rollout->options & RESIZE_AREA) &&
 			std::abs(my - (y + div)) < DEFAULT_PADDING * 2) {
-			return div_drag(&n->div, n->h);
+
+			return div_drag(&toolbar->div, toolbar->h);
 		}
-		res = find_div(mx, my, n->left, x, y, w, div);
+		res = find_div(mx, my, toolbar->left, x, y, w, div);
 		if (res.div)
 			return res;
-		res = find_div(mx, my, n->right, x, y + div + sep, w, h - div - sep);
+		res = find_div(mx, my, toolbar->right, x, y + div + sep, w, h - div - sep);
 		if (res.div)
 			return res;
 	}

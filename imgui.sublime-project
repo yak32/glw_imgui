@@ -15,6 +15,7 @@
 			"modelling",
 			"tools",
 			"documentation",
+			"thirdparty",
 			".git",
 		 ],
 		 "file_include_patterns":[

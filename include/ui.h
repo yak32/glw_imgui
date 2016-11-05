@@ -12,6 +12,7 @@
 namespace imgui {
 
 class IRenderer;
+class IPlatform;
 
 typedef unsigned int uint;
 typedef uint		 color;
@@ -91,7 +92,7 @@ enum SOUNDS { SOUND_MOUSE_HOVER = 0, SOUND_CLICK };
 enum INPUT_KEYS { MBUT_LEFT = 1, MBUT_RIGHT = 2, MBUT_LEFT_DBL = 4};
 enum SCROLL_MODE { SCROLL_START = 0, SCROLL_END, SCROLL_CURRENT };
 
-#define WND_STYLE DRAG_AREA | RESIZE_AREA | SYSTEM_BUTTONS;
+#define WND_STYLE (DRAG_AREA | RESIZE_AREA | SYSTEM_BUTTONS)
 #define DEFAULT_PADDING 6
 static const int MAX_UI_LAYER_COUNT = 10;
 
@@ -99,7 +100,7 @@ class Ui {
 public:
 	typedef std::vector<Rollout*> Rollouts;
 
-	Ui();
+	Ui(IPlatform& platform);
 	~Ui();
 
 public:
@@ -292,7 +293,7 @@ private:
 	Rollouts m_rollouts;
 
 	RenderQueue m_rqueue;
-
+	IPlatform& m_platform;
 
 };
 }

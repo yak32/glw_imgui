@@ -12,6 +12,9 @@ INCLUDE_DIRECTORIES(${GLEW_PATH}/include)
 
 INCLUDE_DIRECTORIES(./../include)
 
+IF(WIN32)
+   ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
+ENDIF()
 
 IF (APPLE)
 	FIND_LIBRARY(OpenGL_LIBRARY OpenGL)
@@ -19,7 +22,7 @@ ELSE()
 	SET(OpenGL_LIBRARY opengl32)
 ENDIF()
 
-ADD_EXECUTABLE (${PROJECT_NAME} main.cpp renderer_sdl.cpp renderer_sdl.h)
+ADD_EXECUTABLE (${PROJECT_NAME} main.cpp platform_sdl.cpp platform_sdl.h)
 TARGET_LINK_LIBRARIES( ${PROJECT_NAME} SDL2 SDL2main glew_s ${OpenGL_LIBRARY} imgui)
 
 

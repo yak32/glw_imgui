@@ -3,9 +3,9 @@ PROJECT(imgui)
 
 ADD_SUBDIRECTORY(demo)
 
-if(UNIX)
+IF(UNIX)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=gnu++0x")
-endif()
+ENDIF()
 
 INCLUDE_DIRECTORIES(include thirdparty)
 
@@ -21,9 +21,10 @@ SET(IMGUI_HEADER_FILES
 	include/ui.h
 	include/io.h
 	include/rollout.h
+	include/platform.h
 	include/toolbars.h
 	include/render_queue.h
-	include/stb_truetype.h)
+	thirdparty/stb_truetype.h)
 
 SET_SOURCE_FILES_PROPERTIES(IMGUI_HEADER_FILES PROPERTIES HEADER_FILE_ONLY TRUE)
 LIST(APPEND IMGUI_SOURCE_FILES ${IMGUI_HEADER_FILES})

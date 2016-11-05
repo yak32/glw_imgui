@@ -31,7 +31,7 @@
 #include "stb_truetype.h"
 
 #include "ui.h"
-#include "irenderer.h"
+#include "platform.h"
 
 static stbtt_bakedchar g_cdata[96]; // ASCII 32..126 is 95 glyphs
 
@@ -168,15 +168,14 @@ void Ui::render_draw(IRenderer* r, Ui* ui, bool transparency) {
 #endif
 			break;
 
-		// case GFX_CMD_SCISSOR:
-		// 	if (cmd->flags) {
-		// 		r->set_state(RS_SCISSOR_TEST, RF_TRUE);
-		// 		r->set_scissor(cmd->rect.x, r->get_height() - (cmd->rect.y + cmd->rect.h),
-		// 					   cmd->rect.x + cmd->rect.w, r->get_height() - cmd->rect.y);
-		// 	}
-		// 	else
-		// 		r->set_state(RS_SCISSOR_TEST, RF_FALSE);
-		// 	break;
+		 case GFX_CMD_SCISSOR:
+		 	if (cmd->flags) {
+		 		r->set_scissor(cmd->rect.x, (cmd->rect.y),
+		 					   cmd->rect.w, cmd->rect.h, true);
+		 	}
+		 	else
+				r->set_scissor(0,0,0,0,false);
+		 	break;
 
 		case GFX_CMD_TEXT:
 			texture = g_current_font;
