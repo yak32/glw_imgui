@@ -297,11 +297,11 @@ bool RenderSDL::bind_texture(unsigned int texture) {
 	return true;
 }
 void RenderSDL::set_scissor(int x, int y, int w, int h, bool set){
-	// if (set)
-	// 	glEnable(GL_SCISSOR_TEST);
-	// else
-	// 	glDisable(GL_SCISSOR_TEST);
-	// glScissor(x, y, w, h);
+	if (set)
+		glEnable(GL_SCISSOR_TEST);
+	else
+		glDisable(GL_SCISSOR_TEST);
+	glScissor(x, y, w, h);
 }
 void printProgramLog(GLuint program) {
 	// Make sure name is shader
