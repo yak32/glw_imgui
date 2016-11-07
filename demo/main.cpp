@@ -58,7 +58,7 @@ bool init() {
         return false;
     }
 
-	gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
+	//gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
 
     //Initialize GLEW
     glewExperimental = GL_TRUE;
@@ -89,7 +89,7 @@ bool init() {
 	vert_rollout = ui.create_rollout("VERT", WND_STYLE);
 	ui.insert_rollout(vert_rollout, -200, true, root_rollout);
 
-	ui.font("E:\\projects\\glw_imgui\\DroidSans.ttf", 15);
+	ui.font("/Users/sumygini/dev/glw_imgui/DroidSans.ttf", 15);
 
     //if ( save_layout(ui, "C:\\projects\\glw_imgui\\test.imgui") )
     //    if (!load_layout(ui, "C:\\projects\\glw_imgui\\test.imgui"))
@@ -116,7 +116,7 @@ void update() {
 	}
 
     int w, h;
-    SDL_GetRendererOutputSize(gRenderer, &w, &h);
+    SDL_GL_GetDrawableSize(gWindow, &w, &h);
 
 	ui.begin_frame(w, h, x, h - y, mouse_buttons, -mouse_wheel, last_char);
 	last_char = 0;

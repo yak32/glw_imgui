@@ -39,7 +39,7 @@
 	    "variants":
 	   	[
 	        {
-			    "shell_cmd": "$project_path/cmake/demo/Debug/demo.exe",
+			    "shell_cmd": "$project_path/cmake/demo/demo",
 			    "name": "run",
 			    "file_regex": "^[.\\\\/]*([A-Z]?:?[\\w.\\\\/]+)[:]([0-9]+)[:]([0-9]+)?:?(.*)$",
 			    "selector": "source.c, source.c++"

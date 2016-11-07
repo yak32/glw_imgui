@@ -1,4 +1,5 @@
 build
+cmake
 imgui.sublime-workspace
 test.imgui
 

@@ -205,7 +205,7 @@ bool RenderSDL::begin() {
 	glEnableVertexAttribArray(gVertexTxtLocation);
 
 	int w, h;
-	SDL_GetRendererOutputSize(gRenderer, &w, &h);
+	SDL_GL_GetDrawableSize(gWindow, &w, &h);
 	glUniform2f(gScreenSizeLocation, (float)w, float(h));
 	glViewport(0, 0, w, h);
 
