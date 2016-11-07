@@ -89,7 +89,7 @@ bool init() {
 	vert_rollout = ui.create_rollout("VERT", WND_STYLE);
 	ui.insert_rollout(vert_rollout, -200, true, root_rollout);
 
-	ui.font("/Users/sumygini/dev/glw_imgui/DroidSans.ttf", 15);
+	ui.font("e:\\projects\\glw_imgui\\DroidSans.ttf", 15);
 
     //if ( save_layout(ui, "C:\\projects\\glw_imgui\\test.imgui") )
     //    if (!load_layout(ui, "C:\\projects\\glw_imgui\\test.imgui"))
