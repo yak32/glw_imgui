@@ -13,7 +13,7 @@ struct Rollout {
 			 int _alpha_inc = 0);
 	void set(const char* _name = "", int _options = 0, bool _visible = true,
 			 bool _minimized = false, int _alpha_inc = 0);
-	int  top() const;
+	int top() const;
 	bool is_visible() const;
 
 	int x, y, w, h, z;
@@ -21,12 +21,12 @@ struct Rollout {
 	int alpha_inc;
 	int alpha;
 
-	bool		minimized;
+	bool minimized;
 	std::string name;
-	int			options;
-	int			id;
+	int options;
+	int id;
 
 	typedef std::vector<int> tabs_array_t;
-	tabs_array_t			 tabs;
+	tabs_array_t tabs;
 };
 }

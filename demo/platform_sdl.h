@@ -7,23 +7,24 @@
 #include "platform.h"
 #include <SDL_mouse.h>
 
-namespace imgui{
+namespace imgui {
 
-class PlatformSDL: public IPlatform{
+class PlatformSDL : public IPlatform {
 public:
 	PlatformSDL();
 	~PlatformSDL();
 	void set_cursor(CURSOR cursor);
 	void capture_mouse(bool set);
+
 private:
 	SDL_Cursor* m_cursors[CURSOR_COUNT];
 };
 
-class RenderSDL: public IRenderer{
+class RenderSDL : public IRenderer {
 public:
-	bool create();
-	bool begin();
-	bool end();
+	bool		 create();
+	bool		 begin();
+	bool		 end();
 	unsigned int create_texture(unsigned int width, unsigned int height, void* bmp, bool font);
 	bool bind_texture(unsigned int texture);
 	bool render_mesh(const render_vertex_3d_t* tries, int count, bool b);

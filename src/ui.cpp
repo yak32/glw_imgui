@@ -26,7 +26,6 @@
 
 #define MIN_SCROLL_AREA_WIDTH 40
 #define MIN_SCROLL_AREA_HEIGHT 20
-#define DEF_ROUND 3
 
 namespace imgui {
 
@@ -36,20 +35,20 @@ static const int MIN_SCROLL_HEIGHT = 10;
 static const int g_button_height = 16;
 
 Ui::Ui(IPlatform& platform)
-	: m_platform(platform), m_width(0), m_height(0), m_left(false), m_double_left(false), m_left_pressed(false),
-	  m_left_released(false), m_double_left_released(false), m_mx(-1), m_my(-1), m_scroll(0),
-	  m_buttons(0), m_render_options(0), m_button_height(g_button_height), m_active(0), m_hot(0),
-	  m_hot_to_be(0), m_is_hot(false), m_is_active(false), m_went_active(false),
-	  m_search_next_focus(false), m_drag_x(0), m_drag_y(0), m_drag_orig(0), m_widget_x(0),
-	  m_widget_y(0), m_widget_w(100), m_rollout_width(0), m_rollout_height(0), m_rollout_left(0),
-	  m_rollout_top(0), m_inside_current_scroll(false), m_area_id(0), m_widget_id(0), m_key(0),
-	  m_focus(0), m_edit_buffer_id(0), m_row(0), m_drag_item_width(0), m_options(0), m_alpha(255),
-	  m_text_align(ALIGN_LEFT), m_padding_left(DEFAULT_PADDING), m_padding_top(DEFAULT_PADDING),
-	  m_padding_right(DEFAULT_PADDING), m_padding_bottom(DEFAULT_PADDING), m_property_width(0.5f),
-	  m_dragged_rollout_id(nullptr), m_focused_rollout_id(nullptr), m_cursor(0),
-	  m_cursor_over_drag(0), m_scroll_right(0), m_scroll_area_top(0), m_scroll_val(nullptr),
-	  m_focus_top(0), m_focus_bottom(0), m_scroll_id(0), m_inside_scroll_area(false),
-	  m_scroll_top(0), m_scroll_bottom(0) {
+	: m_platform(platform), m_width(0), m_height(0), m_left(false), m_double_left(false),
+	  m_left_pressed(false), m_left_released(false), m_double_left_released(false), m_mx(-1),
+	  m_my(-1), m_scroll(0), m_buttons(0), m_render_options(0), m_button_height(g_button_height),
+	  m_active(0), m_hot(0), m_hot_to_be(0), m_is_hot(false), m_is_active(false),
+	  m_went_active(false), m_search_next_focus(false), m_drag_x(0), m_drag_y(0), m_drag_orig(0),
+	  m_widget_x(0), m_widget_y(0), m_widget_w(100), m_rollout_width(0), m_rollout_height(0),
+	  m_rollout_left(0), m_rollout_top(0), m_inside_current_scroll(false), m_area_id(0),
+	  m_widget_id(0), m_key(0), m_focus(0), m_edit_buffer_id(0), m_row(0), m_drag_item_width(0),
+	  m_options(0), m_alpha(255), m_text_align(ALIGN_LEFT), m_padding_left(DEFAULT_PADDING()),
+	  m_padding_top(DEFAULT_PADDING()), m_padding_right(DEFAULT_PADDING()),
+	  m_padding_bottom(DEFAULT_PADDING()), m_property_width(0.5f), m_dragged_rollout_id(nullptr),
+	  m_focused_rollout_id(nullptr), m_cursor(0), m_cursor_over_drag(0), m_scroll_right(0),
+	  m_scroll_area_top(0), m_scroll_val(nullptr), m_focus_top(0), m_focus_bottom(0),
+	  m_scroll_id(0), m_inside_scroll_area(false), m_scroll_top(0), m_scroll_bottom(0) {
 	memset(m_edit_buffer, 0, sizeof(m_edit_buffer));
 	memset(m_drag_item, 0, sizeof(m_drag_item));
 	// colors
@@ -319,7 +318,6 @@ void Ui::update_input(int mx, int my, unsigned char mbut, int scroll, char key) 
 		m_platform.capture_mouse(true);
 	else if (m_left)
 		m_platform.capture_mouse(false);
-
 }
 
 void Ui::begin_frame(uint width, uint height, int mx, int my, unsigned char mbut, int scroll,
@@ -328,8 +326,6 @@ void Ui::begin_frame(uint width, uint height, int mx, int my, unsigned char mbut
 
 	m_width = width;
 	m_height = height;
-
-	m_button_height = g_button_height;
 
 	m_hot = m_hot_to_be;
 	m_hot_to_be = 0;
@@ -369,7 +365,8 @@ void Ui::end_frame() {
 			if (r == m_dragged_rollout_id || !(r->options & ROLLOUT_ATTACHED))
 				continue;
 			if (in_rect(r->x, r->y, r->w, r->h, false)) {
-				m_target_side = rollout_move(m_dragged_rollout_id, r, r->x + r->w / 2, r->y + r->h / 2);
+				m_target_side =
+					rollout_move(m_dragged_rollout_id, r, r->x + r->w / 2, r->y + r->h / 2);
 				if (m_target_side) {
 					// user selected area to insert rollout
 					m_target_rollout = r;
@@ -391,20 +388,41 @@ void Ui::cleanup() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // static const int m_button_height = 20;
 
-static const int SLIDER_HEIGHT = 20;
-static const int SLIDER_MARKER_WIDTH = 10;
-static const int CHECK_SIZE = 8;
-static const int DEFAULT_SPACING = 4;
-static const int TEXT_HEIGHT = 8;
-static const int SCROLL_AREA_PADDING = 6;
-static const int INTEND_SIZE = 16;
-static const int AREA_HEADER = 28;
-static const int TOOLBAR_HEADER = 4;
-static const int DEFAULT_ROLLOUT_DEPTH = 0;
-static const int FOCUSED_ROLLOUT_DEPTH = 2;
-static const int FLOATING_ROLLOUT_DEPTH = 1;
-static const int ATTACHED_ROLLOUT_DEPTH = 0;
-static const int MOVE_SIGN_DEPTH = 3; // should be less then MAX_UI_LAYER_COUNT (10)
+const int Ui::SLIDER_HEIGHT() const {
+	return m_button_height + m_buttons / 3;
+}
+const int Ui::SLIDER_MARKER_WIDTH() const {
+	return m_button_height / 3 * 2;
+}
+const int Ui::CHECK_SIZE() const {
+	return m_button_height / 2;
+}
+const int Ui::DEFAULT_SPACING() const {
+	return m_button_height / 4;
+}
+const int Ui::SCROLL_AREA_PADDING() const {
+	return m_button_height / 2;
+}
+const int Ui::INTEND_SIZE() const {
+	return m_button_height;
+}
+const int Ui::AREA_HEADER() const {
+	return m_button_height * 2;
+}
+const int Ui::TOOLBAR_HEADER() const {
+	return m_button_height / 4;
+}
+const int Ui::DEF_ROUND() const {
+	return m_button_height / 5;
+}
+const int Ui::DEFAULT_PADDING() const {
+	return m_button_height / 2;
+}
+const int DEFAULT_ROLLOUT_DEPTH = 0;
+const int FOCUSED_ROLLOUT_DEPTH = 2;
+const int FLOATING_ROLLOUT_DEPTH = 1;
+const int ATTACHED_ROLLOUT_DEPTH = 0;
+const int MOVE_SIGN_DEPTH = 3; // should be less then MAX_UI_LAYER_COUNT (10)
 
 static const char* cursorMap[] = {"default", "resize_horz", "resize_vert", "resize_corner"};
 
@@ -412,7 +430,7 @@ bool Ui::begin_rollout(Rollout* pr) {
 	if (!pr)
 		return false;
 	Rollout& r = *pr;
-	int		 area_header = AREA_HEADER;
+	int area_header = AREA_HEADER();
 
 	bool toolbar = (r.options & TOOLBAR) != 0;
 	bool rollout_attached = (r.options & ROLLOUT_ATTACHED) != 0;
@@ -434,7 +452,7 @@ bool Ui::begin_rollout(Rollout* pr) {
 	}
 	// if toolbar
 	if (toolbar)
-		area_header = TOOLBAR_HEADER;
+		area_header = TOOLBAR_HEADER();
 
 	int h;
 	if (r.minimized)
@@ -457,7 +475,7 @@ bool Ui::begin_rollout(Rollout* pr) {
 	m_rollout_top = r.y + m_padding_top;
 	m_rollout_width = r.w - m_padding_left - m_padding_right;
 	if (draw_scroll)
-		m_rollout_width = r.w - SCROLL_AREA_PADDING * 2 - m_padding_left - m_padding_right;
+		m_rollout_width = r.w - SCROLL_AREA_PADDING() * 2 - m_padding_left - m_padding_right;
 	m_rollout_height = h - m_padding_bottom - m_padding_top;
 	m_widget_x = m_rollout_left;
 	m_widget_y = r.y + h - area_header + r.scroll;
@@ -481,8 +499,8 @@ bool Ui::begin_rollout(Rollout* pr) {
 	m_inside_current_scroll = m_inside_scroll_area;
 
 	bool ret_val = false;
-	int  caption_y = y + h - area_header + m_button_height / 2 - 2;
-	int  caption_height = m_button_height + 3;
+	int caption_y = y + h - area_header + m_button_height / 2 - 2;
+	int caption_height = m_button_height + 3;
 
 	// setup rollout depth
 	if (m_focused_rollout_id == pr)
@@ -500,7 +518,7 @@ bool Ui::begin_rollout(Rollout* pr) {
 			m_focused_rollout_id = pr;
 		}
 
-		bool	 cursor_over_drag;
+		bool cursor_over_drag;
 		Rollout* draggedRolloutId = m_dragged_rollout_id;
 		// resize area
 		if (!(m_options & TOOLBAR) && m_options & RESIZE_AREA && !r.minimized) {
@@ -564,7 +582,7 @@ bool Ui::begin_rollout(Rollout* pr) {
 			}
 			cursor_over_drag = false;
 			CURSOR cursor = CURSOR_DEFAULT;
-			if (system_drag(x, y, SCROLL_AREA_PADDING * 2, h, xdiff, ydiff, cursor_over_drag)) {
+			if (system_drag(x, y, SCROLL_AREA_PADDING() * 2, h, xdiff, ydiff, cursor_over_drag)) {
 				if (!rollout_attached) {
 					r.x += xdiff;
 					r.w -= xdiff;
@@ -575,12 +593,13 @@ bool Ui::begin_rollout(Rollout* pr) {
 			}
 			if (cursor_over_drag) {
 				if (!rollout_attached ||
-					find_div(m_mx, m_my, m_toolbar_root, 0, 0, m_width, m_height).div) {
+					find_div(m_mx, m_my, m_toolbar_root, 0, 0, m_width, m_height, DEFAULT_PADDING())
+						.div) {
 					cursor = CURSOR_RESIZE_HORZ;
 					m_cursor_over_drag = true;
 				}
 			}
-			if (system_drag(x + w - SCROLL_AREA_PADDING, y, SCROLL_AREA_PADDING * 2, h, xdiff,
+			if (system_drag(x + w - SCROLL_AREA_PADDING(), y, SCROLL_AREA_PADDING() * 2, h, xdiff,
 							ydiff, cursor_over_drag)) {
 				if (!rollout_attached) {
 					r.w += xdiff;
@@ -591,13 +610,14 @@ bool Ui::begin_rollout(Rollout* pr) {
 			}
 			if (cursor_over_drag) {
 				if (!rollout_attached ||
-					find_div(m_mx, m_my, m_toolbar_root, 0, 0, m_width, m_height).div) {
+					find_div(m_mx, m_my, m_toolbar_root, 0, 0, m_width, m_height, DEFAULT_PADDING())
+						.div) {
 					cursor = CURSOR_RESIZE_HORZ;
 					m_cursor_over_drag = true;
 				}
 			}
-			if (system_drag(x, y + h - SCROLL_AREA_PADDING * 2 + 5, w, SCROLL_AREA_PADDING * 2 - 5,
-							xdiff, ydiff, cursor_over_drag)) {
+			if (system_drag(x, y + h - SCROLL_AREA_PADDING() * 2 + 5, w,
+							SCROLL_AREA_PADDING() * 2 - 5, xdiff, ydiff, cursor_over_drag)) {
 				if (!rollout_attached)
 					r.h += ydiff;
 				else if (m_rollout_drag_div.div)
@@ -605,13 +625,14 @@ bool Ui::begin_rollout(Rollout* pr) {
 			}
 			if (cursor_over_drag) {
 				if (!rollout_attached ||
-					find_div(m_mx, m_my, m_toolbar_root, 0, 0, m_width, m_height).div) {
+					find_div(m_mx, m_my, m_toolbar_root, 0, 0, m_width, m_height, DEFAULT_PADDING())
+						.div) {
 					cursor = CURSOR_RESIZE_VERT;
 					m_cursor_over_drag = true;
 				}
 			}
-			if (system_drag(x, y - SCROLL_AREA_PADDING, w, SCROLL_AREA_PADDING * 2, xdiff, ydiff,
-							cursor_over_drag)) {
+			if (system_drag(x, y - SCROLL_AREA_PADDING(), w, SCROLL_AREA_PADDING() * 2, xdiff,
+							ydiff, cursor_over_drag)) {
 				if (!rollout_attached) {
 					r.y += ydiff;
 					r.h -= ydiff;
@@ -621,15 +642,15 @@ bool Ui::begin_rollout(Rollout* pr) {
 			}
 			if (cursor_over_drag) {
 				if (!rollout_attached ||
-					find_div(m_mx, m_my, m_toolbar_root, 0, 0, m_width, m_height).div) {
+					find_div(m_mx, m_my, m_toolbar_root, 0, 0, m_width, m_height, DEFAULT_PADDING())
+						.div) {
 					cursor = CURSOR_RESIZE_VERT;
 					m_cursor_over_drag = true;
 				}
 			}
-			int padd = SCROLL_AREA_PADDING * 2;
-			if (system_drag(x + w - padd, y - padd,
-						padd * 2, padd * 2, xdiff,
-							ydiff, cursor_over_drag)) {
+			int padd = SCROLL_AREA_PADDING() * 2;
+			if (system_drag(x + w - padd, y - padd, padd * 2, padd * 2, xdiff, ydiff,
+							cursor_over_drag)) {
 				if (!rollout_attached) {
 					r.w += xdiff;
 					r.y += ydiff;
@@ -657,8 +678,7 @@ bool Ui::begin_rollout(Rollout* pr) {
 					if (system_tab(tr->name.c_str(), xx, caption_y, width - 2, caption_height,
 								   tr == &r, xdiff, ydiff)) {
 						if (tr != &r) {
-							for (int r_id : r.tabs)
-								m_rollouts[r_id]->alpha = 0;
+							for (int r_id : r.tabs) m_rollouts[r_id]->alpha = 0;
 							tr->alpha = 255;
 						}
 					}
@@ -711,14 +731,14 @@ void Ui::end_rollout() {
 	m_rqueue.add_scissor(-1, -1, -1, -1);
 	if (!(m_options & NO_SCROLL)) {
 		// Draw scroll bar
-		int x = m_scroll_right + SCROLL_AREA_PADDING / 2;
+		int x = m_scroll_right + SCROLL_AREA_PADDING() / 2;
 		int y = m_scroll_bottom;
-		int w = SCROLL_AREA_PADDING * 2;
+		int w = SCROLL_AREA_PADDING() * 2;
 		int h = m_scroll_top - m_scroll_bottom;
 		if (h > 0) {
-			int   stop = m_scroll_area_top;
-			int   sbot = m_widget_y;
-			int   sh = stop - sbot; // The scrollable area height.
+			int stop = m_scroll_area_top;
+			int sbot = m_widget_y;
+			int sh = stop - sbot; // The scrollable area height.
 			float barHeight = (float)h / (float)sh;
 			if (barHeight < 1) {
 				float barY = (float)(y - sbot) / (float)sh;
@@ -729,13 +749,13 @@ void Ui::end_rollout() {
 
 				// Handle scroll bar logic.
 				uint hid = m_scroll_id;
-				int					   hx = x;
-				int					   hy = y + (int)(barY * h);
-				int					   hw = w;
-				int					   hh = (int)(barHeight * h);
+				int hx = x;
+				int hy = y + (int)(barY * h);
+				int hw = w;
+				int hh = (int)(barHeight * h);
 
 				const int range = h - (hh - 1);
-				bool	  over = in_rect(hx, hy, hw, hh);
+				bool over = in_rect(hx, hy, hw, hh);
 				button_logic(hid, over);
 				if (is_item_active(hid)) {
 					float u = (float)(hy - y) / (float)range;
@@ -792,9 +812,9 @@ bool Ui::start_control(bool enabled, int& x, int& y, int& w, int& h, uint& id, b
 	w = m_widget_w;
 	h = m_button_height;
 	if (!m_row)
-		m_widget_y -= m_button_height + DEFAULT_SPACING;
+		m_widget_y -= m_button_height + DEFAULT_SPACING();
 	else
-		m_widget_x += w + DEFAULT_SPACING;
+		m_widget_x += w + DEFAULT_SPACING();
 	if (m_widget_id > 10 && (y + h < m_scroll_bottom || y > m_scroll_top))
 		return false;
 
@@ -804,18 +824,17 @@ bool Ui::start_control(bool enabled, int& x, int& y, int& w, int& h, uint& id, b
 }
 color Ui::text_color_hot(uint id, bool enabled, bool focused) {
 	if (enabled)
-		return (is_item_hot(id) || focused) ? m_colors[TEXT_COLOR_HOT]
-														: m_colors[TEXT_COLOR];
+		return (is_item_hot(id) || focused) ? m_colors[TEXT_COLOR_HOT] : m_colors[TEXT_COLOR];
 	return m_colors[TEXT_COLOR_DISABLED];
 }
 color Ui::text_color(uint id, bool enabled) {
 	return enabled ? m_colors[TEXT_COLOR] : m_colors[TEXT_COLOR_DISABLED];
 }
 color Ui::button_color(uint id, bool enabled) {
-//	if (!is_item_focused(id))
-		return is_item_active(id) ? m_colors[BUTTON_COLOR_ACTIVE] : m_colors[BUTTON_COLOR];
+	//	if (!is_item_focused(id))
+	return is_item_active(id) ? m_colors[BUTTON_COLOR_ACTIVE] : m_colors[BUTTON_COLOR];
 
-//	return RGBA(m_colors[BUTTON_COLOR_ACTIVE], 150);
+	//	return RGBA(m_colors[BUTTON_COLOR_ACTIVE], 150);
 }
 color Ui::edit_color(uint id, bool enabled) {
 	if (!is_item_focused(id))
@@ -824,14 +843,14 @@ color Ui::edit_color(uint id, bool enabled) {
 	return RGBA(m_colors[EDIT_COLOR_ACTIVE], 150);
 }
 bool Ui::button(const char* text, bool enabled) {
-	int  x, y, w, h;
+	int x, y, w, h;
 	uint id;
 	bool over, wasFocus;
 	if (!start_control(enabled, x, y, w, h, id, over, wasFocus))
 		return false;
 
 	bool res = button_logic(id, over);
-	m_rqueue.add_rounded_rect(x, y, w, h, DEF_ROUND, button_color(id));
+	m_rqueue.add_rounded_rect(x, y, w, h, DEF_ROUND(), button_color(id));
 	m_rqueue.add_text(x, y, m_widget_w, m_button_height, m_text_align, text,
 					  text_color_hot(id, enabled));
 	return res;
@@ -846,7 +865,7 @@ bool Ui::button(const char* text, int x, int y, int w, int h, bool enabled) {
 	bool over = enabled && in_rect(x, y, w, h);
 	bool res = button_logic(id, over);
 
-	m_rqueue.add_rounded_rect(x, y, w, h, DEF_ROUND, button_color(id));
+	m_rqueue.add_rounded_rect(x, y, w, h, DEF_ROUND(), button_color(id));
 	m_rqueue.add_text(x, y, m_widget_w, m_button_height, m_text_align, text,
 					  text_color(id, enabled));
 	return res;
@@ -871,7 +890,8 @@ bool Ui::system_tab(const char* text, int x, int y, int w, int h, bool checked, 
 	if (over && m_left_pressed) {
 		m_drag_x = m_mx;
 		m_drag_y = m_my;
-		m_rollout_drag_div = find_div(m_mx, m_my, m_toolbar_root, 0, 0, m_width, m_height);
+		m_rollout_drag_div =
+			find_div(m_mx, m_my, m_toolbar_root, 0, 0, m_width, m_height, DEFAULT_PADDING());
 	}
 	if (is_item_active(id)) {
 		xmove = m_mx - m_drag_x;
@@ -894,7 +914,8 @@ bool Ui::system_drag(int x, int y, int w, int h, int& xdiff, int& ydiff, bool& o
 	if (over && m_left_pressed) {
 		m_drag_x = m_mx;
 		m_drag_y = m_my;
-		m_rollout_drag_div = find_div(m_mx, m_my, m_toolbar_root, 0, 0, m_width, m_height);
+		m_rollout_drag_div =
+			find_div(m_mx, m_my, m_toolbar_root, 0, 0, m_width, m_height, DEFAULT_PADDING());
 	}
 	bool res = button_logic(id, over);
 	if (is_item_active(id)) {
@@ -907,7 +928,7 @@ bool Ui::system_drag(int x, int y, int w, int h, int& xdiff, int& ydiff, bool& o
 	return is_item_active(id);
 }
 bool Ui::item(const char* text, bool selected, bool enabled) {
-	int  x, y, w, h;
+	int x, y, w, h;
 	uint id;
 	bool over, wasFocus;
 	if (!start_control(enabled, x, y, w, h, id, over, wasFocus))
@@ -929,7 +950,7 @@ bool Ui::item(const char* text, bool selected, bool enabled) {
 	return res;
 }
 bool Ui::combo_item(const char* text, bool enabled) {
-	int  x, y, w, h;
+	int x, y, w, h;
 	uint id;
 	bool over, wasFocus;
 	if (!start_control(enabled, x, y, w, h, id, over, wasFocus))
@@ -950,7 +971,7 @@ bool Ui::combo_item(const char* text, bool enabled) {
 }
 // same as item, but displays only last part of filepath
 bool Ui::file_item(const char* text, char slash, bool selected, bool enabled) {
-	int  x, y, w, h;
+	int x, y, w, h;
 	uint id;
 	bool over, wasFocus;
 	if (!start_control(enabled, x, y, w, h, id, over, wasFocus))
@@ -971,7 +992,7 @@ bool Ui::file_item(const char* text, char slash, bool selected, bool enabled) {
 
 	// find slash symbol
 	const char* filename = text;
-	int			len = strlen(text) - 1;
+	int len = strlen(text) - 1;
 	for (; len >= 0; --len)
 		if (text[len] == slash) {
 			filename = &text[len + 1];
@@ -1028,7 +1049,7 @@ bool Ui::item_dropped(char* text, uint buffer_len, int& mouse_x, int& mouse_y) {
 }
 
 bool Ui::check(const char* text, bool checked, bool enabled) {
-	int  x, y, w, h;
+	int x, y, w, h;
 	uint id;
 	bool over, wasFocus;
 	if (!start_control(enabled, x, y, w, h, id, over, wasFocus))
@@ -1037,9 +1058,9 @@ bool Ui::check(const char* text, bool checked, bool enabled) {
 	bool res = button_logic(id, over);
 
 	const int cx = x;
-	const int cy = y + CHECK_SIZE / 2;
-	m_rqueue.add_rounded_rect(x + CHECK_SIZE - 3, cy - 3, CHECK_SIZE + 6, CHECK_SIZE + 6, DEF_ROUND,
-							  button_color(id, enabled));
+	const int cy = y + CHECK_SIZE() / 2;
+	m_rqueue.add_rounded_rect(x + CHECK_SIZE() - 3, cy - 3, CHECK_SIZE() + 6, CHECK_SIZE() + 6,
+							  DEF_ROUND(), button_color(id, enabled));
 
 	if (checked) {
 		uint check_clr;
@@ -1048,14 +1069,15 @@ bool Ui::check(const char* text, bool checked, bool enabled) {
 		else
 			check_clr = m_colors[TEXT_COLOR_DISABLED];
 
-		m_rqueue.add_rounded_rect(x + CHECK_SIZE, cy, CHECK_SIZE, CHECK_SIZE, DEF_ROUND, check_clr);
+		m_rqueue.add_rounded_rect(x + CHECK_SIZE(), cy, CHECK_SIZE(), CHECK_SIZE(), DEF_ROUND(),
+								  check_clr);
 	}
 	m_rqueue.add_text(x + m_button_height, y, m_widget_w, m_button_height, m_text_align, text,
 					  text_color_hot(id, enabled));
 	return res;
 }
 bool Ui::button_check(const char* text, bool checked, bool enabled) {
-	int  x, y, w, h;
+	int x, y, w, h;
 	uint id;
 	bool over, wasFocus;
 	if (!start_control(enabled, x, y, w, h, id, over, wasFocus))
@@ -1064,9 +1086,9 @@ bool Ui::button_check(const char* text, bool checked, bool enabled) {
 	bool res = button_logic(id, over);
 
 	// check behavior, but button look
-	m_rqueue.add_rounded_rect(x, y, w, h, DEF_ROUND, is_item_active(id) || checked
-														 ? m_colors[BUTTON_COLOR_ACTIVE]
-														 : m_colors[BUTTON_COLOR]);
+	m_rqueue.add_rounded_rect(x, y, w, h, DEF_ROUND(), is_item_active(id) || checked
+														   ? m_colors[BUTTON_COLOR_ACTIVE]
+														   : m_colors[BUTTON_COLOR]);
 	m_rqueue.add_text(x, y, m_widget_w, m_button_height, m_text_align, text,
 					  text_color_hot(id, enabled));
 	return res;
@@ -1074,7 +1096,7 @@ bool Ui::button_check(const char* text, bool checked, bool enabled) {
 void Ui::row(uint count) {
 	// set new widget width
 	int remainder = m_row ? (m_rollout_width - m_widget_w) : m_rollout_width;
-	m_widget_w = (remainder + DEFAULT_SPACING) / count - DEFAULT_SPACING;
+	m_widget_w = (remainder + DEFAULT_SPACING()) / count - DEFAULT_SPACING();
 	m_row++;
 }
 void Ui::set_widget_width(int width) {
@@ -1085,81 +1107,81 @@ void Ui::end_row() {
 	if (m_row == 1) {
 		m_widget_w = m_rollout_width;
 		m_widget_x = m_rollout_left;
-		m_widget_y -= m_button_height + DEFAULT_SPACING;
+		m_widget_y -= m_button_height + DEFAULT_SPACING();
 	}
 	m_row--;
 }
 bool Ui::collapse(const char* text, bool checked, bool enabled) {
-	int  x, y, w, h;
+	int x, y, w, h;
 	uint id;
 	bool over, wasFocus;
 	if (!start_control(enabled, x, y, w, h, id, over, wasFocus))
 		return false;
 
-	const int cx = x + CHECK_SIZE / 2;
+	const int cx = x + CHECK_SIZE() / 2;
 	const int cy = y + m_button_height / 4;
-	bool	  res = button_logic(id, over);
-	//m_rqueue.add_rect(x, y, w, h, is_item_active(id) ? m_colors[COLLAPSE_COLOR_ACTIVE]
+	bool res = button_logic(id, over);
+	// m_rqueue.add_rect(x, y, w, h, is_item_active(id) ? m_colors[COLLAPSE_COLOR_ACTIVE]
 	//												 : m_colors[COLLAPSE_COLOR]);
 	unsigned char clr = enabled ? clr = 255 : clr = 128;
 	;
 	if (checked)
-		m_rqueue.add_triangle(cx, cy, CHECK_SIZE, CHECK_SIZE, 1,
+		m_rqueue.add_triangle(cx, cy, CHECK_SIZE(), CHECK_SIZE(), 1,
 							  RGBA(clr, clr, clr, is_item_active(id) ? 255 : 200));
 	else
-		m_rqueue.add_triangle(cx, cy, CHECK_SIZE, CHECK_SIZE, 2,
+		m_rqueue.add_triangle(cx, cy, CHECK_SIZE(), CHECK_SIZE(), 2,
 							  RGBA(clr, clr, clr, is_item_active(id) ? 255 : 200));
 
-	m_rqueue.add_text(x + CHECK_SIZE, y, w, h, m_text_align, text, text_color_hot(id, enabled));
+	m_rqueue.add_text(x + CHECK_SIZE(), y, w, h, m_text_align, text, text_color_hot(id, enabled));
 	return res;
 }
 bool Ui::combo(const char* text, const char* value, bool enabled) {
-	int  x, y, w, h;
+	int x, y, w, h;
 	uint id;
 	bool over, wasFocus;
 	if (!start_control(enabled, x, y, w, h, id, over, wasFocus))
 		return false;
 
-	const int cx = x + CHECK_SIZE / 2;
+	const int cx = x + CHECK_SIZE() / 2;
 	const int cy = y + m_button_height / 4;
-	bool	  res = combo_button_logic(id, over);
-	bool	  focused = is_item_focused(id);
+	bool res = combo_button_logic(id, over);
+	bool focused = is_item_focused(id);
 	if (res && wasFocus)
 		set_focused(0); // clear focus, of combo was clicked second time
 
 	unsigned char clr = enabled ? clr = 255 : clr = 128;
 	if (!focused)
-		m_rqueue.add_triangle(cx, cy, CHECK_SIZE, CHECK_SIZE, 1,
+		m_rqueue.add_triangle(cx, cy, CHECK_SIZE(), CHECK_SIZE(), 1,
 							  RGBA(clr, clr, clr, is_item_active(id) ? 255 : 200));
 	else
-		m_rqueue.add_triangle(cx, cy, CHECK_SIZE, CHECK_SIZE, 2,
+		m_rqueue.add_triangle(cx, cy, CHECK_SIZE(), CHECK_SIZE(), 2,
 							  RGBA(clr, clr, clr, is_item_active(id) ? 255 : 200));
 
-	m_rqueue.add_rounded_rect(x + w / 2, y, w / 2, h, DEF_ROUND, button_color(id, enabled));
-	m_rqueue.add_text(x + CHECK_SIZE, y, m_widget_w, m_button_height, m_text_align, text,
+	m_rqueue.add_rounded_rect(x + w / 2, y, w / 2, h, DEF_ROUND(), button_color(id, enabled));
+	m_rqueue.add_text(x + CHECK_SIZE(), y, m_widget_w, m_button_height, m_text_align, text,
 					  text_color(id, true));
 	m_rqueue.add_text(x + w / 2, y, m_widget_w, m_button_height, m_text_align, value,
 					  text_color_hot(id, enabled, focused));
 	return wasFocus;
 }
 bool Ui::button_collapse(const char* text, bool enabled) {
-	int  x, y, w, h;
+	int x, y, w, h;
 	uint id;
 	bool over, wasFocus;
 	if (!start_control(enabled, x, y, w, h, id, over, wasFocus))
 		return false;
 
-	bool	  res = button_logic(id, over);
+	bool res = button_logic(id, over);
 	const int cx = x + m_button_height / 2;
 	const int cy = y + m_button_height / 3;
 
 	if (wasFocus && res)
 		set_focused(0); // close combo
 
-	bool		  focused = is_item_focused(id);
+	bool focused = is_item_focused(id);
 	unsigned char clr;
 	clr = enabled ? 255 : 128;
-	m_rqueue.add_rounded_rect(x, y, w, h, DEF_ROUND, button_color(id, enabled));
+	m_rqueue.add_rounded_rect(x, y, w, h, DEF_ROUND(), button_color(id, enabled));
 	m_rqueue.add_text(x + m_button_height, y, m_widget_w, m_button_height, m_text_align, text,
 					  text_color_hot(id, enabled));
 	if (!focused)
@@ -1172,7 +1194,7 @@ bool Ui::button_collapse(const char* text, bool enabled) {
 }
 
 bool Ui::file(const char* text, const char* value, bool enabled) {
-	int  x, y, w, h;
+	int x, y, w, h;
 	uint id;
 	bool over, wasFocus;
 	if (!start_control(enabled, x, y, w, h, id, over, wasFocus))
@@ -1180,16 +1202,15 @@ bool Ui::file(const char* text, const char* value, bool enabled) {
 
 	bool res = button_logic(id, over);
 
-	bool	  focused = is_item_focused(id);
-	const int cx = x - CHECK_SIZE / 2;
-	const int cy = y - CHECK_SIZE / 2;
+	bool focused = is_item_focused(id);
+	const int cx = x - CHECK_SIZE() / 2;
+	const int cy = y - CHECK_SIZE() / 2;
 
 	m_rqueue.add_text(x, y, m_widget_w, m_button_height, m_text_align, text,
 					  text_color_hot(id, enabled));
 
 	// file value
-	m_rqueue.add_rounded_rect(x + w / 2, y, w / 2, h, DEF_ROUND,
-							  button_color(id, enabled));
+	m_rqueue.add_rounded_rect(x + w / 2, y, w / 2, h, DEF_ROUND(), button_color(id, enabled));
 	m_rqueue.add_text(x + w / 2, y, m_widget_w, m_button_height, m_text_align, value,
 					  text_color_hot(id, enabled, focused));
 
@@ -1201,7 +1222,7 @@ bool Ui::file(const char* text, const char* value, bool enabled) {
 }
 
 bool Ui::color_edit(const char* text, color clr, bool enabled, bool is_property) {
-	int  x, y, w, h;
+	int x, y, w, h;
 	uint id;
 	bool over, wasFocus;
 	if (!start_control(enabled, x, y, w, h, id, over, wasFocus))
@@ -1223,7 +1244,7 @@ bool Ui::color_edit(const char* text, color clr, bool enabled, bool is_property)
 	const uint blue = (clr >> 16) & 0xff;
 
 	m_rqueue.add_rounded_rect(
-		x + twidth, y, vwidth, h, DEF_ROUND,
+		x + twidth, y, vwidth, h, DEF_ROUND(),
 		RGBA(red, green, blue, is_item_hot(id) || is_item_active(id) ? 180 : 255));
 
 	// clear focus
@@ -1249,14 +1270,14 @@ void Ui::label(const char* text) {
 	if (!m_row)
 		m_widget_y -= m_button_height;
 	else
-		m_widget_x += m_widget_w + DEFAULT_SPACING;
+		m_widget_x += m_widget_w + DEFAULT_SPACING();
 	if (m_widget_id > 10 && (y < m_scroll_bottom || y > m_scroll_top))
 		return;
 	// m_rqueue.add_text(x, y, m_text_align, text, RGBA(255,255,255,255));
 	m_rqueue.add_text(x, y, m_widget_w, m_button_height, m_text_align, text, m_colors[TEXT_COLOR]);
 }
 bool Ui::edit(char* text, int buffer_len, bool* edit_finished, bool enabled) {
-	int  x, y, w, h;
+	int x, y, w, h;
 	uint id;
 	bool over, wasFocus;
 	if (!start_control(enabled, x, y, w, h, id, over, wasFocus))
@@ -1264,13 +1285,13 @@ bool Ui::edit(char* text, int buffer_len, bool* edit_finished, bool enabled) {
 
 	button_logic(id, over);
 	bool res = edit_logic(id, wasFocus, enabled, text, buffer_len, edit_finished, m_key);
-	m_rqueue.add_rounded_rect(x, y, w, h, DEF_ROUND, edit_color(id, enabled));
+	m_rqueue.add_rounded_rect(x, y, w, h, DEF_ROUND(), edit_color(id, enabled));
 	m_rqueue.add_text(x, y, m_widget_w, m_button_height, m_text_align, text,
 					  text_color_hot(id, enabled));
 	return res;
 }
 bool Ui::property(const char* name, char* text, int buffer_len, bool* edit_finished, bool enabled) {
-	int  x, y, w, h;
+	int x, y, w, h;
 	uint id;
 	bool over, wasFocus;
 	if (!start_control(enabled, x, y, w, h, id, over, wasFocus))
@@ -1286,7 +1307,7 @@ bool Ui::property(const char* name, char* text, int buffer_len, bool* edit_finis
 
 	// property value
 	int vwidth = (int)(w * (1.0f - m_property_width));
-	m_rqueue.add_rounded_rect(x + twidth, y, vwidth, h, DEF_ROUND, edit_color(id, enabled));
+	m_rqueue.add_rounded_rect(x + twidth, y, vwidth, h, DEF_ROUND(), edit_color(id, enabled));
 	m_rqueue.add_text(x + twidth, y, vwidth, m_button_height, m_text_align, text,
 					  text_color_hot(id, enabled));
 	return res;
@@ -1298,22 +1319,22 @@ void Ui::value(const char* text) {
 	if (!m_row)
 		m_widget_y -= m_button_height;
 	else
-		m_widget_x += w + DEFAULT_SPACING;
+		m_widget_x += w + DEFAULT_SPACING();
 	if (m_widget_id > 10 && (y < m_scroll_bottom || y > m_scroll_top))
 		return;
-	m_rqueue.add_text(x + m_button_height / 2, y, m_widget_w, m_button_height, ALIGN_RIGHT,
-					  text, m_colors[TEXT_COLOR]);
+	m_rqueue.add_text(x + m_button_height / 2, y, m_widget_w, m_button_height, ALIGN_RIGHT, text,
+					  m_colors[TEXT_COLOR]);
 }
 bool Ui::slider(const char* text, float* val, float vmin, float vmax, float vinc, bool* last_change,
 				bool enabled) {
-	int  x, y, w, h;
+	int x, y, w, h;
 	uint id;
 	bool over, wasFocus;
 	if (!start_control(enabled, x, y, w, h, id, over, wasFocus))
 		return false;
 
-	m_rqueue.add_rounded_rect(x, y, w, h, DEF_ROUND, m_colors[SLIDER_BG]);
-	const int range = w - SLIDER_MARKER_WIDTH;
+	m_rqueue.add_rounded_rect(x, y, w, h, DEF_ROUND(), m_colors[SLIDER_BG]);
+	const int range = w - SLIDER_MARKER_WIDTH();
 
 	float u = (*val - vmin) / (vmax - vmin);
 	if (u < 0)
@@ -1322,7 +1343,7 @@ bool Ui::slider(const char* text, float* val, float vmin, float vmax, float vinc
 		u = 1;
 	int m = (int)(u * range);
 
-	over = in_rect(x + m, y, SLIDER_MARKER_WIDTH, SLIDER_HEIGHT);
+	over = in_rect(x + m, y, SLIDER_MARKER_WIDTH(), SLIDER_HEIGHT());
 	bool was_focusedBefore = is_item_focused(id);
 	bool wasActiveBefore = is_item_active(id);
 	bool res = button_logic(id, over);
@@ -1349,15 +1370,15 @@ bool Ui::slider(const char* text, float* val, float vmin, float vmax, float vinc
 	}
 
 	if (is_item_active(id))
-		m_rqueue.add_rounded_rect(x + m, y, SLIDER_MARKER_WIDTH, SLIDER_HEIGHT, DEF_ROUND,
+		m_rqueue.add_rounded_rect(x + m, y, SLIDER_MARKER_WIDTH(), SLIDER_HEIGHT(), DEF_ROUND(),
 								  RGBA(255, 255, 255, 255));
 	else
-		m_rqueue.add_rounded_rect(x + m, y, SLIDER_MARKER_WIDTH, SLIDER_HEIGHT, DEF_ROUND,
+		m_rqueue.add_rounded_rect(x + m, y, SLIDER_MARKER_WIDTH(), SLIDER_HEIGHT(), DEF_ROUND(),
 								  is_item_hot(id) ? RGBA(255, 196, 0, 128)
 												  : RGBA(255, 255, 255, 64));
 
 	// TODO: fix this, take a look at 'nicenum'.
-	int  digits = (int)(ceilf(log10f(vinc)));
+	int digits = (int)(ceilf(log10f(vinc)));
 	char fmt[16];
 	snprintf(fmt, 16, "%%.%df", digits >= 0 ? 0 : -digits);
 	char msg[128];
@@ -1365,8 +1386,8 @@ bool Ui::slider(const char* text, float* val, float vmin, float vmax, float vinc
 
 	m_rqueue.add_text(x + m_button_height / 2, y, m_widget_w, m_button_height, m_text_align, text,
 					  text_color_hot(id, enabled));
-	m_rqueue.add_text(x + m_button_height/2, y, m_widget_w, m_button_height, ALIGN_RIGHT,
-					  msg, text_color_hot(id, enabled));
+	m_rqueue.add_text(x + m_button_height / 2, y, m_widget_w, m_button_height, ALIGN_RIGHT, msg,
+					  text_color_hot(id, enabled));
 
 	bool _lastchange = wasActiveBefore && (!isItemActive) && was_focused;
 	if (last_change)
@@ -1376,16 +1397,16 @@ bool Ui::slider(const char* text, float* val, float vmin, float vmax, float vinc
 		   (was_focused && !was_focusedBefore); // to catch last change in slider value
 }
 bool Ui::progress(float val, float vmin, float vmax, float vinc, uint color, bool enabled) {
-	int  x, y, w, h;
+	int x, y, w, h;
 	uint id;
 	bool over, wasFocus;
 	if (!start_control(enabled, x, y, w, h, id, over, wasFocus))
 		return false;
 
-	m_rqueue.add_rounded_rect(x, y, w, h, DEF_ROUND, RGBA(255, 255, 255, 64));
+	m_rqueue.add_rounded_rect(x, y, w, h, DEF_ROUND(), RGBA(255, 255, 255, 64));
 
 	const int range = w;
-	float	 u = (val - vmin) / (vmax - vmin);
+	float u = (val - vmin) / (vmax - vmin);
 	if (u < 0)
 		u = 0;
 	if (u > 1)
@@ -1393,11 +1414,11 @@ bool Ui::progress(float val, float vmin, float vmax, float vinc, uint color, boo
 	int m = (int)(u * range);
 
 	// if (is_item_active(id))
-	//	m_rqueue.add_rounded_rect(x+m, y, SLIDER_MARKER_WIDTH, SLIDER_HEIGHT, 4,
+	//	m_rqueue.add_rounded_rect(x+m, y, SLIDER_MARKER_WIDTH(), SLIDER_HEIGHT(), 4,
 	// RGBA(255,255,255,255));
 	// else
 	if (m > 0)
-		m_rqueue.add_rounded_rect(x, y, m, m_button_height, DEF_ROUND, color);
+		m_rqueue.add_rounded_rect(x, y, m, m_button_height, DEF_ROUND(), color);
 
 	return true;
 }
@@ -1405,20 +1426,20 @@ void Ui::set_options(size_t m_options) {
 	m_render_options = m_options;
 }
 void Ui::indent() {
-	m_widget_x += INTEND_SIZE;
-	m_rollout_left += INTEND_SIZE;
-	m_widget_w -= INTEND_SIZE;
-	m_rollout_width -= INTEND_SIZE;
+	m_widget_x += INTEND_SIZE();
+	m_rollout_left += INTEND_SIZE();
+	m_widget_w -= INTEND_SIZE();
+	m_rollout_width -= INTEND_SIZE();
 }
 void Ui::unindent() {
-	m_widget_x -= INTEND_SIZE;
-	m_rollout_left -= INTEND_SIZE;
-	m_widget_w += INTEND_SIZE;
-	m_rollout_width += INTEND_SIZE;
+	m_widget_x -= INTEND_SIZE();
+	m_rollout_left -= INTEND_SIZE();
+	m_widget_w += INTEND_SIZE();
+	m_rollout_width += INTEND_SIZE();
 }
 void Ui::separator(bool draw_line) {
 	if (!m_row)
-		// m_widget_y -= DEFAULT_SPACING*3;
+		// m_widget_y -= DEFAULT_SPACING()*3;
 		m_widget_y -= m_button_height;
 	else
 		m_widget_x += m_button_height;
@@ -1441,6 +1462,11 @@ uint Ui::set_button_height(uint button_height) {
 	uint mem = m_button_height;
 	if (button_height)
 		m_button_height = button_height;
+
+	m_padding_left = DEFAULT_PADDING();
+	m_padding_top = DEFAULT_PADDING();
+	m_padding_right = DEFAULT_PADDING();
+	m_padding_bottom = DEFAULT_PADDING();
 	return mem;
 }
 uint Ui::get_button_height() {
@@ -1460,8 +1486,8 @@ bool Ui::active_text(int x, int y, int align, const char* text, uint color, bool
 	uint id = m_widget_id;
 
 	size_t len = strlen(text);
-	int	w = m_button_height * len;
-	int	h = m_button_height;
+	int w = m_button_height * len;
+	int h = m_button_height;
 	if (m_widget_id > 10 && (y < m_scroll_bottom || y > m_scroll_top))
 		return false;
 	bool over = in_rect(x, y, w, h, false);
@@ -1494,7 +1520,7 @@ bool Ui::font(const char* path, float height) {
 	return true;
 }
 // check before item
-//bool Ui::check_rect(int mouse_x, int mouse_y, uint id) {
+// bool Ui::check_rect(int mouse_x, int mouse_y, uint id) {
 //	if (id == CHECK_ITEM_RECT) {
 //		int x = m_widget_x;
 //		int y = m_widget_y - m_button_height;
@@ -1526,9 +1552,9 @@ uint Ui::text_align(uint align) {
 // 	int h = m_button_height;
 
 // 	if (!m_row)
-// 		m_widget_y -= m_button_height + DEFAULT_SPACING;
+// 		m_widget_y -= m_button_height + DEFAULT_SPACING();
 // 	else
-// 		m_widget_x += w + DEFAULT_SPACING;
+// 		m_widget_x += w + DEFAULT_SPACING();
 
 // 	bool over = enabled && in_rect(x, y, w, h);
 // 	bool res = button_logic(id, over);

@@ -15,7 +15,7 @@ class IRenderer;
 class IPlatform;
 
 typedef unsigned int uint;
-typedef uint		 color;
+typedef uint color;
 
 #define LOGI(...)
 #define LOG_ERROR(...)
@@ -33,11 +33,7 @@ enum Options {
 	ROLLOUT_ATTACHED = 1 << 31
 };
 
-enum BlendMode{
-	BLEND_NONE = 0,
-	BLEND_RECT,
-	BLEND_TEXT
-};
+enum BlendMode { BLEND_NONE = 0, BLEND_RECT, BLEND_TEXT };
 
 struct Rollout;
 
@@ -89,11 +85,11 @@ enum CURSOR {
 };
 enum ALIGN { ALIGN_LEFT = 0, ALIGN_RIGHT, ALIGN_BOTTOM, ALIGN_TOP, ALIGN_CENTER };
 enum SOUNDS { SOUND_MOUSE_HOVER = 0, SOUND_CLICK };
-enum INPUT_KEYS { MBUT_LEFT = 1, MBUT_RIGHT = 2, MBUT_LEFT_DBL = 4};
+enum INPUT_KEYS { MBUT_LEFT = 1, MBUT_RIGHT = 2, MBUT_LEFT_DBL = 4 };
 enum SCROLL_MODE { SCROLL_START = 0, SCROLL_END, SCROLL_CURRENT };
 
 #define WND_STYLE (DRAG_AREA | RESIZE_AREA | SYSTEM_BUTTONS)
-#define DEFAULT_PADDING 6
+
 static const int MAX_UI_LAYER_COUNT = 10;
 
 class Ui {
@@ -190,7 +186,7 @@ public:
 	bool font(const char* path, float height);
 	// bool custom(CUSTOM_RENDER_CALLBACK callback, int param, bool enabled);
 	uint text_align(uint align);
-	//bool check_rect(int x, int y, uint id);
+	// bool check_rect(int x, int y, uint id);
 
 	const gfx_cmd* get_render_queue(int& size);
 
@@ -234,67 +230,77 @@ private:
 
 	void detach_tabbed_rollout(Rollout* r);
 
-private:
-	uint			m_width;
-	uint			m_height;
-	uint			m_render_options;
-	uint			m_button_height;
-	unsigned char   m_buttons;
-	bool			m_left, m_double_left;
-	bool			m_left_pressed, m_left_released, m_double_left_released;
-	int				m_mx, m_my;
-	int				m_scroll;
-	uint			m_active;
-	uint			m_hot;
-	uint			m_hot_to_be;
-	uint			m_focus;
-	bool			m_is_hot;
-	bool			m_is_active;
-	bool			m_went_active;
-	bool			m_search_next_focus; // tab pressed, search for next focus
-	int				m_drag_x, m_drag_y;
-	float			m_drag_orig;
-	int				m_widget_x, m_widget_y, m_widget_w;
-	int				m_rollout_width, m_rollout_height, m_rollout_left, m_rollout_top;
-	int				m_row;
-	bool			m_inside_current_scroll;
-	char			m_key;
-	uint			m_area_id;
-	uint			m_widget_id;
-	char			m_edit_buffer[256]; // used for holding buffer for current edited control
-	char			m_drag_item[256];   // used for holding buffer for current draging item
-	uint			m_drag_item_width;  // width of dragging item
-	uint			m_edit_buffer_id;
-	uint			m_options;
-	int				m_alpha;
-	uint			m_colors[MAX_COLORS];
-	uint			m_text_align;
-	int				m_padding_left, m_padding_right, m_padding_top, m_padding_bottom;
-	float			m_property_width;
-	RolloutMoveSide m_target_side;
-	Rollout*		m_target_rollout;
-	div_drag		m_rollout_drag_div;
-	Rollout*		m_dragged_rollout_id;
-	Rollout*		m_focused_rollout_id;
-	Toolbar 		*m_toolbar_root, *m_rollout_last;
-	int		   		m_cursor;
-	bool	   		m_cursor_over_drag;
+	inline const int SLIDER_HEIGHT() const;
+	inline const int SLIDER_MARKER_WIDTH() const;
+	inline const int CHECK_SIZE() const;
+	inline const int DEFAULT_SPACING() const;
+	inline const int SCROLL_AREA_PADDING() const;
+	inline const int INTEND_SIZE() const;
+	inline const int AREA_HEADER() const;
+	inline const int TOOLBAR_HEADER() const;
+	inline const int DEF_ROUND() const;
+	inline const int DEFAULT_PADDING() const;
 
-	int			m_scroll_right;
-	int			m_scroll_area_top;
-	int			m_scroll_top;
-	int		 	m_scroll_bottom;
-	int*		m_scroll_val;
-	int			m_focus_top;
-	int			m_focus_bottom;
-	uint 		m_scroll_id;
-	bool		m_inside_scroll_area;
+private:
+	uint m_width;
+	uint m_height;
+	uint m_render_options;
+	uint m_button_height;
+	unsigned char m_buttons;
+	bool m_left, m_double_left;
+	bool m_left_pressed, m_left_released, m_double_left_released;
+	int m_mx, m_my;
+	int m_scroll;
+	uint m_active;
+	uint m_hot;
+	uint m_hot_to_be;
+	uint m_focus;
+	bool m_is_hot;
+	bool m_is_active;
+	bool m_went_active;
+	bool m_search_next_focus; // tab pressed, search for next focus
+	int m_drag_x, m_drag_y;
+	float m_drag_orig;
+	int m_widget_x, m_widget_y, m_widget_w;
+	int m_rollout_width, m_rollout_height, m_rollout_left, m_rollout_top;
+	int m_row;
+	bool m_inside_current_scroll;
+	char m_key;
+	uint m_area_id;
+	uint m_widget_id;
+	char m_edit_buffer[256]; // used for holding buffer for current edited control
+	char m_drag_item[256];   // used for holding buffer for current draging item
+	uint m_drag_item_width;  // width of dragging item
+	uint m_edit_buffer_id;
+	uint m_options;
+	int m_alpha;
+	uint m_colors[MAX_COLORS];
+	uint m_text_align;
+	int m_padding_left, m_padding_right, m_padding_top, m_padding_bottom;
+	float m_property_width;
+	RolloutMoveSide m_target_side;
+	Rollout* m_target_rollout;
+	div_drag m_rollout_drag_div;
+	Rollout* m_dragged_rollout_id;
+	Rollout* m_focused_rollout_id;
+	Toolbar *m_toolbar_root, *m_rollout_last;
+	int m_cursor;
+	bool m_cursor_over_drag;
+
+	int m_scroll_right;
+	int m_scroll_area_top;
+	int m_scroll_top;
+	int m_scroll_bottom;
+	int* m_scroll_val;
+	int m_focus_top;
+	int m_focus_bottom;
+	uint m_scroll_id;
+	bool m_inside_scroll_area;
 
 	Rollouts m_rollouts;
 
 	RenderQueue m_rqueue;
 	IPlatform& m_platform;
-
 };
 }
 #endif // _IMGUI_H_

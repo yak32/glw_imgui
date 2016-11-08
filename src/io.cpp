@@ -31,7 +31,7 @@ template <typename T> bool serialize(T& t, Toolbar& v) {
 }
 bool save_layout(Ui& ui, const char* filename) {
 	int res = save_object_to_file(filename, *ui.get_root_toolbar());
-	if ( res != JSON_OK) {
+	if (res != JSON_OK) {
 		LOG_ERROR("Saving layout file failed, error: %d", res);
 		return false;
 	}

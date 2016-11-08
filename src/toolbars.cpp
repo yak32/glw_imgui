@@ -59,7 +59,7 @@ void visit_rollout_node(std::vector<Rollout*>& rollouts, Toolbar* n, int x, int 
 		visit_rollout_node(rollouts, n->right, x, y + div + sep, w, h - div - sep);
 	}
 }
-div_drag find_div(int mx, int my, Toolbar* toolbar, int x, int y, int w, int h) {
+div_drag find_div(int mx, int my, Toolbar* toolbar, int x, int y, int w, int h, int padding) {
 	div_drag res;
 	res.div = nullptr;
 	if (!toolbar || mx < x || mx > x + w || my < y || my > y + h)
@@ -74,34 +74,32 @@ div_drag find_div(int mx, int my, Toolbar* toolbar, int x, int y, int w, int h) 
 
 	int sep = 1;
 	if (toolbar->horz) {
-		if ((!toolbar->left || !toolbar->left->rollout || 
+		if ((!toolbar->left || !toolbar->left->rollout ||
 			 toolbar->left->rollout->options & RESIZE_AREA) &&
-			(!toolbar->right || !toolbar->right->rollout || 
-			toolbar->right->rollout->options & RESIZE_AREA) &&
-			std::abs(mx - (x + div)) < DEFAULT_PADDING * 2) {
-
+			(!toolbar->right || !toolbar->right->rollout ||
+			 toolbar->right->rollout->options & RESIZE_AREA) &&
+			std::abs(mx - (x + div)) < padding * 2) {
 			return div_drag(&toolbar->div, toolbar->w);
 		}
-		res = find_div(mx, my, toolbar->left, x, y, div, h);
+		res = find_div(mx, my, toolbar->left, x, y, div, h, padding);
 		if (res.div)
 			return res;
-		res = find_div(mx, my, toolbar->right, x + div + sep, y, w - div - sep, h);
+		res = find_div(mx, my, toolbar->right, x + div + sep, y, w - div - sep, h, padding);
 		if (res.div)
 			return res;
 	}
 	else {
-		if ((!toolbar->left || !toolbar->left->rollout || 
-			toolbar->left->rollout->options & RESIZE_AREA) &&
-			(!toolbar->right || !toolbar->right->rollout || 
-			toolbar->right->rollout->options & RESIZE_AREA) &&
-			std::abs(my - (y + div)) < DEFAULT_PADDING * 2) {
-
+		if ((!toolbar->left || !toolbar->left->rollout ||
+			 toolbar->left->rollout->options & RESIZE_AREA) &&
+			(!toolbar->right || !toolbar->right->rollout ||
+			 toolbar->right->rollout->options & RESIZE_AREA) &&
+			std::abs(my - (y + div)) < padding * 2) {
 			return div_drag(&toolbar->div, toolbar->h);
 		}
-		res = find_div(mx, my, toolbar->left, x, y, w, div);
+		res = find_div(mx, my, toolbar->left, x, y, w, div, padding);
 		if (res.div)
 			return res;
-		res = find_div(mx, my, toolbar->right, x, y + div + sep, w, h - div - sep);
+		res = find_div(mx, my, toolbar->right, x, y + div + sep, w, h - div - sep, padding);
 		if (res.div)
 			return res;
 	}

@@ -47,8 +47,6 @@ bool Rollout::is_visible() const {
 	return alpha != 0;
 }
 
-#define RSIZE 20
-
 bool Ui::rollout_move_rect(int x, int y, int w, int h) {
 	m_widget_id++;
 	bool over = in_rect(x, y, w, h, false);
@@ -60,45 +58,46 @@ RolloutMoveSide Ui::rollout_move(Rollout* dr, Rollout* r, int x, int y) {
 
 	// center
 	RolloutMoveSide side = ROLLOUT_UNDEFINED;
-	bool			selected = false;
+	bool selected = false;
 	side = ROLLOUT_UNDEFINED;
-	if (rollout_move_rect(x - RSIZE, y - RSIZE, RSIZE * 2, RSIZE * 2)) {
+	int rsize = m_button_height + m_button_height / 3;
+	if (rollout_move_rect(x - rsize, y - rsize, rsize * 2, rsize * 2)) {
 		m_rqueue.add_rect(r->x, r->y, r->w, r->h, RGBA(14, 99, 156, 180));
 		side = ROLLOUT_CENTER;
 	}
 	// sides
-	if (rollout_move_rect(x - RSIZE * 3 - 2, y - RSIZE, RSIZE * 2, RSIZE * 2)) {
+	if (rollout_move_rect(x - rsize * 3 - 2, y - rsize, rsize * 2, rsize * 2)) {
 		m_rqueue.add_rect(r->x, r->y, r->w / 2, r->h, RGBA(14, 99, 156, 180));
 		side = ROLLOUT_LEFT;
 	}
-	if (rollout_move_rect(x - RSIZE, y + RSIZE + 2, RSIZE * 2, RSIZE * 2)) {
+	if (rollout_move_rect(x - rsize, y + rsize + 2, rsize * 2, rsize * 2)) {
 		m_rqueue.add_rect(r->x, r->y + r->h / 2, r->w, r->h / 2, RGBA(14, 99, 156, 180));
 		side = ROLLOUT_TOP;
 	}
-	if (rollout_move_rect(x + RSIZE + 2, y - RSIZE, RSIZE * 2, RSIZE * 2)) {
+	if (rollout_move_rect(x + rsize + 2, y - rsize, rsize * 2, rsize * 2)) {
 		m_rqueue.add_rect(r->x + r->w / 2, r->y, r->w / 2, r->h, RGBA(14, 99, 156, 180));
 		side = ROLLOUT_RIGHT;
 	}
-	if (rollout_move_rect(x - RSIZE, y - RSIZE * 3 - 2, RSIZE * 2, RSIZE * 2)) {
+	if (rollout_move_rect(x - rsize, y - rsize * 3 - 2, rsize * 2, rsize * 2)) {
 		m_rqueue.add_rect(r->x, r->y, r->w, r->h / 2, RGBA(14, 99, 156, 180));
 		side = ROLLOUT_BOTTOM;
 	}
-	if (rollout_move_rect(x - RSIZE * 4 - 4, y - RSIZE, RSIZE, RSIZE * 2)) {
+	if (rollout_move_rect(x - rsize * 4 - 4, y - rsize, rsize, rsize * 2)) {
 		int neww = dr->w > r->w / 2 ? r->w / 2 : dr->w;
 		m_rqueue.add_rect(r->x, r->y, neww, r->h, RGBA(14, 99, 156, 180));
 		side = ROLLOUT_LEFT_FIXED;
 	}
-	if (rollout_move_rect(x - RSIZE, y + RSIZE * 3 + 4, RSIZE * 2, RSIZE)) {
+	if (rollout_move_rect(x - rsize, y + rsize * 3 + 4, rsize * 2, rsize)) {
 		int newh = dr->h > r->h / 2 ? r->h / 2 : dr->h;
 		m_rqueue.add_rect(r->x, r->y + r->h - newh, r->w, newh, RGBA(14, 99, 156, 180));
 		side = ROLLOUT_TOP_FIXED;
 	}
-	if (rollout_move_rect(x + RSIZE * 3 + 4, y - RSIZE, RSIZE, RSIZE * 2)) {
+	if (rollout_move_rect(x + rsize * 3 + 4, y - rsize, rsize, rsize * 2)) {
 		int neww = dr->w > r->w / 2 ? r->w / 2 : dr->w;
 		m_rqueue.add_rect(r->x + r->w - neww, r->y, neww, r->h, RGBA(14, 99, 156, 180));
 		side = ROLLOUT_RIGHT_FIXED;
 	}
-	if (rollout_move_rect(x - RSIZE, y - RSIZE * 4 - 4, RSIZE * 2, RSIZE)) {
+	if (rollout_move_rect(x - rsize, y - rsize * 4 - 4, rsize * 2, rsize)) {
 		int newh = dr->h > r->h / 2 ? r->h / 2 : dr->h;
 		m_rqueue.add_rect(r->x, r->y, r->w, newh, RGBA(14, 99, 156, 180));
 		side = ROLLOUT_BOTTOM_FIXED;
@@ -151,7 +150,7 @@ bool Ui::insert_rollout(Rollout* r, float div, bool horz, Rollout* rollout) {
 			return 0;
 		}
 		Toolbar* mem_n = lastNode->add_rollout(lastNode->rollout, -div,
-												 horz); // minus to move prev rollout to the right
+											   horz); // minus to move prev rollout to the right
 		lastNode->rollout = nullptr;
 		lastNode->div = div;
 		lastNode = mem_n;
@@ -188,7 +187,7 @@ void Ui::detach_tabbed_rollout(Rollout* r) {
 	auto& tabs = r->tabs;
 	tabs.erase(std::remove(tabs.begin(), tabs.end(), r->id), tabs.end());
 	m_rollouts[tabs[0]]->alpha = 255;
-	if (tabs.size() == 1){
+	if (tabs.size() == 1) {
 		Rollout::tabs_array_t temp;
 		r->tabs.swap(temp);
 	}

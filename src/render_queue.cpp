@@ -38,11 +38,10 @@ unsigned char get_alpha(unsigned int color) {
 	return (unsigned char)(color >> 24);
 }
 
-RenderQueue::RenderQueue() :
-	m_size(0) {
+RenderQueue::RenderQueue() : m_size(0) {
 	m_render_options = 0;
 	m_alpha = 255;
-	//m_render_options(RENDER_OPTIONS_NONROUNDED_RECT)
+	// m_render_options(RENDER_OPTIONS_NONROUNDED_RECT)
 }
 
 void RenderQueue::on_frame_finished() {
@@ -82,28 +81,28 @@ void RenderQueue::add_scissor(int x, int y, int w, int h) {
 	set_gfx_rect(cmd.rect, x, y, w, h);
 }
 void RenderQueue::add_rect(int x, int y, int w, int h, unsigned int color) {
-	 if (m_size >= GFXCMD_QUEUE_SIZE)
-	 	return;
+	if (m_size >= GFXCMD_QUEUE_SIZE)
+		return;
 
-	 gfx_cmd& cmd = m_queue[m_size++];
-	 cmd.type = GFX_CMD_RECT;
-	 cmd.flags = 0;
-	 cmd.col = apply_alpha_state(color, m_alpha);
-	 set_gfx_rect(cmd.rect, x, y, w, h);
+	gfx_cmd& cmd = m_queue[m_size++];
+	cmd.type = GFX_CMD_RECT;
+	cmd.flags = 0;
+	cmd.col = apply_alpha_state(color, m_alpha);
+	set_gfx_rect(cmd.rect, x, y, w, h);
 }
 void RenderQueue::add_rounded_rect(int x, int y, int w, int h, int r, unsigned int color) {
-	 if (m_size >= GFXCMD_QUEUE_SIZE)
-	 	return;
+	if (m_size >= GFXCMD_QUEUE_SIZE)
+		return;
 
-	 gfx_cmd& cmd = m_queue[m_size++];
-	 cmd.type = GFX_CMD_RECT;
-	 cmd.flags = 0;
-	 cmd.col = apply_alpha_state(color, m_alpha);
+	gfx_cmd& cmd = m_queue[m_size++];
+	cmd.type = GFX_CMD_RECT;
+	cmd.flags = 0;
+	cmd.col = apply_alpha_state(color, m_alpha);
 
-	 if (m_render_options & RENDER_OPTIONS_NONROUNDED_RECT)
-	 	set_gfx_rect(cmd.rect, x, y, w, h);
-	 else
-	 	set_gfx_rect(cmd.rect, x, y, w, h, r);
+	if (m_render_options & RENDER_OPTIONS_NONROUNDED_RECT)
+		set_gfx_rect(cmd.rect, x, y, w, h);
+	else
+		set_gfx_rect(cmd.rect, x, y, w, h, r);
 }
 void RenderQueue::add_triangle(int x, int y, int w, int h, int flags, unsigned int color) {
 	if (m_size >= GFXCMD_QUEUE_SIZE)

@@ -10,37 +10,34 @@
 #include <stdio.h>
 #include <cstddef>
 #ifdef WIN32
-	#include <windows.h>
+#include <windows.h>
 #endif
 
 extern SDL_Window*   gWindow;
 extern SDL_Renderer* gRenderer;
 
 namespace imgui {
-namespace{
-	const SDL_SystemCursor mapCursor[CURSOR_COUNT] = { SDL_SYSTEM_CURSOR_ARROW,
-											SDL_SYSTEM_CURSOR_SIZEWE,
-											SDL_SYSTEM_CURSOR_SIZENS,
-											SDL_SYSTEM_CURSOR_SIZENWSE };
+namespace {
+const SDL_SystemCursor mapCursor[CURSOR_COUNT] = {SDL_SYSTEM_CURSOR_ARROW, SDL_SYSTEM_CURSOR_SIZEWE,
+												  SDL_SYSTEM_CURSOR_SIZENS,
+												  SDL_SYSTEM_CURSOR_SIZENWSE};
 }
-PlatformSDL::PlatformSDL(){
+PlatformSDL::PlatformSDL() {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
 		throw;
 	}
-	for (int i = 0; i < CURSOR_COUNT; ++i)
-		m_cursors[i] = SDL_CreateSystemCursor(mapCursor[i]);
+	for (int i = 0; i < CURSOR_COUNT; ++i) m_cursors[i] = SDL_CreateSystemCursor(mapCursor[i]);
 }
-PlatformSDL::~PlatformSDL(){
-	for (int i = 0; i < CURSOR_COUNT; ++i)
-		SDL_FreeCursor(m_cursors[i]);
+PlatformSDL::~PlatformSDL() {
+	for (int i = 0; i < CURSOR_COUNT; ++i) SDL_FreeCursor(m_cursors[i]);
 	SDL_Quit();
 }
-void PlatformSDL::set_cursor(CURSOR cursor){
+void PlatformSDL::set_cursor(CURSOR cursor) {
 	SDL_SetCursor(m_cursors[cursor]);
 }
-void PlatformSDL::capture_mouse(bool set){
-	SDL_CaptureMouse(set?SDL_TRUE:SDL_FALSE);
+void PlatformSDL::capture_mouse(bool set) {
+	SDL_CaptureMouse(set ? SDL_TRUE : SDL_FALSE);
 }
 // Graphics program
 GLuint gProgramID = 0;
@@ -68,7 +65,8 @@ unsigned int compile_shader(const GLchar** vertex_source, const GLchar** fragmen
 bool RenderSDL::create() {
 	bool success = true;
 
-	const GLchar* vertexShaderSource[] = { "#version 150\n"
+	const GLchar* vertexShaderSource[] = {
+		"#version 150\n"
 		"uniform vec2 screen_size;\n"
 		"in vec3 in_vertex;\n"
 		"in vec2 in_texcoord;\n"
@@ -79,17 +77,17 @@ bool RenderSDL::create() {
 		"Texcoord = in_texcoord;\n"
 		"gl_Position = vec4(2*in_vertex.x/screen_size.x-1.0, "
 		"2*in_vertex.y/screen_size.y-1.0, in_vertex.z, 1 );var_color = "
-		"in_color;}" };
+		"in_color;}"};
 
-	const GLchar* fragmentShaderSource[] = { "#version 150\n"
-		"precision highp float;\n"
-		"in vec2 Texcoord;\n"
-		"in  vec4 var_color;\n"
-		"out vec4 FragColor;\n"
-		"uniform sampler2D tex;\n"
-		"void main() { FragColor = texture(tex, "
-		"Texcoord).r*var_color; "
-		"}" };
+	const GLchar* fragmentShaderSource[] = {"#version 150\n"
+											"precision highp float;\n"
+											"in vec2 Texcoord;\n"
+											"in  vec4 var_color;\n"
+											"out vec4 FragColor;\n"
+											"uniform sampler2D tex;\n"
+											"void main() { FragColor = texture(tex, "
+											"Texcoord).r*var_color; "
+											"}"};
 
 	gProgramID = compile_shader(vertexShaderSource, fragmentShaderSource);
 
@@ -116,7 +114,7 @@ bool RenderSDL::create() {
 	return success;
 }
 
-unsigned int compile_shader(const GLchar** vertex_source, const GLchar** fragment_source){
+unsigned int compile_shader(const GLchar** vertex_source, const GLchar** fragment_source) {
 	// Generate program
 	GLuint programID = glCreateProgram();
 
@@ -253,7 +251,7 @@ bool RenderSDL::render_mesh(const render_vertex_3d_t* tris, int count, bool b) {
 	return true;
 }
 void RenderSDL::set_blend_mode(BlendMode mode) {
-	switch (mode){
+	switch (mode) {
 	case BLEND_NONE:
 		glDisable(GL_BLEND);
 		break;
@@ -296,7 +294,7 @@ bool RenderSDL::bind_texture(unsigned int texture) {
 	checkError();
 	return true;
 }
-void RenderSDL::set_scissor(int x, int y, int w, int h, bool set){
+void RenderSDL::set_scissor(int x, int y, int w, int h, bool set) {
 	if (set)
 		glEnable(GL_SCISSOR_TEST);
 	else

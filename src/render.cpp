@@ -38,20 +38,20 @@ static stbtt_bakedchar g_cdata[96]; // ASCII 32..126 is 95 glyphs
 namespace imgui {
 
 static const unsigned TEMP_COORD_COUNT = 1000;
-static float		  g_tempCoords[TEMP_COORD_COUNT * 2];
-static float		  g_tempNormals[TEMP_COORD_COUNT * 2];
+static float g_tempCoords[TEMP_COORD_COUNT * 2];
+static float g_tempNormals[TEMP_COORD_COUNT * 2];
 
 static render_vertex_3d_t new_coords[TEMP_COORD_COUNT * 2 * 6];
 
 static const int CIRCLE_VERTS = 8 * 4;
-static float	 g_circleVerts[CIRCLE_VERTS * 2];
+static float g_circleVerts[CIRCLE_VERTS * 2];
 
 static unsigned int gWhiteTexture;
 
 static unsigned int g_current_texture;
 static unsigned int g_current_font;
-static bool			g_blend_texture;
-static float		g_depth =
+static bool g_blend_texture;
+static float g_depth =
 	0; // ui depth (need to sorting windows properly, especially during moving rollouts)
 static const float MAX_UI_DEPTH = 256.0f; // to match z buffer depth
 
@@ -106,12 +106,12 @@ void Ui::render_destroy(IRenderer* r) {
 void Ui::render_draw(IRenderer* r, Ui* ui, bool transparency) {
 	r->begin();
 
-	int			   size;
+	int size;
 	const gfx_cmd* cmd = ui->get_render_queue(size);
 
 	unsigned int texture = gWhiteTexture;
 	r->bind_texture(texture);
-	
+
 	bool bind_font = true;
 	for (int i = 0; i < size; ++i, ++cmd) {
 		switch (cmd->type) {
@@ -168,14 +168,13 @@ void Ui::render_draw(IRenderer* r, Ui* ui, bool transparency) {
 #endif
 			break;
 
-		 case GFX_CMD_SCISSOR:
-		 	if (cmd->flags) {
-		 		r->set_scissor(cmd->rect.x, (cmd->rect.y),
-		 					   cmd->rect.w, cmd->rect.h, true);
-		 	}
-		 	else
-				r->set_scissor(0,0,0,0,false);
-		 	break;
+		case GFX_CMD_SCISSOR:
+			if (cmd->flags) {
+				r->set_scissor(cmd->rect.x, (cmd->rect.y), cmd->rect.w, cmd->rect.h, true);
+			}
+			else
+				r->set_scissor(0, 0, 0, 0, false);
+			break;
 
 		case GFX_CMD_TEXT:
 			texture = g_current_font;
@@ -191,7 +190,7 @@ void Ui::render_draw(IRenderer* r, Ui* ui, bool transparency) {
 			//			cmd->texture.path,
 			//			TLO_BACKUP |
 			//				RESOURCE_HOLD); // use RESOURCE_HOLD to save reference in resource
-			//manager
+			// manager
 			break;
 
 		case GFX_CMD_FONT:
@@ -233,9 +232,9 @@ static void render_mesh(IRenderer* renderer, const float* coords, float txt_shif
 	for (unsigned i = 0, j = numCoords - 1; i < numCoords; j = i++) {
 		const float* v0 = &coords[j * 2];
 		const float* v1 = &coords[i * 2];
-		float		 dx = v1[0] - v0[0];
-		float		 dy = v1[1] - v0[1];
-		float		 d = sqrtf(dx * dx + dy * dy);
+		float dx = v1[0] - v0[0];
+		float dy = v1[1] - v0[1];
+		float d = sqrtf(dx * dx + dy * dy);
 		if (d > 0) {
 			d = 1.0f / d;
 			dx *= d;
@@ -299,9 +298,9 @@ static void draw_rect(IRenderer* r, float x, float y, float w, float h, float ft
 }
 static void draw_ellipse(IRenderer* r, float x, float y, float w, float h, float fth,
 						 unsigned int col) {
-	float		 verts[CIRCLE_VERTS * 2];
+	float verts[CIRCLE_VERTS * 2];
 	const float* cverts = g_circleVerts;
-	float*		 v = verts;
+	float* v = verts;
 	for (unsigned i = 0; i < CIRCLE_VERTS; ++i) {
 		*v++ = x + cverts[i * 2] * w;
 		*v++ = y + cverts[i * 2 + 1] * h;
@@ -311,9 +310,9 @@ static void draw_ellipse(IRenderer* r, float x, float y, float w, float h, float
 static void draw_rounded_rect(IRenderer* render, float x, float y, float w, float h, float r,
 							  float fth, unsigned int col) {
 	const unsigned n = CIRCLE_VERTS / 4;
-	float		   verts[(n + 1) * 4 * 2];
-	const float*   cverts = g_circleVerts;
-	float*		   v = verts;
+	float verts[(n + 1) * 4 * 2];
+	const float* cverts = g_circleVerts;
+	float* v = verts;
 	for (unsigned i = 0; i <= n; ++i) {
 		*v++ = x + w - r + cverts[i * 2] * r;
 		*v++ = y + h - r + cverts[i * 2 + 1] * r;
@@ -394,8 +393,8 @@ static unsigned int load_font(IRenderer* r, const char* path, float font_height)
 static void getBaked_quad(stbtt_bakedchar* chardata, int pw, int ph, int char_index, float* xpos,
 						  float* ypos, stbtt_aligned_quad* q) {
 	stbtt_bakedchar* b = chardata + char_index;
-	int				 round_x = STBTT_ifloor(*xpos + b->xoff);
-	int				 round_y = STBTT_ifloor(*ypos - b->yoff);
+	int round_x = STBTT_ifloor(*xpos + b->xoff);
+	int round_y = STBTT_ifloor(*ypos - b->yoff);
 
 	q->x0 = (float)round_x;
 	q->y0 = (float)round_y;
@@ -425,7 +424,7 @@ static float getText_length(stbtt_bakedchar* chardata, const char* text) {
 		}
 		else if (c >= 32 && c < 128) {
 			stbtt_bakedchar* b = chardata + c - 32;
-			int				 round_x = STBTT_ifloor((xpos + b->xoff) + 0.5);
+			int round_x = STBTT_ifloor((xpos + b->xoff) + 0.5);
 			len = round_x + b->x1 - b->x0 + 0.5f;
 			xpos += b->xadvance;
 		}
@@ -448,9 +447,9 @@ static void render_text(IRenderer* r, float x, float y, float w, float h, const 
 
 	// glColor4ub(col&0xff, (col>>8)&0xff, (col>>16)&0xff, (col>>24)&0xff);
 	render_vertex_3d_t* v = new_coords;
-	const float			ox = x;
-	int					k = 0;
-	int					c = 0;
+	const float ox = x;
+	int k = 0;
+	int c = 0;
 	while (*text) {
 		int c = (unsigned char)*text;
 		if (c == '\t') {

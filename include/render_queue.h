@@ -42,14 +42,14 @@ struct gfx_rect {
 	short x, y, w, h, r;
 };
 struct gfx_text {
-	short		x, y, width, height, align;
+	short x, y, width, height, align;
 	const char* text;
 };
 struct gfx_depth {
 	short z;
 };
 struct gfx_font {
-	float		height;
+	float height;
 	const char* path;
 };
 struct rect {
@@ -61,19 +61,19 @@ struct frect {
 	float left, top, right, bottom;
 };
 struct gfx_texture {
-	frect		rc;
+	frect rc;
 	const char* path;
 };
 struct gfx_cmd {
-	char		 type;
-	char		 flags;
-	char		 pad[2];
+	char type;
+	char flags;
+	char pad[2];
 	unsigned int col;
 	union {
-		gfx_rect	rect;
-		gfx_text	text;
-		gfx_depth   depth;
-		gfx_font	font;
+		gfx_rect rect;
+		gfx_text text;
+		gfx_depth depth;
+		gfx_font font;
 		gfx_texture texture;
 	};
 };
@@ -81,8 +81,8 @@ struct gfx_cmd {
 struct RenderQueue {
 	RenderQueue();
 
-	void		on_frame_finished();
-	void		on_render_finished();
+	void on_frame_finished();
+	void on_render_finished();
 	const char* alloc_text(const char* text);
 	void reset_gfx_cmd_queue();
 	void add_scissor(int x, int y, int w, int h);
@@ -96,13 +96,13 @@ struct RenderQueue {
 	void add_font(const char* path, float height);
 
 	const gfx_cmd* get_queue() const;
-	size_t		   get_size() const;
+	size_t get_size() const;
 
 private:
 	gfx_cmd m_queue[GFXCMD_QUEUE_SIZE];
-	size_t  m_size;
+	size_t m_size;
 
-	char	 m_text_pool[TEXT_POOL_SIZE];
+	char m_text_pool[TEXT_POOL_SIZE];
 	unsigned m_text_pool_size;
 
 	int m_render_options;
