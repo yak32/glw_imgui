@@ -209,7 +209,7 @@ template <typename V> const char* load(const char* in, size_t len, V& t, int opt
 // overrides for embedded objects and pointers to object
 template <typename V> const char* load(const char* obj_start, size_t len, V*& value, int options) {
 	if (len == 4 && strncmp(obj_start, "null", len) == 0){
-		value = nullptr;
+		value = NULL;
 		return obj_start + len;
 	}
 	value = new V;

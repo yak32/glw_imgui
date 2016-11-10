@@ -1,6 +1,8 @@
 // glw_imgui
 // Copyright (C) 2016 Iakov Sumygin - BSD license
 
+
+#include "io.h"
 #include "toolbars.h"
 #include "glw_json.h"
 #include "ui.h"
@@ -38,7 +40,7 @@ bool save_layout(Ui& ui, const char* filename) {
 	return true;
 }
 bool load_layout(Ui& ui, const char* filename) {
-	Toolbar* root = new Toolbar(nullptr);
+	Toolbar* root = new Toolbar(NULL);
 	int res = load_object_from_file(filename, *root);
 	if (res != JSON_OK) {
 		LOG_ERROR("Opening layout file failed, error: %d", res);

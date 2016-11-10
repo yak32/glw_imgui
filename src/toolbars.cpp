@@ -17,11 +17,11 @@ Toolbar* Toolbar::add_rollout(Rollout* r, float _div, bool _horz) {
 	}
 	if (div > 0) {
 		left = new Toolbar(r);
-		right = new Toolbar(nullptr);
+		right = new Toolbar(NULL);
 		return right;
 	}
 	right = new Toolbar(r);
-	left = new Toolbar(nullptr);
+	left = new Toolbar(NULL);
 	return left;
 }
 void visit_rollout_node(std::vector<Rollout*>& rollouts, Toolbar* n, int x, int y, int w, int h) {
@@ -61,7 +61,7 @@ void visit_rollout_node(std::vector<Rollout*>& rollouts, Toolbar* n, int x, int 
 }
 div_drag find_div(int mx, int my, Toolbar* toolbar, int x, int y, int w, int h, int padding) {
 	div_drag res;
-	res.div = nullptr;
+	res.div = NULL;
 	if (!toolbar || mx < x || mx > x + w || my < y || my > y + h)
 		return res;
 
@@ -107,7 +107,7 @@ div_drag find_div(int mx, int my, Toolbar* toolbar, int x, int y, int w, int h, 
 }
 Toolbar* search_rollout_node(Toolbar* n, const Rollout* search, bool check_tabs) {
 	if (!n)
-		return nullptr;
+		return NULL;
 	if (n->rollout == search)
 		return n;
 	if (check_tabs && n->rollout)
@@ -120,11 +120,11 @@ Toolbar* search_rollout_node(Toolbar* n, const Rollout* search, bool check_tabs)
 	r = search_rollout_node(n->right, search, check_tabs);
 	if (r)
 		return r;
-	return nullptr;
+	return NULL;
 }
 Toolbar* search_rollout_parent_node(Toolbar* n, const Rollout* search) {
 	if (!n)
-		return nullptr;
+		return NULL;
 	if (n->left && n->left->rollout == search)
 		return n;
 	if (n->right && n->right->rollout == search)
@@ -135,7 +135,7 @@ Toolbar* search_rollout_parent_node(Toolbar* n, const Rollout* search) {
 	r = search_rollout_parent_node(n->right, search);
 	if (r)
 		return r;
-	return nullptr;
+	return NULL;
 }
 void div_drag::shift(int shift) {
 	*div += (fabs(*div) >= 1.0f) ? (float)shift : (float)shift / size;
@@ -147,7 +147,7 @@ void clear_toolbars(Toolbar* n) {
 	clear_toolbars(n->right);
 	delete (n->left);
 	delete (n->right);
-	n->left = nullptr;
-	n->right = nullptr;
+	n->left = NULL;
+	n->right = NULL;
 }
 }

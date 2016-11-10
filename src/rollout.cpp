@@ -151,7 +151,7 @@ bool Ui::insert_rollout(Rollout* r, float div, bool horz, Rollout* rollout) {
 		}
 		Toolbar* mem_n = lastNode->add_rollout(lastNode->rollout, -div,
 											   horz); // minus to move prev rollout to the right
-		lastNode->rollout = nullptr;
+		lastNode->rollout = NULL;
 		lastNode->div = div;
 		lastNode = mem_n;
 		div = 1.0f; // reset div
@@ -218,7 +218,7 @@ bool Ui::detach_rollout(Rollout* r) {
 		return false; // no issue, rollout can be detached
 	if (n->left && n->left->rollout == r) {
 		delete (n->left);
-		n->left = nullptr;
+		n->left = NULL;
 		if (n->right) {
 			Toolbar* mem = n->right;
 			*n = *n->right;
@@ -227,7 +227,7 @@ bool Ui::detach_rollout(Rollout* r) {
 	}
 	else {
 		delete (n->right);
-		n->right = nullptr;
+		n->right = NULL;
 		if (n->left) {
 			Toolbar* mem = n->left;
 			*n = *n->left;
@@ -258,7 +258,7 @@ bool Ui::get_rollout_rect(Rollout* r, int& x, int& y, int& w, int& h) {
 	return true;
 }
 const char* get_rollout_name(Rollout* r) {
-	return r ? r->name.c_str() : nullptr;
+	return r ? r->name.c_str() : NULL;
 }
 bool Ui::scroll_rollout(Rollout* r, int scroll, SCROLL_MODE mode) {
 	if (!r)

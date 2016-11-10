@@ -2,14 +2,14 @@
 // Copyright (C) 2016 Iakov Sumygin - BSD license
 
 #pragma once
-
+#include <cstddef>
 #include <vector>
 
 namespace imgui {
 struct Rollout;
 struct Toolbar {
-	Toolbar(Rollout* r = nullptr)
-		: rollout(r), left(nullptr), right(nullptr), div(0), horz(false) {}
+	Toolbar(Rollout* r = NULL)
+		: rollout(r), left(NULL), right(NULL), div(0), horz(false) {}
 	~Toolbar() {}
 	Toolbar* left;
 	Toolbar* right;

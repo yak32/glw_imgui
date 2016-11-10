@@ -45,9 +45,9 @@ Ui::Ui(IPlatform& platform)
 	  m_widget_id(0), m_key(0), m_focus(0), m_edit_buffer_id(0), m_row(0), m_drag_item_width(0),
 	  m_options(0), m_alpha(255), m_text_align(ALIGN_LEFT), m_padding_left(DEFAULT_PADDING()),
 	  m_padding_top(DEFAULT_PADDING()), m_padding_right(DEFAULT_PADDING()),
-	  m_padding_bottom(DEFAULT_PADDING()), m_property_width(0.5f), m_dragged_rollout_id(nullptr),
-	  m_focused_rollout_id(nullptr), m_cursor(0), m_cursor_over_drag(0), m_scroll_right(0),
-	  m_scroll_area_top(0), m_scroll_val(nullptr), m_focus_top(0), m_focus_bottom(0),
+	  m_padding_bottom(DEFAULT_PADDING()), m_property_width(0.5f), m_dragged_rollout_id(NULL),
+	  m_focused_rollout_id(NULL), m_cursor(0), m_cursor_over_drag(0), m_scroll_right(0),
+	  m_scroll_area_top(0), m_scroll_val(NULL), m_focus_top(0), m_focus_bottom(0),
 	  m_scroll_id(0), m_inside_scroll_area(false), m_scroll_top(0), m_scroll_bottom(0) {
 	memset(m_edit_buffer, 0, sizeof(m_edit_buffer));
 	memset(m_drag_item, 0, sizeof(m_drag_item));
@@ -65,7 +65,7 @@ Ui::Ui(IPlatform& platform)
 	m_colors[ROLLOUT_CAPTION_COLOR] = RGBA(0, 0, 0, 0); // non visible by default
 	m_colors[DRAG_COLOR] = RGBA(80, 80, 80, 40);
 	m_colors[SLIDER_BG] = RGBA(0, 0, 0, 126);
-	m_toolbar_root = new Toolbar(nullptr);
+	m_toolbar_root = new Toolbar(NULL);
 	m_rollout_last = m_toolbar_root;
 }
 Ui::~Ui() {
@@ -109,7 +109,7 @@ void Ui::clear_input() {
 }
 void Ui::clear_active() {
 	m_active = 0;
-	m_dragged_rollout_id = nullptr;
+	m_dragged_rollout_id = NULL;
 	set_cursor(CURSOR_DEFAULT);
 	// mark all UI for this frame as processed
 	clear_input();
@@ -573,7 +573,7 @@ bool Ui::begin_rollout(Rollout* pr) {
 						r.y += ydiff;
 						if (m_left_pressed) {
 							m_target_side = ROLLOUT_UNDEFINED;
-							m_target_rollout = nullptr;
+							m_target_rollout = NULL;
 							m_dragged_rollout_id = pr;
 							detach_rollout(&r); // if rollout attached, detach it
 						}

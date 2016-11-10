@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 #include <SDL_opengl.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "platform_sdl.h"
 #include "ui.h"
@@ -50,7 +51,7 @@ void setup_ui() {
 	ui.render_init(&renderer);
 
 	root_rollout = ui.create_rollout("root", ROLLOUT_HOLLOW | WND_STYLE);
-	ui.insert_rollout(root_rollout, 1, true, nullptr);
+	ui.insert_rollout(root_rollout, 1, true, NULL);
 
 	rollout = ui.create_rollout("TEST", WND_STYLE);
 	ui.insert_rollout(rollout, 0.2f, true, root_rollout);
@@ -65,7 +66,7 @@ bool init() {
 
 	// Use OpenGL 3.2 core
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);

@@ -6,6 +6,7 @@
 
 #include <unordered_map>
 #include <string>
+#include <limits.h>
 #include "toolbars.h"
 #include "render_queue.h"
 
