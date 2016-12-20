@@ -1,6 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 PROJECT(demo)
-
 SET( SDL2_PATH thirdparty/SDL2)
 SET( GLEW_PATH thirdparty/glew)
 
