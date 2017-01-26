@@ -7,8 +7,10 @@
 #include <string.h>
 
 #include "platform_sdl.h"
-#include "ui.h"
-#include "io.h"
+#include "imgui_ui.h"
+#include "imgui_io.h"
+
+//#include "texture_atlas/texture_atlas.h"
 
 const int SCREEN_WIDTH = 1024;
 const int SCREEN_HEIGHT = 768;
@@ -31,7 +33,7 @@ int mouse_wheel = 0;
 using namespace imgui;
 
 PlatformSDL gPlatform;
-Ui ui(gPlatform);
+Ui ui;
 Rollout *root_rollout, *rollout, *vert_rollout;
 RenderSDL renderer;
 
@@ -48,7 +50,7 @@ void setup_ui() {
 	getDisplayScaleFactor(scaleX, scaleY);
 	ui.set_button_height(ui.get_button_height() * scaleX);
 
-	ui.render_init(&renderer);
+	ui.create(&gPlatform, &renderer);
 
 	root_rollout = ui.create_rollout("root", ROLLOUT_HOLLOW | WND_STYLE);
 	ui.insert_rollout(root_rollout, 1, true, NULL);
@@ -110,6 +112,17 @@ bool init() {
 	// if ( save_layout(ui, "C:\\projects\\glw_imgui\\test.imgui") )
 	//    if (!load_layout(ui, "C:\\projects\\glw_imgui\\test.imgui"))
 	//        printf("failed to load");
+
+
+	// TextureAtlas a;
+	// a.create(20,100);
+	// unsigned int x, y;
+	// a.add_box(10,10, &x, &y);
+	// a.add_box(20, 20, &x, &y);
+	// a.add_box(10, 10, &x, &y);
+	// a.add_box(18, 18, &x, &y);
+	// a.add_box(20, 90, &x, &y);
+
 	return success;
 }
 
@@ -221,7 +234,7 @@ void update_ui() {
 void render() {
 	glClearColor(0.5, 0.5, 0.5, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
-	ui.render_draw(&renderer, &ui, true);
+	ui.render_draw(true);
 }
 
 void close() {

@@ -6,6 +6,7 @@
 #include <GL/glew.h>
 #include <SDL_opengl.h>
 #include <SDL.h>
+#include <fstream>
 
 #include <stdio.h>
 #include <cstddef>
@@ -38,6 +39,24 @@ void PlatformSDL::set_cursor(CURSOR cursor) {
 }
 void PlatformSDL::capture_mouse(bool set) {
 	SDL_CaptureMouse(set ? SDL_TRUE : SDL_FALSE);
+}
+
+void* PlatformSDL::load_file(const char* path, size_t& buf_size)
+{
+	using namespace std;
+
+	streampos size;
+	ifstream file(path, ios::in | ios::binary | ios::ate);
+	void* memblock = nullptr;
+	if (file.is_open())
+	{
+		size = file.tellg();
+		buf_size = (size_t)size;
+		memblock = malloc(buf_size);
+		file.seekg(0, ios::beg);
+		file.read((char*)memblock, buf_size);
+	}
+	return memblock;
 }
 // Graphics program
 GLuint gProgramID = 0;

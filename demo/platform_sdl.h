@@ -4,7 +4,7 @@
 #ifndef _RENDERER_SDL_H_
 #define _RENDERER_SDL_H_
 
-#include "platform.h"
+#include "imgui_platform.h"
 #include <SDL_mouse.h>
 
 namespace imgui {
@@ -15,6 +15,7 @@ public:
 	~PlatformSDL();
 	void set_cursor(CURSOR cursor);
 	void capture_mouse(bool set);
+	void* load_file(const char* path, size_t& buf_size);
 
 private:
 	SDL_Cursor* m_cursors[CURSOR_COUNT];
