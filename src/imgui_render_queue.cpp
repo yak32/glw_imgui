@@ -43,6 +43,9 @@ RenderQueue::RenderQueue() : m_size(0), m_mem_size(0), m_ready_to_render(false){
 	m_alpha = 255;
 	// m_render_options(RENDER_OPTIONS_NONROUNDED_RECT)
 }
+void RenderQueue::set_render_options(int options){
+	m_render_options = options;
+}
 // to support multithreaded rendering, 2 render queue is added
 // one is used for rendering, another for logic. buffers are swapped
 // after rendering is finished

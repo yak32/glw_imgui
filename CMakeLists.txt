@@ -1,4 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+INCLUDE(CMakeToolsHelpers OPTIONAL)
 PROJECT(imgui)
 
 SET(GLW_IMGUI_DEMO "GLW_IMGUI_DEMO" CACHE STRING "Build demo app")
@@ -20,7 +21,7 @@ SET (IMGUI_SOURCE_FILES
 	src/imgui_rollout.cpp
 	src/imgui_toolbars.cpp
 	src/imgui_render_queue.cpp
-	#thirdparty/texture_atlas/texture_atlas.cpp
+	thirdparty/texture_atlas/texture_atlas.cpp
 	)
 
 SET(IMGUI_HEADER_FILES
@@ -31,7 +32,7 @@ SET(IMGUI_HEADER_FILES
 	include/imgui_toolbars.h
 	include/imgui_render_queue.h
 	thirdparty/stb/stb_truetype.h
-	#thirdparty/texture_atlas/texture_atlas.h
+	thirdparty/texture_atlas/texture_atlas.h
 	thirdparty/glw_json/glw_json.h)
 
 SET_SOURCE_FILES_PROPERTIES(IMGUI_HEADER_FILES PROPERTIES HEADER_FILE_ONLY TRUE)

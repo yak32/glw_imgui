@@ -16,8 +16,8 @@ static const int MOVE_SIGN_DEPTH = 3; // should be less then MAX_UI_LAYER_COUNT 
 
 static const int MAX_TABS = 20;
 Rollout::Rollout(int _x, int _y, int _w, int _h, int _z)
-	: x(_x), y(_y), w(_w), h(_h), z(_z), scroll(0), alpha_inc(0), alpha(255),
-	minimized(false), name(""), options(0) {}
+	: x(_x), y(_y), w(_w), h(_h), z(_z), scroll(0), target_scroll(0), animation_speed(0), alpha(255),
+	animation_type(ANIMATION_NONE),	minimized(false), name(""), options(0), id(0), focused(false){}
 
 void Rollout::set(int _x, int _y, int _w, int _h, int _z, bool _visible, bool _minimized,
 				  int _alpha_inc) {
@@ -27,14 +27,14 @@ void Rollout::set(int _x, int _y, int _w, int _h, int _z, bool _visible, bool _m
 	h = _h;
 	z = _z;
 	alpha = _visible ? 255 : 0;
-	alpha_inc = _alpha_inc;
+	animation_speed = _alpha_inc;
 	scroll = 0;
 	minimized = _minimized;
 }
 void Rollout::set(const char* _name, int _options, bool _visible, bool _minimized, int _alpha_inc) {
 	x = y = w = h = z = 0;
 	alpha = _visible ? 255 : 0;
-	alpha_inc = _alpha_inc;
+	animation_speed = _alpha_inc;
 	scroll = 0;
 	minimized = _minimized;
 	name = _name;
@@ -47,12 +47,48 @@ bool Rollout::is_visible() const {
 	return alpha != 0;
 }
 
+void Rollout::process_animations(Ui& ui) {
+	if (animation_type == Rollout::ANIMATION_NONE)
+		return;
+
+	if (animation_type == Rollout::ANIMATION_SHOW) {
+		int alpha_speed = (int)(0.016f * 255.0f * 3.0f);// 60 fps - TODO: add timer
+		if (alpha_speed > 255)
+			alpha_speed = 45;
+
+		alpha += animation_speed * alpha_speed;
+		if (alpha <= 0) {
+			if (animation_speed < 0)
+				animation_speed = 0; // stop decrementing alpha
+			alpha = 0;
+			ui.detach_rollout(this);
+		}
+		if (alpha > 255) {
+			if (animation_speed > 0)
+				animation_speed = 0; // stop decrementing alpha
+			alpha = 255;
+		}
+	}
+	else if (animation_type == Rollout::ANIMATION_SCROLL) {
+		int speed = (int)(0.016f * 255.0f * 3.0f);// 60 fps - TODO: add timer
+		if (speed > 255)
+			speed = 45;
+
+		scroll += animation_speed * speed;
+		if ((animation_speed < 0.0f && scroll < target_scroll) ||
+			(animation_speed >  0.0f && scroll > target_scroll)) {
+			scroll = target_scroll;
+			animation_type = ANIMATION_NONE;
+		}
+	}
+}
 bool Ui::rollout_move_rect(int x, int y, int w, int h) {
 	m_widget_id++;
 	bool over = in_rect(x, y, w, h, false);
 	m_rqueue->add_rect(x, y, w, h, over ? RGBA(14, 130, 156, 240) : RGBA(14, 130, 156, 180));
 	return over;
 }
+
 RolloutMoveSide Ui::rollout_move(Rollout* dr, Rollout* r, int x, int y) {
 	set_depth(MOVE_SIGN_DEPTH);
 
@@ -60,7 +96,7 @@ RolloutMoveSide Ui::rollout_move(Rollout* dr, Rollout* r, int x, int y) {
 	RolloutMoveSide side = ROLLOUT_UNDEFINED;
 	bool selected = false;
 	side = ROLLOUT_UNDEFINED;
-	int rsize = m_button_height + m_button_height / 3;
+	int rsize = m_item_height + m_item_height / 3;
 	if (rollout_move_rect(x - rsize, y - rsize, rsize * 2, rsize * 2)) {
 		m_rqueue->add_rect(r->x, r->y, r->w, r->h, RGBA(14, 99, 156, 180));
 		side = ROLLOUT_CENTER;
@@ -110,7 +146,7 @@ bool Ui::show_rollout(Rollout* r, bool animate) {
 	if (r->is_visible())
 		return false;
 	if (animate) {
-		r->alpha_inc = 1;
+		r->animation_speed = 1;
 		r->alpha++;
 	}
 	else
@@ -125,13 +161,37 @@ bool Ui::hide_rollout(Rollout* r, bool animate) {
 	if (!r->is_visible())
 		return false;
 	if (animate) {
-		r->alpha_inc = -1;
+		r->animation_speed = -1;
 		r->alpha--;
 	}
 	else
 		r->alpha = 0;
 	return r->alpha <= 0;
 }
+
+void Ui::scroll_rollout(Rollout* r, int scroll_val, bool animate, float animation_speed) {
+
+	if (r->scroll + scroll_val < 0)
+		scroll_val = -r->scroll;
+	if (!r) {
+		assert(false);
+		return;
+	}
+	if (animate) {
+
+		// finish previous animation
+		if (r->animation_type == Rollout::ANIMATION_SCROLL)
+			r->scroll = r->target_scroll;
+
+		r->animation_type = Rollout::ANIMATION_SCROLL;
+		r->animation_speed = animation_speed;
+		r->target_scroll = r->scroll + scroll_val;
+	}
+	else {
+		r->scroll += scroll_val;
+	}
+}
+
 // insert rollout to another rollout (tabs)
 bool Ui::insert_rollout(Rollout* r, float div, bool horz, Rollout* rollout) {
 	if (!r)
@@ -278,6 +338,7 @@ const char* Ui::get_rollout_name(Rollout* r) const{
 bool Ui::scroll_rollout(Rollout* r, int scroll, SCROLL_MODE mode) {
 	if (!r)
 		return false;
+
 	switch (mode) {
 	case SCROLL_START:
 		r->scroll = scroll;

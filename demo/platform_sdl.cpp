@@ -14,6 +14,9 @@
 #include <windows.h>
 #endif
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 extern SDL_Window*   gWindow;
 extern SDL_Renderer* gRenderer;
 
@@ -28,7 +31,8 @@ PlatformSDL::PlatformSDL() {
 		printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
 		throw;
 	}
-	for (int i = 0; i < CURSOR_COUNT; ++i) m_cursors[i] = SDL_CreateSystemCursor(mapCursor[i]);
+	for (int i = 0; i < CURSOR_COUNT; ++i) 
+		m_cursors[i] = SDL_CreateSystemCursor(mapCursor[i]);
 }
 PlatformSDL::~PlatformSDL() {
 	for (int i = 0; i < CURSOR_COUNT; ++i) SDL_FreeCursor(m_cursors[i]);
@@ -105,7 +109,7 @@ bool RenderSDL::create() {
 											"out vec4 FragColor;\n"
 											"uniform sampler2D tex;\n"
 											"void main() { FragColor = texture(tex, "
-											"Texcoord).r*var_color; "
+											"Texcoord)*var_color; "
 											"}"};
 
 	gProgramID = compile_shader(vertexShaderSource, fragmentShaderSource);
@@ -200,19 +204,21 @@ unsigned int compile_shader(const GLchar** vertex_source, const GLchar** fragmen
 	return programID;
 }
 
-bool RenderSDL::begin() {
+bool RenderSDL::begin(uint width, uint height) {
+	int wnd_width, wnd_height;
+	SDL_GL_GetDrawableSize(gWindow, &wnd_width, &wnd_height);
+	glViewport(0, 0, wnd_width, wnd_height);
+
+	initialize_render(width, height);
+	return true;
+}
+
+void RenderSDL::initialize_render(uint width, uint height){
 	glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
 	glDisable(GL_DEPTH_TEST);
-
-	// glEnable(GL_DEPTH_WRITE);
 	glDepthFunc(GL_LEQUAL);
-
 	glDisable(GL_CULL_FACE);
-
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-
-	// glDisable(GL_SCISSOR_TEST);
 	checkError();
 
 	// Bind program
@@ -221,16 +227,44 @@ bool RenderSDL::begin() {
 	glEnableVertexAttribArray(gVertexClrLocation);
 	glEnableVertexAttribArray(gVertexTxtLocation);
 
-	int w, h;
-	SDL_GL_GetDrawableSize(gWindow, &w, &h);
-	glUniform2f(gScreenSizeLocation, (float)w, float(h));
-	glViewport(0, 0, w, h);
+	glUniform2f(gScreenSizeLocation, (float)width, float(height));
+	checkError();
+}
+bool RenderSDL::render_mesh(const render_vertex_3d_t* tris, int count, bool b) {
+	m_mesh.insert(m_mesh.end(), tris, tris + count);
+	render(m_mesh.size()-count, count);
+	return true;
+}
+void RenderSDL::render(int start, int count){
+	// The following commands will talk about our 'vertexbuffer' buffer
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+	// Give our vertices to OpenGL.
+	glBufferData(GL_ARRAY_BUFFER, sizeof(render_vertex_3d_t) * m_mesh.size(), &m_mesh[0], GL_DYNAMIC_DRAW);
+	checkError();
+
+	// bind vertex attributes
+	glVertexAttribPointer(gVertexPos3DLocation, 3, GL_FLOAT, GL_FALSE, sizeof(render_vertex_3d_t),
+		0);
+	glVertexAttribPointer(gVertexClrLocation, 4, GL_UNSIGNED_BYTE, GL_TRUE,
+		sizeof(render_vertex_3d_t), (void*)offsetof(render_vertex_3d_t, clr));
+	glVertexAttribPointer(gVertexTxtLocation, 2, GL_FLOAT, GL_FALSE, sizeof(render_vertex_3d_t),
+		(void*)offsetof(render_vertex_3d_t, u));
+	checkError();
+
+	glDrawArrays(GL_TRIANGLES, start, count);
+}
+bool RenderSDL::end() {
+	if (m_mesh.empty())
+		return true; // nothing to draw
+
+	m_mesh.clear();
+	// GLenum e = glGetError();
+	// printf("%s", glewGetErrorString(e));
 
 	checkError();
 
-	return true;
-}
-bool RenderSDL::end() {
+
 	glDisable(GL_SCISSOR_TEST);
 
 	// Disable vertex position
@@ -245,30 +279,7 @@ bool RenderSDL::end() {
 	// /on_render_finished();
 	return true;
 }
-bool RenderSDL::render_mesh(const render_vertex_3d_t* tris, int count, bool b) {
-	// The following commands will talk about our 'vertexbuffer' buffer
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-	// Give our vertices to OpenGL.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(render_vertex_3d_t) * count, tris, GL_DYNAMIC_DRAW);
-	checkError();
-
-	// bind vertex attributes
-	glVertexAttribPointer(gVertexPos3DLocation, 3, GL_FLOAT, GL_FALSE, sizeof(render_vertex_3d_t),
-						  0);
-	glVertexAttribPointer(gVertexClrLocation, 4, GL_UNSIGNED_BYTE, GL_TRUE,
-						  sizeof(render_vertex_3d_t), (void*)offsetof(render_vertex_3d_t, clr));
-	glVertexAttribPointer(gVertexTxtLocation, 2, GL_FLOAT, GL_FALSE, sizeof(render_vertex_3d_t),
-						  (void*)offsetof(render_vertex_3d_t, u));
-	checkError();
-
-	glDrawArrays(GL_TRIANGLES, 0, count);
-	// GLenum e = glGetError();
-	// printf("%s", glewGetErrorString(e));
-
-	checkError();
-	return true;
-}
 void RenderSDL::set_blend_mode(BlendMode mode) {
 	switch (mode) {
 	case BLEND_NONE:
@@ -284,8 +295,12 @@ void RenderSDL::set_blend_mode(BlendMode mode) {
 		break;
 	}
 }
-unsigned int RenderSDL::create_texture(unsigned int width, unsigned int height, void* bmp,
-									   bool font) {
+unsigned char* RenderSDL::load_image(const char* filename, int* width, int* height,
+				int* channels){
+    return stbi_load(filename, width, height, channels, 0);
+}
+
+unsigned int RenderSDL::create_texture(unsigned int width, unsigned int height, unsigned int channels, void* bmp) {
 	// can free ttf_buffer at this point
 	checkError();
 
@@ -296,16 +311,56 @@ unsigned int RenderSDL::create_texture(unsigned int width, unsigned int height, 
 	glBindTexture(GL_TEXTURE_2D, ftex);
 	checkError();
 
-	if (font)
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, bmp);
+	// convert luminance image manually
+	if (channels == 1){
+		unsigned char* new_bmp = (unsigned char*)malloc(width*height*3);
+		unsigned char* old_bmp = (unsigned char*)bmp;
+		int j = 0;
+		for (int i=0;i<height*width;++i){
+			new_bmp[j++] = old_bmp[i];
+			new_bmp[j++] = old_bmp[i];
+			new_bmp[j++] = old_bmp[i];
+		}
+		bmp = new_bmp;
+	}
+
+	GLenum bmpFormat;
+	switch (channels) {
+	case 1: bmpFormat = GL_RGB; break;
+	case 3: bmpFormat = GL_RGB; break;
+	case 4: bmpFormat = GL_RGBA; break;
+	}
+	if (channels==1)
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, bmpFormat, GL_UNSIGNED_BYTE, bmp);
 	else
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, bmp);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, bmpFormat, GL_UNSIGNED_BYTE, bmp);
 	checkError();
+
+	if (channels == 1)
+		free(bmp);
 
 	// can free temp_bitmap at this point
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	checkError();
 	return ftex;
+}
+bool RenderSDL::copy_sub_texture(
+		unsigned int target,
+		unsigned int x,
+		unsigned int y,
+		unsigned int width,
+		unsigned int height,
+		void* bmp){
+
+	glBindTexture(GL_TEXTURE_2D, target);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, bmp);
+	checkError();
+	return true;
+}
+
+bool RenderSDL::remove_texture(unsigned int texture){
+	glDeleteTextures(1, &texture);
+	return true;
 }
 bool RenderSDL::bind_texture(unsigned int texture) {
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -314,11 +369,11 @@ bool RenderSDL::bind_texture(unsigned int texture) {
 	return true;
 }
 void RenderSDL::set_scissor(int x, int y, int w, int h, bool set) {
-	if (set)
-		glEnable(GL_SCISSOR_TEST);
-	else
-		glDisable(GL_SCISSOR_TEST);
-	glScissor(x, y, w, h);
+	//if (set)
+	//	glEnable(GL_SCISSOR_TEST);
+	//else
+	//	glDisable(GL_SCISSOR_TEST);
+	//glScissor(x, y, w, h);
 }
 void printProgramLog(GLuint program) {
 	// Make sure name is shader

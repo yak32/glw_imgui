@@ -12,8 +12,8 @@
 
 //#include "texture_atlas/texture_atlas.h"
 
-const int SCREEN_WIDTH = 1024;
-const int SCREEN_HEIGHT = 768;
+const int SCREEN_WIDTH = 1280;
+const int SCREEN_HEIGHT = 720;
 
 bool init();
 bool initGL();
@@ -23,7 +23,7 @@ void render();
 void close();
 
 bool quit = false;
-char last_char = 0;
+unsigned int last_char = 0;
 SDL_Window* gWindow = NULL;
 SDL_GLContext gContext;
 SDL_Renderer* gRenderer;
@@ -48,7 +48,7 @@ void setup_ui() {
 	// scale ui to support high dpi
 	float scaleX, scaleY;
 	getDisplayScaleFactor(scaleX, scaleY);
-	ui.set_button_height(ui.get_button_height() * scaleX);
+	ui.set_item_height(15);
 
 	ui.create(&gPlatform, &renderer);
 
@@ -61,7 +61,7 @@ void setup_ui() {
 	vert_rollout = ui.create_rollout("VERT", WND_STYLE);
 	ui.insert_rollout(vert_rollout, -200, true, root_rollout);
 
-	ui.font("E:/projects/glw_imgui/DroidSans.ttf", 15 * scaleY);
+	ui.font("E:/projects/glw_imgui/DroidSans.ttf", 15);
 }
 bool init() {
 	bool success = true;
@@ -137,22 +137,42 @@ void handleKeys(unsigned char key) {
 	last_char = key;
 }
 
+uint handle_input(int& mouse_x, int& mouse_y) {
+	uint keysPressed = 0;
+	uint mouse_keys = SDL_GetMouseState(&mouse_x, &mouse_y);
+	if (mouse_keys & SDL_BUTTON(SDL_BUTTON_LEFT))
+		keysPressed |= KEY_MOUSE_LEFT;
+
+	if (mouse_keys & SDL_BUTTON(SDL_BUTTON_RIGHT))
+		keysPressed |= KEY_MOUSE_RIGHT;
+
+	const Uint8* keys = SDL_GetKeyboardState(NULL);
+	if (keys[SDL_SCANCODE_RETURN])
+		keysPressed |= KEY_ENTER;
+
+	if (keys[SDL_SCANCODE_DOWN])
+		keysPressed |= KEY_DOWN;
+
+	if (keys[SDL_SCANCODE_UP])
+		keysPressed |= KEY_UP;
+
+	if (keys[SDL_SCANCODE_LEFT])
+		keysPressed |= KEY_LEFT;
+
+	if (keys[SDL_SCANCODE_RIGHT])
+		keysPressed |= KEY_RIGHT;
+	
+	return keysPressed;
+}
 void update_ui() {
 	int x, y;
-	SDL_PumpEvents();
-	int mouse_buttons = 0;
-	if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-		mouse_buttons = MBUT_LEFT;
-	}
-
+	
+	uint keysPressed = handle_input(x, y);
 	int w, h;
-	SDL_GL_GetDrawableSize(gWindow, &w, &h);
+	SDL_GetWindowSize(gWindow, &w, &h);
+	ui.set_text_align(ALIGN_LEFT);
 
-	// support for high DPI displays
-	float scaleX, scaleY;
-	getDisplayScaleFactor(scaleX, scaleY);
-
-	ui.begin_frame(w, h, x * scaleX, h - y * scaleY, mouse_buttons, -mouse_wheel, last_char);
+	ui.begin_frame(w, h, x, y, -mouse_wheel, last_char, keysPressed);
 	last_char = 0;
 	mouse_wheel = 0;
 
