@@ -11,11 +11,9 @@
 			 "*.vcxproj.*"
 		 ],
 		 "folder_exclude_patterns":[
-			"cmake*",
 			"modelling",
 			"tools",
 			"documentation",
-
 			".git",
 		 ],
 		 "file_include_patterns":[

@@ -18,7 +18,7 @@ public:
 	void* load_file(const char* path, size_t& buf_size);
 
 private:
-	SDL_Cursor* m_cursors[CURSOR_COUNT];
+	SDL_Cursor* _cursors[CURSOR_COUNT];
 };
 
 class RenderSDL : public IRenderer {
@@ -48,7 +48,7 @@ protected:
 	void render(int start, int count);
 
 protected:
-	std::vector<render_vertex_3d_t> m_mesh;
+	std::vector<render_vertex_3d_t> _mesh;
 };
 }
 #endif //_RENDERER_SDL_H_

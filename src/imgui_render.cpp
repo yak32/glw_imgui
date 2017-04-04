@@ -47,17 +47,9 @@ render_vertex_3d_t new_coords[TEMP_COORD_COUNT * 2 * 6];
 
 const int CIRCLE_VERTS = 8 * 4;
 float g_circleVerts[CIRCLE_VERTS * 2];
-
 const float MAX_UI_DEPTH = 256.0f; // to match z buffer depth
 
 }
-
-
-#define RENDERER_ARGB(a, r, g, b)                                                                  \
-	((unsigned int)((((a)&0xff) << 24) | (((r)&0xff) << 16) | (((g)&0xff) << 8) | ((b)&0xff)))
-#define RENDERER_COLOR_RGBA(r, g, b, a) RENDERER_ARGB(a, r, g, b)
-#define COLOR_TO_D3D(c)                                                                            \
-	RENDERER_COLOR_RGBA((c & 0xff), ((c >> 8) & 0xff), ((c >> 16) & 0xff), ((c >> 24) & 0xff))
 
 struct font_t {
 	stbtt_bakedchar cdata[96]; // ASCII 32..126 is 95 glyphs
@@ -92,10 +84,10 @@ void render_mesh(IRenderer* renderer, const float* coords, float txt_shift_x,
 						float txt_shift_y, float txt_scale_x, float txt_scale_y, unsigned numCoords,
 						float r, unsigned int col, float depth);
 bool Ui::render_init(IRenderer* r) {
-	m_renderer = r;
+	_renderer = r;
 
-	m_texture_atlas = new TextureAtlas;
-	
+	_texture_atlas = new TextureAtlas;
+
 	for (unsigned i = 0; i < CIRCLE_VERTS; ++i) {
 		float a = (float)i / (float)CIRCLE_VERTS * (float)M_PI * 2;
 		g_circleVerts[i * 2 + 0] = cosf(a);
@@ -104,69 +96,69 @@ bool Ui::render_init(IRenderer* r) {
 
 	unsigned int white = 0xffffffff;
 
-	m_white_texture = { 0 };
-	m_white_texture.width = 0.0f; m_white_texture.height = 0.0f;
+	_white_texture = { 0 };
+	_white_texture.width = 0.0f; _white_texture.height = 0.0f;
 
 	// create batch texture
-	if (m_mode & MODE_BATCH_DRAW_CALLS){
-		m_texture_atlas->create(TEXTURE_ATLAS_SIZE, TEXTURE_ATLAS_SIZE);
-		m_atlas = r->create_texture(TEXTURE_ATLAS_SIZE, TEXTURE_ATLAS_SIZE, 4, nullptr);
+	if (_mode & MODE_BATCH_DRAW_CALLS){
+		_texture_atlas->create(TEXTURE_ATLAS_SIZE, TEXTURE_ATLAS_SIZE);
+		_atlas = r->create_texture(TEXTURE_ATLAS_SIZE, TEXTURE_ATLAS_SIZE, 4, nullptr);
 
 		unsigned int x, y;
-		m_texture_atlas->add_box(1, 1, &x, &y);
-		if (!r->copy_sub_texture(m_atlas, x, y, 1, 1, &white)){
+		_texture_atlas->add_box(1, 1, &x, &y);
+		if (!r->copy_sub_texture(_atlas, x, y, 1, 1, &white)){
 			IMGUI_LOG_ERROR("failed to create white texture");
 			return false;
 		}
-		m_white_texture.x = x + 0.5f / TEXTURE_ATLAS_SIZE;
-		m_white_texture.y = y + 0.5f / TEXTURE_ATLAS_SIZE;
-		m_white_texture.width = m_white_texture.height = 0.0f;
-		m_white_texture.id = m_atlas;
-		return m_atlas != UNDEFINED_TEXTURE;
+		_white_texture.x = x + 0.5f / TEXTURE_ATLAS_SIZE;
+		_white_texture.y = y + 0.5f / TEXTURE_ATLAS_SIZE;
+		_white_texture.width = _white_texture.height = 0.0f;
+		_white_texture.id = _atlas;
+		return _atlas != UNDEFINED_TEXTURE;
 	}
-	m_white_texture.id = r->create_texture(1, 1, 4, &white);
-	m_white_texture.width = 1.0f; m_white_texture.height = 1.0f;
-	return m_white_texture.id != UNDEFINED_TEXTURE;
+	_white_texture.id = r->create_texture(1, 1, 4, &white);
+	_white_texture.width = 1.0f; _white_texture.height = 1.0f;
+	return _white_texture.id != UNDEFINED_TEXTURE;
 }
 bool Ui::render_destroy() {
-	if (!m_renderer)
+	if (!_renderer)
 		return false;
 
-	if (m_mode & MODE_BATCH_DRAW_CALLS){
-		if (m_atlas != UNDEFINED_TEXTURE)
-			m_renderer->remove_texture(m_atlas);
+	if (_mode & MODE_BATCH_DRAW_CALLS){
+		if (_atlas != UNDEFINED_TEXTURE)
+			_renderer->remove_texture(_atlas);
 	}
-	else if (m_white_texture.id != UNDEFINED_TEXTURE){
-		m_renderer->remove_texture(m_white_texture.id);
+	else if (_white_texture.id != UNDEFINED_TEXTURE){
+		_renderer->remove_texture(_white_texture.id);
 	}
 
-	delete m_texture_atlas;
-	m_texture_atlas = nullptr;
+	delete _texture_atlas;
+	_texture_atlas = nullptr;
 
-	for (auto& font : m_fonts)
+	for (auto& font : _fonts)
 		delete font.second;
 
-	m_fonts.clear();
+	_fonts.clear();
 	return true;
 }
 bool Ui::bind_texture(const char* path){
-	auto it_texture = m_textures.find(path);
-	if (it_texture != m_textures.end()){
-		m_current_texture = it_texture->second;
+	auto it_texture = _textures.find(path);
+	if (it_texture != _textures.end()){
+		_current_texture = it_texture->second;
 		return true;
 	};
-	IRenderer* r = m_renderer;
+	IRenderer* r = _renderer;
 
 	texture_t texture;
 	texture.id = UNDEFINED_TEXTURE;
-	if (m_mode & MODE_BATCH_DRAW_CALLS){
+	if (_mode & MODE_BATCH_DRAW_CALLS){
 		// put image into atlas
 		int width, height, channels;
 		unsigned int x, y;
 		unsigned char* image = r->load_image(path, &width, &height, &channels);
 		if (image && channels == 4 ){
-			m_texture_atlas->add_box(width, height, &x, &y);
-			r->copy_sub_texture(m_atlas, x,  y,  width,  height, image);
+			_texture_atlas->add_box(width, height, &x, &y);
+			r->copy_sub_texture(_atlas, x,  y,  width,  height, image);
 
 			texture.x = (float)x/TEXTURE_ATLAS_SIZE;
 			texture.y = (float)y/TEXTURE_ATLAS_SIZE;
@@ -183,26 +175,26 @@ bool Ui::bind_texture(const char* path){
 		texture.width = 1.0f;
 		texture.height = 1.0f;
 	}
-	m_textures[path] = texture;
-	m_current_texture = texture;
+	_textures[path] = texture;
+	_current_texture = texture;
 	return texture.id != UNDEFINED_TEXTURE;
 }
 void Ui::render_draw(bool transparency) {
-	if (!m_renderer)
+	if (!_renderer)
 		return; // not yet initialized
 
-	IRenderer* r = m_renderer;
-	r->begin(m_width, m_height);
+	IRenderer* r = _renderer;
+	r->begin(_width, _height);
 
 	int size;
 	const gfx_cmd* cmd = get_render_queue(size);
-	m_current_texture = m_white_texture;
+	_current_texture = _white_texture;
 
 	bool bind_font = true;
 	for (int i = 0; i < size; ++i, ++cmd) {
 		switch (cmd->type) {
 		case GFX_CMD_RECT:
-			r->bind_texture(m_current_texture.id);
+			r->bind_texture(_current_texture.id);
 			r->set_blend_mode(BLEND_RECT);
 			// if (!g_blend_texture)
 			//	r->set_state(RS_BLEND, RF_FALSE);
@@ -213,24 +205,24 @@ void Ui::render_draw(bool transparency) {
 						(float)cmd->rect.y,
 						(float)cmd->rect.w,
 						(float)cmd->rect.h,
-						m_current_texture.x,
-						m_current_texture.y,
-						m_current_texture.width,
-						m_current_texture.height,
+						_current_texture.x,
+						_current_texture.y,
+						_current_texture.width,
+						_current_texture.height,
 						cmd->col,
-						m_depth,
+						_depth,
 						false);
 			}
 			else {
 				draw_rounded_rect(r, (float)cmd->rect.x, (float)cmd->rect.y,
 								  (float)cmd->rect.w, (float)cmd->rect.h,
-								  (float)cmd->rect.r, 1.0f, cmd->col, m_depth);
+								  (float)cmd->rect.r, 1.0f, cmd->col, _depth);
 			}
 			break;
 
 		case GFX_CMD_TRIANGLE:
 			r->set_blend_mode(BLEND_RECT);
-			r->bind_texture(m_white_texture.id);
+			r->bind_texture(_white_texture.id);
 			if (cmd->flags == 1) {
 				const float verts[3 * 2] = {
 					(float)cmd->rect.x,
@@ -240,7 +232,7 @@ void Ui::render_draw(bool transparency) {
 					(float)cmd->rect.x,
 					(float)cmd->rect.y + (float)cmd->rect.h,
 				};
-				render_mesh(r, verts, 0, 0, 1.0f, 1.0f, 3, 1.0f, cmd->col, m_depth);
+				render_mesh(r, verts, 0, 0, 1.0f, 1.0f, 3, 1.0f, cmd->col, _depth);
 			}
 			if (cmd->flags == 2) {
 				const float verts[3 * 2] = {
@@ -251,16 +243,16 @@ void Ui::render_draw(bool transparency) {
 					(float)cmd->rect.x + (float)cmd->rect.w,
 					(float)cmd->rect.y + (float)cmd->rect.h,
 				};
-				render_mesh(r, verts, 0, 0, 1.0f, 1.0f, 3, 1.0f, cmd->col, m_depth);
+				render_mesh(r, verts, 0, 0, 1.0f, 1.0f, 3, 1.0f, cmd->col, _depth);
 			}
 			break;
 
 		case GFX_CMD_DEPTH:
 // after receiving depth command, setup depth testing (disabled by default)
 #ifdef IMGUI_RIGHTHANDED
-			m_depth = 1.0f - (float)cmd->depth.z / MAX_UI_DEPTH;
+			_depth = 1.0f - (float)cmd->depth.z / MAX_UI_DEPTH;
 #else
-			m_depth = (float)(MAX_UI_LAYER_COUNT - cmd->depth.z) / MAX_UI_DEPTH;
+			_depth = (float)(MAX_UI_LAYER_COUNT - cmd->depth.z) / MAX_UI_DEPTH;
 #endif
 			break;
 
@@ -273,32 +265,32 @@ void Ui::render_draw(bool transparency) {
 			break;
 
 		case GFX_CMD_TEXT:
-			r->bind_texture(m_current_font->second->id);
+			r->bind_texture(_current_font->second->id);
 			r->set_blend_mode(BLEND_TEXT);
-			render_text(*m_current_font->second, cmd->text.x, cmd->text.y, cmd->text.width, cmd->text.height,
-						cmd->text.text, cmd->text.align, cmd->col, m_depth);
+			render_text(*_current_font->second, cmd->text.x, cmd->text.y, cmd->text.width, cmd->text.height,
+						cmd->text.text, cmd->text.align, cmd->col, _depth);
 			break;
 
 		case GFX_CMD_TEXTURE:
 			if (cmd->texture.path)
 				bind_texture(cmd->texture.path);
 			else
-				m_current_texture = m_white_texture;
+				_current_texture = _white_texture;
 			// manager
 			break;
 
 		case GFX_CMD_FONT:
 			if (cmd->font.path){
 				char font_name[256];
-				sprintf(font_name, "%s:%f", cmd->font.path, cmd->font.height);
-				auto font = m_fonts.find(font_name);
-				if (font != m_fonts.end())
-					m_current_font = font;
+				snprintf(font_name, sizeof(font_name), "%s:%f", cmd->font.path, cmd->font.height);
+				auto font = _fonts.find(font_name);
+				if (font != _fonts.end())
+					_current_font = font;
 				else{
 					font_t* f = new font_t;
 					if (load_font(cmd->font.path, cmd->font.height, *f)) {
-						m_fonts[font_name] = f;
-						m_current_font = m_fonts.find(font_name);//TODO: IMPROVE
+						_fonts[font_name] = f;
+						_current_font = _fonts.find(font_name);//TODO: IMPROVE
 					}
 					else
 						delete f;
@@ -506,7 +498,7 @@ void draw_line(IRenderer* render, float x0, float y0, float x1, float y1, float 
 bool Ui::load_font(const char* path, float font_height, font_t& font) {
 	// Load font.
 	size_t file_size;
-	void* file_buffer = m_platform->load_file(path, file_size);
+	void* file_buffer = _platform->load_file(path, file_size);
 	if (!file_buffer ) {
 		assert(false && "failed to load file");
 		return false;
@@ -519,14 +511,14 @@ bool Ui::load_font(const char* path, float font_height, font_t& font) {
 						 font.cdata); // no guarantee this fits!
 
 	// create texture
-	unsigned int texture = m_renderer->create_texture(512, 512, 1, bmap);
+	unsigned int texture = _renderer->create_texture(512, 512, 1, bmap);
 	if (texture == 0xffffffff)
 		return false;
 
 	free(bmap);
 	free(file_buffer);
 	font.id = texture;
-	font.height = font_height;
+	font.height = (uint)font_height;
 	return true;
 }
 void get_baked_quad(const stbtt_bakedchar* chardata, int pw, int ph, int char_index, float* xpos,
@@ -587,7 +579,7 @@ void Ui::render_text(const font_t& font, float x, float y, float w, float h, con
 		y += font.height/4;
 	else if (align == ALIGN_TOP)
 		y = y + h - font.height/4;
-	else	
+	else
 		y = y + h/2 - font.height/4;
 
 	//y += h / 4; // adjust text position
@@ -623,6 +615,6 @@ void Ui::render_text(const font_t& font, float x, float y, float w, float h, con
 		++text;
 	}
 	k = v - new_coords;
-	m_renderer->render_mesh(new_coords, k, true);
+	_renderer->render_mesh(new_coords, k, true);
 }
 }

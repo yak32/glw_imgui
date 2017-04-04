@@ -165,7 +165,7 @@ public:
 	const char* get_rollout_name(Rollout* r) const;
 	bool is_rollout_visible(Rollout* r) const;
 
-	unsigned int mode() const { return m_mode;}
+	unsigned int mode() const { return _mode;}
 
 	bool scroll_rollout(Rollout* r, int scroll, SCROLL_MODE mode);
 	bool hit_test(int x, int y) const;
@@ -296,91 +296,91 @@ private:
 	inline const int TOOLBAR_HEADER() const;
 	inline const int DEF_ROUND() const;
 	inline const int DEFAULT_PADDING() const;
-	
+
 	uint get_control_id(uint widget_id) const;
 private:
-	uint m_width;
-	uint m_height;
-	bool m_left, m_double_left;
-	int m_keys_state, m_prev_keys_state;
-	bool m_left_pressed, m_left_released, m_double_left_released;
-	int m_mx, m_my;
-	int m_scroll;
-	uint m_render_options;
-	uint m_item_height;
+	uint _width;
+	uint _height;
+	bool _left, _double_left;
+	int _keys_state, _prev_keys_state;
+	bool _left_pressed, _left_released, _double_left_released;
+	int _mx, _my;
+	int _scroll;
+	uint _render_options;
+	uint _item_height;
 
-	uint m_active;
-	uint m_hot;
-	uint m_hot_to_be;
-	uint m_prev_enabled_id;
-	bool m_is_hot;
-	bool m_is_active;
-	bool m_went_active;
-	bool m_search_next_focus; // tab pressed, search for next focus
-	int m_drag_x, m_drag_y;
-	float m_drag_orig;
-	int m_widget_x, m_widget_y, m_widget_w;
-	int m_rollout_width, m_rollout_height, m_rollout_left, m_rollout_top;
-	bool m_inside_current_scroll;
-	uint m_area_id;
-	uint m_character;
-	uint m_widget_id;
-	uint m_focus;
+	uint _active;
+	uint _hot;
+	uint _hot_to_be;
+	uint _prev_enabled_id;
+	bool _is_hot;
+	bool _is_active;
+	bool _went_active;
+	bool _search_next_focus; // tab pressed, search for next focus
+	int _drag_x, _drag_y;
+	float _drag_orig;
+	int _widget_x, _widget_y, _widget_w;
+	int _rollout_width, _rollout_height, _rollout_left, _rollout_top;
+	bool _inside_current_scroll;
+	uint _area_id;
+	uint _character;
+	uint _widget_id;
+	uint _focus;
 
-	char m_edit_buffer[256]; // used for holding buffer for current edited control
-	int m_row;
-	uint m_drag_item_width;  // width of dragging item
-	uint m_options;
-	int m_alpha;
-	uint m_text_align;
-	int m_padding_left, m_padding_right, m_padding_top, m_padding_bottom;
-	int m_item_padding_left, m_item_padding_right, m_item_padding_top, m_item_padding_bottom;
-	float m_property_width;
-	Rollout* m_dragged_rollout_id;
-	Rollout* m_focused_rollout_id;
-	int m_cursor;
-	bool m_cursor_over_drag;
-	int m_scroll_right;
-	int m_scroll_area_top;
-	int* m_scroll_val;
-	int m_focus_top;
-	int m_focus_bottom;
-	uint m_scroll_id;
-	bool m_inside_scroll_area;
-	int m_scroll_top;
-	int m_scroll_bottom;
-	IPlatform* m_platform;
+	char _edit_buffer[256]; // used for holding buffer for current edited control
+	int _row;
+	uint _drag_item_width;  // width of dragging item
+	uint _options;
+	int _alpha;
+	uint _text_align;
+	int _padding_left, _padding_right, _padding_top, _padding_bottom;
+	int _item_padding_left, _item_padding_right, _item_padding_top, _item_padding_bottom;
+	float _property_width;
+	Rollout* _dragged_rollout_id;
+	Rollout* _focused_rollout_id;
+	int _cursor;
+	bool _cursor_over_drag;
+	int _scroll_right;
+	int _scroll_area_top;
+	int* _scroll_val;
+	int _focus_top;
+	int _focus_bottom;
+	uint _scroll_id;
+	bool _inside_scroll_area;
+	int _scroll_top;
+	int _scroll_bottom;
+	IPlatform* _platform;
 
-	char m_drag_item[256];   // used for holding buffer for current draging item
-	uint m_edit_buffer_id;
-	uint m_colors[MAX_COLORS];
-	RolloutMoveSide m_target_side;
-	Rollout* m_target_rollout;
-	div_drag m_rollout_drag_div;
-	Toolbar *m_toolbar_root, *m_rollout_last;
+	char _drag_item[256];   // used for holding buffer for current draging item
+	uint _edit_buffer_id;
+	uint _colors[MAX_COLORS];
+	RolloutMoveSide _target_side;
+	Rollout* _target_rollout;
+	div_drag _rollout_drag_div;
+	Toolbar *_toolbar_root, *_rollout_last;
 
 
-	Rollouts m_rollouts;
+	Rollouts _rollouts;
 
-	RenderQueue m_rqueues[2];
-	RenderQueue* m_rqueue, *m_rqueue_display;
-	std::mutex	m_mutex;
-	IRenderer* m_renderer;
-	std::unordered_map<std::string, font_t*> m_fonts;
-	std::unordered_map<std::string, texture_t> m_textures;
+	RenderQueue _rqueues[2];
+	RenderQueue* _rqueue, *_rqueue_display;
+	std::mutex	_mutex;
+	IRenderer* _renderer;
+	std::unordered_map<std::string, font_t*> _fonts;
+	std::unordered_map<std::string, texture_t> _textures;
 
-	texture_t m_current_texture;
-	texture_t m_white_texture;
+	texture_t _current_texture;
+	texture_t _white_texture;
 
-	std::unordered_map<std::string, font_t*>::iterator m_current_font;
-	bool m_blend_texture;
-	float m_depth;
-	uint m_mode;
+	std::unordered_map<std::string, font_t*>::iterator _current_font;
+	bool _blend_texture;
+	float _depth;
+	uint _mode;
 
-	uint m_atlas;
-	TextureAtlas* m_texture_atlas;
+	uint _atlas;
+	TextureAtlas* _texture_atlas;
 
-	Rollout* m_focus_rollout;
+	Rollout* _focus_rollout;
 };
 }
 #endif // _IMGUI_H_

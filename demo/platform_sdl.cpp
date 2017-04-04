@@ -31,15 +31,15 @@ PlatformSDL::PlatformSDL() {
 		printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
 		throw;
 	}
-	for (int i = 0; i < CURSOR_COUNT; ++i) 
-		m_cursors[i] = SDL_CreateSystemCursor(mapCursor[i]);
+	for (int i = 0; i < CURSOR_COUNT; ++i)
+		_cursors[i] = SDL_CreateSystemCursor(mapCursor[i]);
 }
 PlatformSDL::~PlatformSDL() {
-	for (int i = 0; i < CURSOR_COUNT; ++i) SDL_FreeCursor(m_cursors[i]);
+	for (int i = 0; i < CURSOR_COUNT; ++i) SDL_FreeCursor(_cursors[i]);
 	SDL_Quit();
 }
 void PlatformSDL::set_cursor(CURSOR cursor) {
-	SDL_SetCursor(m_cursors[cursor]);
+	SDL_SetCursor(_cursors[cursor]);
 }
 void PlatformSDL::capture_mouse(bool set) {
 	SDL_CaptureMouse(set ? SDL_TRUE : SDL_FALSE);
@@ -231,8 +231,8 @@ void RenderSDL::initialize_render(uint width, uint height){
 	checkError();
 }
 bool RenderSDL::render_mesh(const render_vertex_3d_t* tris, int count, bool b) {
-	m_mesh.insert(m_mesh.end(), tris, tris + count);
-	render(m_mesh.size()-count, count);
+	_mesh.insert(_mesh.end(), tris, tris + count);
+	render(_mesh.size()-count, count);
 	return true;
 }
 void RenderSDL::render(int start, int count){
@@ -240,7 +240,7 @@ void RenderSDL::render(int start, int count){
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
 	// Give our vertices to OpenGL.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(render_vertex_3d_t) * m_mesh.size(), &m_mesh[0], GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(render_vertex_3d_t) * _mesh.size(), &_mesh[0], GL_DYNAMIC_DRAW);
 	checkError();
 
 	// bind vertex attributes
@@ -255,10 +255,10 @@ void RenderSDL::render(int start, int count){
 	glDrawArrays(GL_TRIANGLES, start, count);
 }
 bool RenderSDL::end() {
-	if (m_mesh.empty())
+	if (_mesh.empty())
 		return true; // nothing to draw
 
-	m_mesh.clear();
+	_mesh.clear();
 	// GLenum e = glGetError();
 	// printf("%s", glewGetErrorString(e));
 

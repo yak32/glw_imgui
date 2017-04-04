@@ -1377,13 +1377,13 @@ if(NOT WINDOWS OR CYGWIN)
     set(ENABLE_STATIC_TRUE "#")
     set(ENABLE_STATIC_FALSE "")
   endif()
-  if(SDL_SHARED)
-    set(ENABLE_SHARED_TRUE "")
-    set(ENABLE_SHARED_FALSE "#")
-  else()
+  #if(SDL_SHARED)
+  #  set(ENABLE_SHARED_TRUE "")
+   # set(ENABLE_SHARED_FALSE "#")
+  #else()
     set(ENABLE_SHARED_TRUE "#")
     set(ENABLE_SHARED_FALSE "")
-  endif()
+  #endif()
 
   # Clean up the different lists
   listtostr(EXTRA_LIBS _EXTRA_LIBS "-l")
@@ -1454,30 +1454,30 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_CFLAGS}")
 add_library(SDL2main STATIC ${SDLMAIN_SOURCES})
 set(_INSTALL_LIBS "SDL2main")
 
-if(SDL_SHARED)
-  add_library(SDL2 SHARED ${SOURCE_FILES})
-  if(UNIX)
-    set_target_properties(SDL2 PROPERTIES
-      VERSION ${LT_VERSION}
-      SOVERSION ${LT_REVISION}
-      OUTPUT_NAME "SDL2-${LT_RELEASE}")
-  else()
-    set_target_properties(SDL2 PROPERTIES
-      VERSION ${SDL_VERSION}
-      SOVERSION ${LT_REVISION}
-      OUTPUT_NAME "SDL2")
-  endif()
-  if(MSVC)
-    # Don't try to link with the default set of libraries.
-    set_target_properties(SDL2 PROPERTIES LINK_FLAGS_RELEASE "/NODEFAULTLIB")
-    set_target_properties(SDL2 PROPERTIES LINK_FLAGS_DEBUG "/NODEFAULTLIB")
-    set_target_properties(SDL2 PROPERTIES STATIC_LIBRARY_FLAGS "/NODEFAULTLIB")
-  endif()
-  set(_INSTALL_LIBS "SDL2" ${_INSTALL_LIBS})
-  target_link_libraries(SDL2 ${EXTRA_LIBS} ${EXTRA_LDFLAGS})
-endif()
+#if(SDL_SHARED)
+#  add_library(SDL2 SHARED ${SOURCE_FILES})
+#if(UNIX)
+#    set_target_properties(SDL2 PROPERTIES
+#      VERSION ${LT_VERSION}
+#      SOVERSION ${LT_REVISION}
+#      OUTPUT_NAME "SDL2-${LT_RELEASE}")
+#  else()
+#    set_target_properties(SDL2 PROPERTIES
+#      VERSION ${SDL_VERSION}
+#      SOVERSION ${LT_REVISION}
+#      OUTPUT_NAME "SDL2")
+#  endif()
+#  if(MSVC)
+#    # Don't try to link with the default set of libraries.
+#    set_target_properties(SDL2 PROPERTIES LINK_FLAGS_RELEASE "/NODEFAULTLIB")
+#    set_target_properties(SDL2 PROPERTIES LINK_FLAGS_DEBUG "/NODEFAULTLIB")
+#    set_target_properties(SDL2 PROPERTIES STATIC_LIBRARY_FLAGS "/NODEFAULTLIB")
+#  endif()
+#  set(_INSTALL_LIBS "SDL2" ${_INSTALL_LIBS})
+#  target_link_libraries(SDL2 ${EXTRA_LIBS} ${EXTRA_LDFLAGS})
+#endif()
 
-if(SDL_STATIC)
+#if(SDL_STATIC)
   set (BUILD_SHARED_LIBS FALSE)
   add_library(SDL2-static STATIC ${SOURCE_FILES})
   set_target_properties(SDL2-static PROPERTIES OUTPUT_NAME "SDL2")
@@ -1490,13 +1490,13 @@ if(SDL_STATIC)
   # libraries - do we need to consider this?
   set(_INSTALL_LIBS "SDL2-static" ${_INSTALL_LIBS})
   target_link_libraries(SDL2-static ${EXTRA_LIBS} ${EXTRA_LDFLAGS})
-endif()
+#endif()
 
 ##### Installation targets #####
-install(TARGETS ${_INSTALL_LIBS}
-  LIBRARY DESTINATION "lib${LIB_SUFFIX}"
-  ARCHIVE DESTINATION "lib${LIB_SUFFIX}"
-  RUNTIME DESTINATION bin)
+#install(TARGETS ${_INSTALL_LIBS}
+#  LIBRARY DESTINATION "lib${LIB_SUFFIX}"
+#  ARCHIVE DESTINATION "lib${LIB_SUFFIX}"
+#  RUNTIME DESTINATION bin)
 
 file(GLOB INCLUDE_FILES ${SDL2_SOURCE_DIR}/include/*.h)
 file(GLOB BIN_INCLUDE_FILES ${SDL2_BINARY_DIR}/include/*.h)
@@ -1505,25 +1505,25 @@ foreach(_FNAME ${BIN_INCLUDE_FILES})
   list(REMOVE_ITEM INCLUDE_FILES ${SDL2_SOURCE_DIR}/include/${_INCNAME})
 endforeach()
 list(APPEND INCLUDE_FILES ${BIN_INCLUDE_FILES})
-install(FILES ${INCLUDE_FILES} DESTINATION include/SDL2)
+#install(FILES ${INCLUDE_FILES} DESTINATION include/SDL2)
 
 if(NOT WINDOWS OR CYGWIN)
   if(SDL_SHARED)
-    install(CODE "
-      execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
-      \"libSDL2-2.0.so\" \"libSDL2.so\")")
-    install(FILES ${SDL2_BINARY_DIR}/libSDL2.so DESTINATION "lib${LIB_SUFFIX}")
+ #   install(CODE "
+  #    execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
+  #    \"libSDL2-2.0.so\" \"libSDL2.so\")")
+   # install(FILES ${SDL2_BINARY_DIR}/libSDL2.so DESTINATION "lib${LIB_SUFFIX}")
   endif()
   if(FREEBSD)
     # FreeBSD uses ${PREFIX}/libdata/pkgconfig
-    install(FILES ${SDL2_BINARY_DIR}/sdl2.pc DESTINATION "libdata/pkgconfig")
+    #install(FILES ${SDL2_BINARY_DIR}/sdl2.pc DESTINATION "libdata/pkgconfig")
   else()
-    install(FILES ${SDL2_BINARY_DIR}/sdl2.pc
-      DESTINATION "lib${LIB_SUFFIX}/pkgconfig")
+    #install(FILES ${SDL2_BINARY_DIR}/sdl2.pc
+    #  DESTINATION "lib${LIB_SUFFIX}/pkgconfig")
   endif()
-  install(PROGRAMS ${SDL2_BINARY_DIR}/sdl2-config DESTINATION bin)
+  #install(PROGRAMS ${SDL2_BINARY_DIR}/sdl2-config DESTINATION bin)
   # TODO: what about the .spec file? Is it only needed for RPM creation?
-  install(FILES "${SDL2_SOURCE_DIR}/sdl2.m4" DESTINATION "share/aclocal")
+  #install(FILES "${SDL2_SOURCE_DIR}/sdl2.m4" DESTINATION "share/aclocal")
 endif()
 
 ##### Uninstall target #####
@@ -1535,3 +1535,5 @@ configure_file(
 
 add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+
+

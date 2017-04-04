@@ -102,16 +102,16 @@ struct RenderQueue {
 	void set_alpha(unsigned int alpha);
 	void set_render_options(int options);
 private:
-	gfx_cmd m_queue[GFXCMD_QUEUE_SIZE];
-	size_t m_size, m_mem_size;
+	gfx_cmd _queue[GFXCMD_QUEUE_SIZE];
+	size_t _size, _mem_size;
 
-	char m_text_pool[TEXT_POOL_SIZE];
-	unsigned m_text_pool_size;
+	char _text_pool[TEXT_POOL_SIZE];
+	unsigned _text_pool_size;
 
-	int m_render_options;
-	unsigned int m_alpha;
+	int _render_options;
+	unsigned int _alpha;
 
-	std::atomic<bool> m_ready_to_render;
+	std::atomic<bool> _ready_to_render;
 };
 }
 #endif //_RENDER_QUEUE_H_

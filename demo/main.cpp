@@ -61,7 +61,7 @@ void setup_ui() {
 	vert_rollout = ui.create_rollout("VERT", WND_STYLE);
 	ui.insert_rollout(vert_rollout, -200, true, root_rollout);
 
-	ui.font("E:/projects/glw_imgui/DroidSans.ttf", 15);
+	ui.font("DroidSans.ttf", 15);
 }
 bool init() {
 	bool success = true;
