@@ -20,7 +20,7 @@ The library has basic suppot for layouting (attachable toolbars, layout serializ
 Basic GUI manipulations, various controls, resizable and movable toolbars. Entire UI is built using IMGUI.
 [![ScreenShot](/../feature-screenshots/screenshots/IMGUI_toolbars.png)](https://www.youtube.com/watch?v=TlJiuguyLVo)
 
-The Editor of [Glow game engine](www.glow3d.com)
+The Editor of [Glow game engine](http://www.glow3d.com)
 
 ### Sample UI update loop with various controls
 ```c++
