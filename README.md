@@ -95,6 +95,18 @@ The Editor of [Glow game engine](www.glow3d.com)
 		ui.unindent();
 	}
 	ui.end_rollout();
+
+	ui.begin_rollout(vert_rollout);
+
+	char str[100];
+	static int selected = -1;
+	for (int i = 0; i < 100; ++i) {
+		sprintf(str, "item %d", i);
+		if (ui.item(str, i == selected))
+			selected = i;
+	}
+	ui.end_rollout();
+
 	ui.end_frame();
 ```
 ![Alt text](/../feature-screenshots/screenshots/ref_ui.png)
