@@ -23,6 +23,8 @@
 			"*.c",
 			"*.h",
 			"*.json",
+			"*.png",
+			"*.jpeg",
 			"*.types",
 			"*.txt",
 			"*.sublime*",
