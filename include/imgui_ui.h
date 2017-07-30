@@ -244,7 +244,6 @@ public:
 	void play_sound(SOUNDS s);
 	void render_draw(bool transparency);
 
-
 private:
 	bool any_active() const;
 	bool is_item_active(uint id) const;
@@ -269,7 +268,6 @@ private:
 	color text_color_hot(uint id, bool enabled, bool focused = false);
 	color button_color(uint id, bool enabled = true);
 	color edit_color(uint id, bool enabled = true);
-
 
 	void detach_tabbed_rollout(Rollout* r);
 
@@ -296,7 +294,7 @@ private:
 	inline const int TOOLBAR_HEADER() const;
 	inline const int DEF_ROUND() const;
 	inline const int DEFAULT_PADDING() const;
-	
+
 	uint get_control_id(uint widget_id) const;
 private:
 	uint m_width;

@@ -2,7 +2,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 INCLUDE(CMakeToolsHelpers OPTIONAL)
 PROJECT(imgui)
 
-SET(GLW_IMGUI_DEMO "GLW_IMGUI_DEMO" CACHE STRING "Build demo app")
+OPTION(GLW_IMGUI_DEMO "Build demo app" ON)
+OPTION(GLW_BUILD_TESTS "Build tests" ON)
 
 IF (GLW_IMGUI_DEMO)
 	ADD_SUBDIRECTORY(demo)
@@ -13,6 +14,8 @@ IF(UNIX)
 ENDIF()
 
 INCLUDE_DIRECTORIES(include thirdparty)
+
+MESSAGE("GLW_JSON_INCLUDE_DIRS: ${GLW_JSON_INCLUDE_DIRS}")
 
 SET (IMGUI_SOURCE_FILES
 	src/imgui_ui.cpp
@@ -32,12 +35,14 @@ SET(IMGUI_HEADER_FILES
 	include/imgui_toolbars.h
 	include/imgui_render_queue.h
 	thirdparty/stb/stb_truetype.h
-	thirdparty/texture_atlas/texture_atlas.h
-	thirdparty/glw_json/glw_json.h)
+	thirdparty/texture_atlas/texture_atlas.h)
 
 SET_SOURCE_FILES_PROPERTIES(IMGUI_HEADER_FILES PROPERTIES HEADER_FILE_ONLY TRUE)
 LIST(APPEND IMGUI_SOURCE_FILES ${IMGUI_HEADER_FILES})
 
 ADD_LIBRARY (glw_imgui STATIC ${IMGUI_SOURCE_FILES})
 
+IF (GLW_BUILD_TESTS)
+	ADD_SUBDIRECTORY(tests)
+ENDIF()
 

@@ -1,41 +1,41 @@
 {
  	"folders": [
-	 {
-		 "path": ".",
-		 "file_exclude_patterns": [
-			 "*.vcproj",
-			 "*.vcxproj",
-			 "*.sln",
-			 "*.gitignore",
-			 "*.gitmodules",
-			 "*.vcxproj.*"
-		 ],
-		 "folder_exclude_patterns":[
+	{
+		"path": ".",
+		"file_exclude_patterns": [
+			"*.vcproj",
+			"*.vcxproj",
+			"*.sln",
+			"*.gitignore",
+			"*.gitmodules",
+			"*.vcxproj.*"
+		],
+		"folder_exclude_patterns":[
 			"cmake*",
 			"modelling",
 			"tools",
 			"documentation",
-
 			".git",
-		 ],
-		 "file_include_patterns":[
+		],
+		"file_include_patterns":[
 			"*.cpp",
 			"*.c",
+			"*.cc",
 			"*.h",
 			"*.json",
 			"*.types",
 			"*.txt",
 			"*.sublime*",
 			"*.txt"
-		 ],
+		],
 	 }
 	],
  	"build_systems":[
-	 {
+	{
 	 	"name": "imgui",
 		"shell_cmd": "cmake --build $project_path/build",
 		"file_regex": "^[ .\\\\/]*([a-zA-Z]?:?[\\w.\\\\/]+)[()]([0-9]+)[)]([0-9]+)?:?(.*)$",
-		"working_dir": "${project_path}/build/",
+		"working_dir": "${project_path}\\build",
 		"selector": "source.c, source.c++",
 	    "variants":
 	   	[
@@ -45,14 +45,18 @@
 			    "file_regex": "^[.\\\\/]*([A-Z]?:?[\\w.\\\\/]+)[:]([0-9]+)[:]([0-9]+)?:?(.*)$",
 			    "selector": "source.c, source.c++"
 	   		},
-	   	      {
-			    "shell_cmd": "cmake -D GLW_IMGUI_DEMO=ON $project_path/build",
+			{
+			    "shell_cmd": "cmake -B$project_path\\build -H$project_path",
 			    "name": "project",
-			    "working_dir": "${project_path}/build/",
 			    "file_regex": "^[.\\\\/]*([A-Z]?:?[\\w.\\\\/]+)[:]([0-9]+)[:]([0-9]+)?:?(.*)$",
 			    "selector": "source.c, source.c++"
-	   		}
-
+	   		},
+			{
+				"shell_cmd": "ctest -VV",
+				"name": "test",
+				"file_regex": "^[.\\\\/]*([A-Z]?:?[\\w.\\\\/]+)[:]([0-9]+)[:]([0-9]+)?:?(.*)$",
+				"selector": "source.c, source.c++"
+			}
 	  	]
 	}
 	]
