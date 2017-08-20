@@ -44,7 +44,8 @@
 			    "selector": "source.c, source.c++"
 	   		},
 	   		{
-			    "shell_cmd": "$project_path/build/demo/demo",
+			    "shell_cmd": "$project_path/demo/install/demo",
+			    "working_dir": "$project_path/demo/install/",
 			    "name": "run",
 			    "file_regex": "^[.\\\\/]*([A-Z]?:?[\\w.\\\\/]+)[:]([0-9]+)[:]([0-9]+)?:?(.*)$",
 			    "selector": "source.c, source.c++"

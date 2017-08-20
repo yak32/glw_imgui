@@ -72,8 +72,8 @@ Ui::Ui(uint mode)
 	memset(_drag_item, 0, sizeof(_drag_item));
 	// colors
 	_colors[BUTTON_COLOR_ACTIVE] = RGBA(128, 128, 128, 196);
-	_colors[BUTTON_COLOR_FOCUSED] = RGBA(128, 128, 128, 196);
 	_colors[BUTTON_COLOR] = RGBA(128, 128, 128, 96);
+	_colors[BUTTON_COLOR_FOCUSED] = RGBA(128, 128, 128, 120);
 	_colors[EDIT_COLOR] = _colors[BUTTON_COLOR];
 	_colors[EDIT_COLOR_ACTIVE] = _colors[BUTTON_COLOR_ACTIVE];
 	_colors[COLLAPSE_COLOR] = RGBA(0, 0, 0, 196);
@@ -909,11 +909,10 @@ color Ui::text_color(uint id, bool enabled) {
 	return enabled ? _colors[TEXT_COLOR] : _colors[TEXT_COLOR_DISABLED];
 }
 color Ui::button_color(uint id, bool enabled) {
-	if (is_item_focused(id))
-		return _colors[BUTTON_COLOR_FOCUSED];
-	return is_item_active(id) ? _colors[BUTTON_COLOR_ACTIVE] : _colors[BUTTON_COLOR];
+	if (is_item_active(id))
+		return _colors[BUTTON_COLOR_ACTIVE];
 
-	//	return RGBA(_colors[BUTTON_COLOR_ACTIVE], 150);
+	return is_item_focused(id) ? _colors[BUTTON_COLOR_FOCUSED]: _colors[BUTTON_COLOR];
 }
 color Ui::edit_color(uint id, bool enabled) {
 	if (!is_item_focused(id))
