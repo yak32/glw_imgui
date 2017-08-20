@@ -17,7 +17,7 @@ class IPlatform {
 public:
 	virtual void set_cursor(CURSOR cursor) = 0;
 	virtual void capture_mouse(bool set) = 0;
-	virtual void* load_file(const char* path,  size_t& buf_size) = 0;
+	virtual void* load_file(const char* path,  unsigned int& buf_size) = 0;
 };
 
 class IRenderer {

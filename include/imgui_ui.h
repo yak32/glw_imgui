@@ -208,7 +208,7 @@ public:
 	bool key_released(Key key) const;
 
 	uint set_item_height(uint button_height);
-	uint get_button_height() const;
+	uint get_item_height() const;
 	void set_padding(int left, int top, int right, int bottom);
 	void set_item_padding(int left, int top, int right, int bottom);
 	void set_property_width(float w);
