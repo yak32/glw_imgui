@@ -1,63 +1,71 @@
 {
- 	"folders": [
-	{
-		"path": ".",
-		"file_exclude_patterns": [
-			"*.vcproj",
-			"*.vcxproj",
-			"*.sln",
-			"*.gitignore",
-			"*.gitmodules",
-			"*.vcxproj.*"
-		],
-		"folder_exclude_patterns":[
-			"cmake*",
-			"modelling",
-			"tools",
-			"documentation",
-			".git",
-		],
-		"file_include_patterns":[
-			"*.cpp",
-			"*.c",
-			"*.cc",
-			"*.h",
-			"*.json",
-			"*.types",
-			"*.txt",
-			"*.sublime*",
-			"*.txt"
-		],
-	 }
+	"build_systems":
+	[
+		{
+			"file_regex": "^[ .\\\\/]*([a-zA-Z]?:?[\\w.\\\\/]+)[()]([0-9]+)[)]([0-9]+)?:?(.*)$",
+			"name": "imgui",
+			"selector": "source.c, source.c++",
+			"shell_cmd": "cmake --build $project_path/build",
+			"variants":
+			[
+				{
+					"file_regex": "^[.\\\\/]*([A-Z]?:?[\\w.\\\\/]+)[:]([0-9]+)[:]([0-9]+)?:?(.*)$",
+					"name": "run",
+					"selector": "source.c, source.c++",
+					"shell_cmd": "$project_path/build/demo/demo"
+				},
+				{
+					"file_regex": "^[.\\\\/]*([A-Z]?:?[\\w.\\\\/]+)[:]([0-9]+)[:]([0-9]+)?:?(.*)$",
+					"name": "project",
+					"selector": "source.c, source.c++",
+					"shell_cmd": "cmake -B$project_path\\build -H$project_path"
+				},
+				{
+					"file_regex": "^[.\\\\/]*([A-Z]?:?[\\w.\\\\/]+)[:]([0-9]+)[:]([0-9]+)?:?(.*)$",
+					"name": "test",
+					"selector": "source.c, source.c++",
+					"shell_cmd": "ctest -VV"
+				}
+			],
+			"working_dir": "${project_path}\\build"
+		}
 	],
- 	"build_systems":[
-	{
-	 	"name": "imgui",
-		"shell_cmd": "cmake --build $project_path/build",
-		"file_regex": "^[ .\\\\/]*([a-zA-Z]?:?[\\w.\\\\/]+)[()]([0-9]+)[)]([0-9]+)?:?(.*)$",
-		"working_dir": "${project_path}\\build",
-		"selector": "source.c, source.c++",
-	    "variants":
-	   	[
-	        {
-			    "shell_cmd": "$project_path/build/demo/demo",
-			    "name": "run",
-			    "file_regex": "^[.\\\\/]*([A-Z]?:?[\\w.\\\\/]+)[:]([0-9]+)[:]([0-9]+)?:?(.*)$",
-			    "selector": "source.c, source.c++"
-	   		},
-			{
-			    "shell_cmd": "cmake -B$project_path\\build -H$project_path",
-			    "name": "project",
-			    "file_regex": "^[.\\\\/]*([A-Z]?:?[\\w.\\\\/]+)[:]([0-9]+)[:]([0-9]+)?:?(.*)$",
-			    "selector": "source.c, source.c++"
-	   		},
-			{
-				"shell_cmd": "ctest -VV",
-				"name": "test",
-				"file_regex": "^[.\\\\/]*([A-Z]?:?[\\w.\\\\/]+)[:]([0-9]+)[:]([0-9]+)?:?(.*)$",
-				"selector": "source.c, source.c++"
-			}
-	  	]
-	}
+	"folders":
+	[
+		{
+			"file_exclude_patterns":
+			[
+				"*.vcproj",
+				"*.vcxproj",
+				"*.sln",
+				"*.gitignore",
+				"*.gitmodules",
+				"*.vcxproj.*"
+			],
+			"file_include_patterns":
+			[
+				"*.cpp",
+				"*.c",
+				"*.cc",
+				"*.h",
+				"*.json",
+				"*.types",
+				"*.txt",
+				"*.sublime*",
+				"*.txt"
+			],
+			"folder_exclude_patterns":
+			[
+				"cmake*",
+				"modelling",
+				"tools",
+				"documentation",
+				".git"
+			],
+			"path": "."
+		},
+		{
+			"path": "C:\\Users\\yak32\\.vim"
+		}
 	]
 }
