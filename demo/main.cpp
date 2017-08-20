@@ -17,7 +17,6 @@ const int SCREEN_HEIGHT = 720;
 
 bool init();
 bool initGL();
-void handleKeys(unsigned char key, int x, int y);
 void update_ui();
 void render();
 void close();
@@ -134,9 +133,10 @@ void handleKeys(unsigned char key) {
 	if (key == 'q') {
 		quit = true;
 	}
+}
+void handleChars(unsigned char key) {
 	last_char = key;
 }
-
 uint handle_input(int& mouse_x, int& mouse_y) {
 	uint keysPressed = 0;
 	uint mouse_keys = SDL_GetMouseState(&mouse_x, &mouse_y);
@@ -149,6 +149,9 @@ uint handle_input(int& mouse_x, int& mouse_y) {
 	const Uint8* keys = SDL_GetKeyboardState(NULL);
 	if (keys[SDL_SCANCODE_RETURN])
 		keysPressed |= KEY_ENTER;
+
+	if (keys[SDL_SCANCODE_BACKSPACE])
+		keysPressed |= KEY_RETURN;
 
 	if (keys[SDL_SCANCODE_DOWN])
 		keysPressed |= KEY_DOWN;
@@ -178,52 +181,71 @@ void update_ui() {
 
 	ui.begin_rollout(rollout);
 	static bool collapsed = false;
-	if (ui.collapse("collapse", collapsed))
+	if (ui.collapse("Collapse", collapsed))
 		collapsed = !collapsed;
 
 	if (!collapsed) {
 		ui.indent();
-		ui.button("button1");
+		ui.button("Button1");
+		ui.button("Button2");
+		ui.button("Button3");
+		ui.button("Button4");
+		ui.separator(true);
 
-		static char combo_value[100] = {0};
-		if (ui.combo("combo", combo_value)) {
-			if (ui.combo_item("combo item1"))
-				strcpy(combo_value, "combo item1");
-			if (ui.combo_item("combo item2"))
-				strcpy(combo_value, "combo item2");
-			if (ui.combo_item("combo item3"))
+		static char combo_value[100] = "Item1";
+		if (ui.combo("Combo Box", combo_value)) {
+			if (ui.combo_item("Item1"))
+				strcpy(combo_value, "Item1");
+			if (ui.combo_item("Item2"))
+				strcpy(combo_value, "Item2");
+			if (ui.combo_item("Item3"))
 				strcpy(combo_value, "combo item3");
-			if (ui.combo_item("combo item4"))
+			if (ui.combo_item("Item4"))
 				strcpy(combo_value, "combo item4");
 		}
+		ui.separator();
 
 		static bool checked = false;
-		if (ui.check("checkbox", checked))
+		if (ui.check("Checkbox", checked))
 			checked = !checked;
 
-		static bool button_checked = false;
-		if (ui.button_check("button checked", button_checked))
-			button_checked = !button_checked;
+		ui.separator(true);
+		static bool button_checked1 = false;
+		if (ui.button_check("Checkbox button1", button_checked1))
+			button_checked1 = !button_checked1;
+		static bool button_checked2 = false;
+		if (ui.button_check("Checkbox button2", button_checked2))
+			button_checked2 = !button_checked2;
+		static bool button_checked3 = false;
+		if (ui.button_check("Checkbox button3", button_checked3))
+			button_checked3 = !button_checked3;
+		
+		ui.separator();
+		ui.separator(true);
+		ui.label("Edit text");
+		static char edit_value[256];
+		bool edit_finished = false;
+		ui.edit(edit_value, 256, &edit_finished);
+		ui.separator(true);
 
-		ui.label("label");
-		ui.value("value");
+		ui.label("Label");
+		ui.value("Value");
 		static float val = 1.0f;
-		ui.slider("slider", &val, 0.0f, 10.0f, 1.0f);
+		ui.slider("Slider", &val, 0.0f, 10.0f, 1.0f);
 
-		static float progress = 1.0f;
+		ui.separator(true);
+		ui.label("Progress bar");
+		static float progress = 7.0f;
 		ui.progress(progress, 0.0f, 10.0f, 1.0f);
 
-		static char str[100];
-		ui.edit(str, 100, NULL);
-
 		ui.row(3);
-		ui.button("row1");
-		ui.button("row2");
-		ui.button("row3");
+		ui.button("Item1");
+		ui.button("Item2");
+		ui.button("Item3");
 		ui.end_row();
 
-		static char str_property[100] = "property val";
-		ui.property("property", str_property, 100, NULL);
+		static char str_property[100] = "Property Val";
+		ui.property("Property", str_property, 100, NULL);
 
 		// if (ui.button_collapse("button collapse", true)) {
 		// 	ui.item("item1");
@@ -231,7 +253,7 @@ void update_ui() {
 		// 	ui.item("item3");
 		// }
 
-		ui.draw_text(5, 5, 0, "draw item", 0xffffffff);
+		ui.draw_text(5, 5, 0, "Draw item", 0xffffffff);
 
 		ui.unindent();
 	}
@@ -283,7 +305,7 @@ int main(int argc, char* args[]) {
 					handleKeys(e.key.keysym.sym);
 				}
 				else if (e.type == SDL_TEXTINPUT) {
-					handleKeys(e.text.text[0]);
+					handleChars(e.text.text[0]);
 				}
 				else if (e.type == SDL_MOUSEWHEEL) {
 					mouse_wheel = e.wheel.y;

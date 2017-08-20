@@ -35,6 +35,7 @@ enum Key {
 	KEY_UP = 0x10,
 	KEY_LEFT = 0x20,
 	KEY_RIGHT = 0x40,
+	KEY_RETURN = 0x80
 };
 enum Options {
 	DRAG_ITEM = 1,

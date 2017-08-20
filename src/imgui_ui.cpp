@@ -55,7 +55,7 @@ Ui::Ui(uint mode)
 		_focused_rollout_id(NULL), _cursor(0), _cursor_over_drag(0), _scroll_right(0),
 		_scroll_area_top(0), _scroll_val(NULL), _focus_top(0), _focus_bottom(0),
 		_scroll_id(0), _inside_scroll_area(false), _scroll_top(0), _scroll_bottom(0), _platform(nullptr),
-		_edit_buffer_id(-1),
+		_edit_buffer_id(0),
 		_target_side(ROLLOUT_UNDEFINED),
 		_target_rollout(NULL),
 		_rollout_drag_div(),
@@ -258,13 +258,15 @@ bool Ui::edit_logic(uint id, bool was_focused, bool enabled, char* text, int buf
 		return false;
 
 	size_t len = strlen(_edit_buffer);
-	if (key_released(KEY_ENTER)) {
+	if (key_released(KEY_RETURN)) {
 		// return key - remove last character
-		if (len > 0)
+		bool ret = false;
+		if (len > 0) {
 			_edit_buffer[len - 1] = 0;
-
+			ret = true;
+		}
 		strncpy(text, _edit_buffer, buffer_len);
-		return false;
+		return ret;
 	}
 	if (key_released(KEY_ENTER)) {
 		if (edit_finished) {
@@ -885,12 +887,12 @@ bool Ui::start_control(bool enabled, int& x, int& y, int& w, int& h, uint& id, b
 		set_focused(id);
 	}
 	else if (is_item_focused(id) ) {
-		if (key_released(KEY_UP) ) {
+		if (key_released(KEY_UP) || key_released(KEY_LEFT) ) {
 			// don't allow to move focus up, if first control is focused
 			if ( _prev_enabled_id >= get_control_id(ROLLOUT_START_WIDGET_ID))
 				set_focused(_prev_enabled_id);
 		}
-		if (key_released(KEY_DOWN)) {
+		if (key_released(KEY_DOWN) || key_released(KEY_RIGHT)) {
 			// TAB pressed -> change focus to next id
 			// focus will be automatically moved to next edit control (look edit_logic)
 			_search_next_focus = true;
