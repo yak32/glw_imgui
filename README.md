@@ -26,71 +26,90 @@ The Editor of [Glow game engine](http://www.glow3d.com)
 ```c++
 	int mouse_x, mouse_y;
 
-	uint keysPressed = handle_input(mouse_x, mouse_y);
-	int width, height;
-	SDL_GetWindowSize(gWindow, &width, &height);
+	uint keysPressed = handle_input(x, y);
+	int w, h;
+	SDL_GetWindowSize(gWindow, &w, &h);
 	ui.set_text_align(ALIGN_LEFT);
 
-	ui.begin_frame(width, height, mouse_x, mouse_y, -mouse_wheel, last_char, keysPressed);
+	ui.begin_frame(w, h, x, y, -mouse_wheel, last_char, keysPressed);
 	last_char = 0;
 	mouse_wheel = 0;
 
 	ui.begin_rollout(rollout);
 	static bool collapsed = false;
-	if (ui.collapse("collapse", collapsed))
+	if (ui.collapse("Collapse", collapsed))
 		collapsed = !collapsed;
 
 	if (!collapsed) {
 		ui.indent();
-		ui.button("button1");
+		ui.button("Button1");
+		ui.button("Button2");
+		ui.button("Button3");
+		ui.button("Button4");
+		ui.separator(true);
 
-		static char combo_value[100] = {0};
-		if (ui.combo("combo", combo_value)) {
-			if (ui.combo_item("combo item1"))
-				strcpy(combo_value, "combo item1");
-			if (ui.combo_item("combo item2"))
-				strcpy(combo_value, "combo item2");
-			if (ui.combo_item("combo item3"))
-				strcpy(combo_value, "combo item3");
-			if (ui.combo_item("combo item4"))
-				strcpy(combo_value, "combo item4");
+		static char combo_value[100] = "Item1";
+		if (ui.combo("Combo Box", combo_value)) {
+			if (ui.combo_item("Item1"))
+				strcpy(combo_value, "Item1");
+			if (ui.combo_item("Item2"))
+				strcpy(combo_value, "Item2");
+			if (ui.combo_item("Item3"))
+				strcpy(combo_value, "Item3");
+			if (ui.combo_item("Item4"))
+				strcpy(combo_value, "Item4");
 		}
+		ui.separator();
 
 		static bool checked = false;
-		if (ui.check("checkbox", checked))
+		if (ui.check("Checkbox", checked))
 			checked = !checked;
 
-		static bool button_checked = false;
-		if (ui.button_check("button checked", button_checked))
-			button_checked = !button_checked;
+		ui.separator(true);
+		static bool button_checked1 = false;
+		if (ui.button_check("Checkbox button1", button_checked1))
+			button_checked1 = !button_checked1;
+		static bool button_checked2 = false;
+		if (ui.button_check("Checkbox button2", button_checked2))
+			button_checked2 = !button_checked2;
+		static bool button_checked3 = false;
+		if (ui.button_check("Checkbox button3", button_checked3))
+			button_checked3 = !button_checked3;
 
-		ui.label("label");
-		ui.value("value");
+		ui.separator();
+		ui.separator(true);
+		ui.label("Edit text");
+		static char edit_value[256];
+		bool edit_finished = false;
+		ui.edit(edit_value, 256, &edit_finished);
+		ui.separator(true);
+
+		ui.label("Label");
+		ui.value("Value");
 		static float val = 1.0f;
-		ui.slider("slider", &val, 0.0f, 10.0f, 1.0f);
+		ui.slider("Slider", &val, 0.0f, 10.0f, 1.0f);
 
-		static float progress = 1.0f;
+		ui.separator(true);
+		ui.label("Progress bar");
+		static float progress = 7.0f;
 		ui.progress(progress, 0.0f, 10.0f, 1.0f);
 
-		static char str[100];
-		ui.edit(str, 100, NULL);
-
 		ui.row(3);
-		ui.button("row1");
-		ui.button("row2");
-		ui.button("row3");
+		ui.button("Item1");
+		ui.button("Item2");
+		ui.button("Item3");
 		ui.end_row();
 
-		static char str_property[100] = "property val";
-		ui.property("property", str_property, 100, NULL);
+		static char str_property[100] = "Property Val";
+		ui.property("Property", str_property, 100, NULL);
 
-		if (ui.button_collapse("button collapse", true)) {
-			ui.item("item1");
-			ui.item("item2");
-			ui.item("item3");
-		}
+		// if (ui.button_collapse("button collapse", true)) {
+		// 	ui.item("item1");
+		// 	ui.item("item2");
+		// 	ui.item("item3");
+		// }
 
-		ui.draw_text(5, 5, 0, "draw item", 0xffffffff);
+		ui.draw_text(5, 5, 0, "Draw item", 0xffffffff);
 
 		ui.unindent();
 	}
@@ -105,6 +124,7 @@ The Editor of [Glow game engine](http://www.glow3d.com)
 		if (ui.item(str, i == selected))
 			selected = i;
 	}
+
 	ui.end_rollout();
 
 	ui.end_frame();
