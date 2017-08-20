@@ -1,33 +1,4 @@
 {
- 	"folders": [
-	 {
-		 "path": ".",
-		 "file_exclude_patterns": [
-			 "*.vcproj",
-			 "*.vcxproj",
-			 "*.sln",
-			 "*.gitignore",
-			 "*.gitmodules",
-			 "*.vcxproj.*"
-		 ],
-		 "folder_exclude_patterns":[
-			"modelling",
-			"tools",
-			"documentation",
-			".git",
-		 ],
-		 "file_include_patterns":[
-			"*.cpp",
-			"*.c",
-			"*.h",
-			"*.json",
-			"*.types",
-			"*.txt",
-			"*.sublime*",
-			"*.txt"
-		 ],
-	 }
-	],
  	"build_systems":[
 	 {
 	 	"name": "imgui",
@@ -70,5 +41,35 @@
 
 	  	]
 	}
-	]
+	],
+ 	"folders": [
+	 {
+		 "path": ".",
+		 "file_exclude_patterns": [
+			 "*.vcproj",
+			 "*.vcxproj",
+			 "*.sln",
+			 "*.gitignore",
+			 "*.gitmodules",
+			 "*.vcxproj.*"
+		 ],
+		 "folder_exclude_patterns":[
+			"modelling",
+			"tools",
+			"documentation",
+			".git",
+		 ],
+		 "file_include_patterns":[
+			"*.cpp",
+			"*.c",
+			"*.h",
+			"*.json",
+			"*.types",
+			"*.txt",
+			"*.sublime*",
+			"*.txt",
+			"*.md",
+		 ],
+	 }
+	],
 }
