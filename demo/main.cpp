@@ -61,7 +61,7 @@ void setup_ui() {
 	vert_rollout = ui.create_rollout("VERT", WND_STYLE);
 	ui.insert_rollout(vert_rollout, -200, true, root_rollout);
 
-	ui.font("E:/projects/glw_imgui/DroidSans.ttf", 15);
+	ui.font("DroidSans.ttf", 15);
 }
 bool init() {
 	bool success = true;
@@ -161,12 +161,12 @@ uint handle_input(int& mouse_x, int& mouse_y) {
 
 	if (keys[SDL_SCANCODE_RIGHT])
 		keysPressed |= KEY_RIGHT;
-	
+
 	return keysPressed;
 }
 void update_ui() {
 	int x, y;
-	
+
 	uint keysPressed = handle_input(x, y);
 	int w, h;
 	SDL_GetWindowSize(gWindow, &w, &h);
@@ -225,11 +225,11 @@ void update_ui() {
 		static char str_property[100] = "property val";
 		ui.property("property", str_property, 100, NULL);
 
-		if (ui.button_collapse("button collapse", true)) {
-			ui.item("item1");
-			ui.item("item2");
-			ui.item("item3");
-		}
+		// if (ui.button_collapse("button collapse", true)) {
+		// 	ui.item("item1");
+		// 	ui.item("item2");
+		// 	ui.item("item3");
+		// }
 
 		ui.draw_text(5, 5, 0, "draw item", 0xffffffff);
 

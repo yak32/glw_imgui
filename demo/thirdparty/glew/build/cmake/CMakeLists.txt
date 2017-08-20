@@ -78,12 +78,12 @@ if(NOT DEFINED BUILD_SHARED_LIBS OR NOT BUILD_SHARED_LIBS)
   list(APPEND targets_to_install glew_s glewmx_s)
 endif()
 
-install ( TARGETS ${targets_to_install}
-          ${MAYBE_EXPORT}
-          RUNTIME DESTINATION bin
-          LIBRARY DESTINATION lib${LIB_SUFFIX}
-          ARCHIVE DESTINATION lib${LIB_SUFFIX}
-)
+#install ( TARGETS ${targets_to_install}
+#          ${MAYBE_EXPORT}
+#          RUNTIME DESTINATION bin
+#          LIBRARY DESTINATION lib${LIB_SUFFIX}
+#          ARCHIVE DESTINATION lib${LIB_SUFFIX}
+#)
 
 if (BUILD_UTILS)
   add_executable (glewinfo ${GLEW_DIR}/src/glewinfo.c)
@@ -110,21 +110,21 @@ set (cflags "-DGLEW_MX")
 set (libname ${GLEW_LIB_NAME}mx)
 configure_file (${GLEW_DIR}/glew.pc.in ${GLEW_DIR}/glewmx.pc @ONLY)
 
-install(FILES ${GLEW_DIR}/glew.pc ${GLEW_DIR}/glewmx.pc
-        DESTINATION lib/pkgconfig
-)
+#install(FILES ${GLEW_DIR}/glew.pc ${GLEW_DIR}/glewmx.pc
+#        DESTINATION lib/pkgconfig
+#)
 
-install (FILES
-    ${GLEW_DIR}/include/GL/wglew.h
-    ${GLEW_DIR}/include/GL/glew.h
-    ${GLEW_DIR}/include/GL/glxew.h
-    DESTINATION include/GL)
+#install (FILES
+#    ${GLEW_DIR}/include/GL/wglew.h
+#    ${GLEW_DIR}/include/GL/glew.h
+#    ${GLEW_DIR}/include/GL/glxew.h
+#    DESTINATION include/GL)
 
-if(MAYBE_EXPORT)
-  install(EXPORT glew-targets DESTINATION lib/cmake/glew
-    NAMESPACE GLEW::)
-  install(FILES
-      ${CMAKE_CURRENT_SOURCE_DIR}/glew-config.cmake
-      ${CMAKE_CURRENT_SOURCE_DIR}/CopyImportedTargetProperties.cmake
-    DESTINATION lib/cmake/glew)
-endif()
+#if(MAYBE_EXPORT)
+#  install(EXPORT glew-targets DESTINATION lib/cmake/glew
+#    NAMESPACE GLEW::)
+#  install(FILES
+#      ${CMAKE_CURRENT_SOURCE_DIR}/glew-config.cmake
+#      ${CMAKE_CURRENT_SOURCE_DIR}/CopyImportedTargetProperties.cmake
+#    DESTINATION lib/cmake/glew)
+#endif()

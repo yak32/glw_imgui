@@ -83,9 +83,9 @@ void Rollout::process_animations(Ui& ui) {
 	}
 }
 bool Ui::rollout_move_rect(int x, int y, int w, int h) {
-	m_widget_id++;
+	_widget_id++;
 	bool over = in_rect(x, y, w, h, false);
-	m_rqueue->add_rect(x, y, w, h, over ? RGBA(14, 130, 156, 240) : RGBA(14, 130, 156, 180));
+	_rqueue->add_rect(x, y, w, h, over ? RGBA(14, 130, 156, 240) : RGBA(14, 130, 156, 180));
 	return over;
 }
 
@@ -96,46 +96,46 @@ RolloutMoveSide Ui::rollout_move(Rollout* dr, Rollout* r, int x, int y) {
 	RolloutMoveSide side = ROLLOUT_UNDEFINED;
 	bool selected = false;
 	side = ROLLOUT_UNDEFINED;
-	int rsize = m_item_height + m_item_height / 3;
+	int rsize = _item_height + _item_height / 3;
 	if (rollout_move_rect(x - rsize, y - rsize, rsize * 2, rsize * 2)) {
-		m_rqueue->add_rect(r->x, r->y, r->w, r->h, RGBA(14, 99, 156, 180));
+		_rqueue->add_rect(r->x, r->y, r->w, r->h, RGBA(14, 99, 156, 180));
 		side = ROLLOUT_CENTER;
 	}
 	// sides
 	if (rollout_move_rect(x - rsize * 3 - 2, y - rsize, rsize * 2, rsize * 2)) {
-		m_rqueue->add_rect(r->x, r->y, r->w / 2, r->h, RGBA(14, 99, 156, 180));
+		_rqueue->add_rect(r->x, r->y, r->w / 2, r->h, RGBA(14, 99, 156, 180));
 		side = ROLLOUT_LEFT;
 	}
 	if (rollout_move_rect(x - rsize, y + rsize + 2, rsize * 2, rsize * 2)) {
-		m_rqueue->add_rect(r->x, r->y + r->h / 2, r->w, r->h / 2, RGBA(14, 99, 156, 180));
+		_rqueue->add_rect(r->x, r->y + r->h / 2, r->w, r->h / 2, RGBA(14, 99, 156, 180));
 		side = ROLLOUT_TOP;
 	}
 	if (rollout_move_rect(x + rsize + 2, y - rsize, rsize * 2, rsize * 2)) {
-		m_rqueue->add_rect(r->x + r->w / 2, r->y, r->w / 2, r->h, RGBA(14, 99, 156, 180));
+		_rqueue->add_rect(r->x + r->w / 2, r->y, r->w / 2, r->h, RGBA(14, 99, 156, 180));
 		side = ROLLOUT_RIGHT;
 	}
 	if (rollout_move_rect(x - rsize, y - rsize * 3 - 2, rsize * 2, rsize * 2)) {
-		m_rqueue->add_rect(r->x, r->y, r->w, r->h / 2, RGBA(14, 99, 156, 180));
+		_rqueue->add_rect(r->x, r->y, r->w, r->h / 2, RGBA(14, 99, 156, 180));
 		side = ROLLOUT_BOTTOM;
 	}
 	if (rollout_move_rect(x - rsize * 4 - 4, y - rsize, rsize, rsize * 2)) {
 		int neww = dr->w > r->w / 2 ? r->w / 2 : dr->w;
-		m_rqueue->add_rect(r->x, r->y, neww, r->h, RGBA(14, 99, 156, 180));
+		_rqueue->add_rect(r->x, r->y, neww, r->h, RGBA(14, 99, 156, 180));
 		side = ROLLOUT_LEFT_FIXED;
 	}
 	if (rollout_move_rect(x - rsize, y + rsize * 3 + 4, rsize * 2, rsize)) {
 		int newh = dr->h > r->h / 2 ? r->h / 2 : dr->h;
-		m_rqueue->add_rect(r->x, r->y + r->h - newh, r->w, newh, RGBA(14, 99, 156, 180));
+		_rqueue->add_rect(r->x, r->y + r->h - newh, r->w, newh, RGBA(14, 99, 156, 180));
 		side = ROLLOUT_TOP_FIXED;
 	}
 	if (rollout_move_rect(x + rsize * 3 + 4, y - rsize, rsize, rsize * 2)) {
 		int neww = dr->w > r->w / 2 ? r->w / 2 : dr->w;
-		m_rqueue->add_rect(r->x + r->w - neww, r->y, neww, r->h, RGBA(14, 99, 156, 180));
+		_rqueue->add_rect(r->x + r->w - neww, r->y, neww, r->h, RGBA(14, 99, 156, 180));
 		side = ROLLOUT_RIGHT_FIXED;
 	}
 	if (rollout_move_rect(x - rsize, y - rsize * 4 - 4, rsize * 2, rsize)) {
 		int newh = dr->h > r->h / 2 ? r->h / 2 : dr->h;
-		m_rqueue->add_rect(r->x, r->y, r->w, newh, RGBA(14, 99, 156, 180));
+		_rqueue->add_rect(r->x, r->y, r->w, newh, RGBA(14, 99, 156, 180));
 		side = ROLLOUT_BOTTOM_FIXED;
 	}
 	return side;
@@ -197,7 +197,7 @@ bool Ui::insert_rollout(Rollout* r, float div, bool horz, Rollout* rollout) {
 	if (!r)
 		return false;
 	// insert into toolbar binary tree
-	Toolbar* lastNode = m_rollout_last;
+	Toolbar* lastNode = _rollout_last;
 	if (rollout) {
 		if (div == 0.0f) {
 			assert(rollout->is_visible()); // rollout to attach should be visible
@@ -207,13 +207,13 @@ bool Ui::insert_rollout(Rollout* r, float div, bool horz, Rollout* rollout) {
 
 			// add rollout to tabs of parent rollout
 			rollout->tabs.push_back(r->id);
-			for (int rollout_id : rollout->tabs) m_rollouts[rollout_id]->alpha = 0;
+			for (int rollout_id : rollout->tabs) _rollouts[rollout_id]->alpha = 0;
 
 			r->tabs = rollout->tabs;
 			r->options |= ROLLOUT_ATTACHED;
 			return true;
 		}
-		lastNode = search_rollout_node(m_toolbar_root, rollout, true);
+		lastNode = search_rollout_node(_toolbar_root, rollout, true);
 		if (!lastNode) {
 			IMGUI_LOG_ERROR("failed to find rollout node");
 			return 0;
@@ -226,21 +226,21 @@ bool Ui::insert_rollout(Rollout* r, float div, bool horz, Rollout* rollout) {
 		div = 1.0f; // reset div
 	}
 	r->options |= ROLLOUT_ATTACHED;
-	m_rollout_last = lastNode->add_rollout(r, div, horz);
+	_rollout_last = lastNode->add_rollout(r, div, horz);
 	return true;
 }
 Rollout* Ui::create_rollout(const char* name, int options) {
 	Rollout* r = new Rollout;
-	r->id = m_rollouts.size();
+	r->id = _rollouts.size();
 
-	m_rollouts.push_back(r);
+	_rollouts.push_back(r);
 	r->name = name;
 	r->options = options;
 	return r;
 }
 bool Ui::remove_rollout(Rollout* r) {
-	Rollouts::iterator i = std::find(m_rollouts.begin(), m_rollouts.end(), r);
-	if (i == m_rollouts.end()) {
+	Rollouts::iterator i = std::find(_rollouts.begin(), _rollouts.end(), r);
+	if (i == _rollouts.end()) {
 		IMGUI_LOG_ERROR("failed to remove rollout");
 		return true;
 	}
@@ -249,7 +249,7 @@ bool Ui::remove_rollout(Rollout* r) {
 	return true;
 }
 Rollout* Ui::find_rollout(const char* name){
-	for( auto r: m_rollouts)
+	for( auto r: _rollouts)
 		if (r->name == name)
 			return r;
 	return nullptr;
@@ -261,7 +261,7 @@ void Ui::detach_tabbed_rollout(Rollout* r) {
 	// rollout can be in tabbed interface
 	auto& tabs = r->tabs;
 	tabs.erase(std::remove(tabs.begin(), tabs.end(), r->id), tabs.end());
-	m_rollouts[tabs[0]]->alpha = 255;
+	_rollouts[tabs[0]]->alpha = 255;
 	if (tabs.size() == 1) {
 		Rollout::tabs_array_t temp;
 		r->tabs.swap(temp);
@@ -276,11 +276,11 @@ bool Ui::detach_rollout(Rollout* r) {
 
 	if (!r->tabs.empty()) {
 		if (r->tabs.at(0) == r->id) {
-			Toolbar* n = search_rollout_node(m_toolbar_root, r);
+			Toolbar* n = search_rollout_node(_toolbar_root, r);
 			if (n) {
 				// move second tabbed rollout to the node
 				std::swap(r->tabs.at(0), r->tabs.at(1));
-				n->rollout = m_rollouts[r->tabs.at(0)];
+				n->rollout = _rollouts[r->tabs.at(0)];
 				n->rollout->alpha = 255;
 			}
 		}
@@ -288,7 +288,7 @@ bool Ui::detach_rollout(Rollout* r) {
 		return true;
 	}
 
-	Toolbar* n = search_rollout_parent_node(m_toolbar_root, r);
+	Toolbar* n = search_rollout_parent_node(_toolbar_root, r);
 	if (!n)
 		return false; // no issue, rollout can be detached
 	if (n->left && n->left->rollout == r) {
@@ -309,7 +309,7 @@ bool Ui::detach_rollout(Rollout* r) {
 			delete (mem);
 		}
 	}
-	m_rollout_last = m_toolbar_root;
+	_rollout_last = _toolbar_root;
 	r->options &= ~ROLLOUT_ATTACHED;
 	r->z = FLOATING_ROLLOUT_DEPTH;
 	return true;
@@ -352,9 +352,9 @@ bool Ui::scroll_rollout(Rollout* r, int scroll, SCROLL_MODE mode) {
 	return true;
 }
 bool Ui::hit_test(int x, int y) const{
-	size_t size = m_rollouts.size();
+	size_t size = _rollouts.size();
 	for (size_t i = 0; i < size; ++i) {
-		Rollout& r = *m_rollouts[i];
+		Rollout& r = *_rollouts[i];
 		if (!(r.options & ROLLOUT_HOLLOW) && r.is_visible() && x >= r.x && x <= r.x + r.w &&
 			y >= r.y && y <= r.y + r.h)
 			return true;

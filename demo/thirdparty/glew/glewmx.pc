@@ -1,4 +1,4 @@
-prefix=C:/Program Files (x86)/imgui
+prefix=E:/projects/glw_imgui/demo/install
 exec_prefix=${prefix}
 libdir=${prefix}/lib
 includedir=${prefix}/include

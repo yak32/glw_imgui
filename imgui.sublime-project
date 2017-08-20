@@ -11,11 +11,9 @@
 			 "*.vcxproj.*"
 		 ],
 		 "folder_exclude_patterns":[
-			"cmake*",
 			"modelling",
 			"tools",
 			"documentation",
-
 			".git",
 		 ],
 		 "file_include_patterns":[
@@ -40,12 +38,19 @@
 	    "variants":
 	   	[
 	        {
-			    "shell_cmd": "$project_path/build/demo/demo",
+			    "shell_cmd": "cmake --build $project_path/build --target install",
+			    "name": "install",
+			    "file_regex": "^[.\\\\/]*([A-Z]?:?[\\w.\\\\/]+)[:]([0-9]+)[:]([0-9]+)?:?(.*)$",
+			    "selector": "source.c, source.c++"
+	   		},
+	   		{
+			    "shell_cmd": "$project_path/demo/install/demo",
+			    "working_dir": "$project_path/demo/install/",
 			    "name": "run",
 			    "file_regex": "^[.\\\\/]*([A-Z]?:?[\\w.\\\\/]+)[:]([0-9]+)[:]([0-9]+)?:?(.*)$",
 			    "selector": "source.c, source.c++"
 	   		},
-	   	      {
+	   	    {
 			    "shell_cmd": "cmake -D GLW_IMGUI_DEMO=ON $project_path/build",
 			    "name": "project",
 			    "working_dir": "${project_path}/build/",
