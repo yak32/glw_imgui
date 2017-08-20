@@ -199,9 +199,9 @@ void update_ui() {
 			if (ui.combo_item("Item2"))
 				strcpy(combo_value, "Item2");
 			if (ui.combo_item("Item3"))
-				strcpy(combo_value, "combo item3");
+				strcpy(combo_value, "Item3");
 			if (ui.combo_item("Item4"))
-				strcpy(combo_value, "combo item4");
+				strcpy(combo_value, "Item4");
 		}
 		ui.separator();
 
