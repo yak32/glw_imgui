@@ -500,6 +500,7 @@ bool Ui::load_font(const char* path, float font_height, font_t& font) {
 	size_t file_size;
 	void* file_buffer = _platform->load_file(path, file_size);
 	if (!file_buffer ) {
+		printf("failed to load file %s\n", path);
 		assert(false && "failed to load file");
 		return false;
 	}

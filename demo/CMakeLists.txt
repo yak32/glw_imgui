@@ -3,7 +3,7 @@ PROJECT(demo)
 SET( SDL2_PATH thirdparty/SDL2)
 SET( GLEW_PATH thirdparty/glew)
 
-SET(SDL_STATIC OFF CACHE BOOL "build sdl static library")
+SET(SDL_STATIC ON CACHE BOOL "build sdl static library")
 SET(BUILD_UTILS OFF CACHE BOOL "build glew utils")
 
 SET(INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/install)

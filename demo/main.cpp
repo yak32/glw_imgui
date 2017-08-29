@@ -60,7 +60,10 @@ void setup_ui() {
 	vert_rollout = ui.create_rollout("VERT", WND_STYLE);
 	ui.insert_rollout(vert_rollout, -200, true, root_rollout);
 
-	ui.font("DroidSans.ttf", 15);
+	char font_path[512];
+	sprintf(font_path, "%s/DroidSans.ttf", SDL_GetBasePath());
+
+	ui.font(font_path, 15);
 }
 bool init() {
 	bool success = true;
@@ -219,7 +222,7 @@ void update_ui() {
 		static bool button_checked3 = false;
 		if (ui.button_check("Checkbox button3", button_checked3))
 			button_checked3 = !button_checked3;
-		
+
 		ui.separator();
 		ui.separator(true);
 		ui.label("Edit text");
