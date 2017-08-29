@@ -15,6 +15,10 @@
 	    {
 	       "file_regex": "^(.*?):([0-9]+):?([0-9]+)?:? .*?[a-z]+:(.*)$",
 	    },
+	    "osx":
+	    {
+	       "file_regex": "^(.*?):([0-9]+):?([0-9]+)?:? .*?[a-z]+:(.*)$",
+	    },
 
 	    "variants":
 	   	[
@@ -32,7 +36,7 @@
 			    "selector": "source.c, source.c++"
 	   		},
 	   	    {
-			    "shell_cmd": "cmake -D GLW_IMGUI_DEMO=ON $project_path/build",
+			    "shell_cmd": "cmake -D GLW_IMGUI_DEMO=ON ..",
 			    "name": "project",
 			    "working_dir": "${project_path}/build/",
 			    "file_regex": "^[.\\\\/]*([A-Z]?:?[\\w.\\\\/]+)[:]([0-9]+)[:]([0-9]+)?:?(.*)$",
