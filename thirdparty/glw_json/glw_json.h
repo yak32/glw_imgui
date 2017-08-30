@@ -164,6 +164,8 @@ inline const char* load(const char* str, size_t len, unsigned int& v, int option
 	char* pEnd;
 	errno = 0;
 	unsigned long l = strtoul(str, &pEnd, 10);
+	if (pEnd < str + len)
+		l = strtoul(str, &pEnd, 16);
 	v = (unsigned int)l;
 	return errno != ERANGE && pEnd == str + len ? pEnd : str;
 }

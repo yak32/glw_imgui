@@ -4,6 +4,9 @@
 #pragma once
 namespace imgui {
 class Ui;
+struct Theme;
 bool save_layout(Ui& ui, const char* filename);
 bool load_layout(Ui& ui, const char* filename);
+bool save_theme(const Theme& theme, const char* filename);
+bool load_theme(Theme& theme, const char* filename);
 }

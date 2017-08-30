@@ -58,21 +58,21 @@ Ui::Ui(uint mode)
 	memset(_edit_buffer, 0, sizeof(_edit_buffer));
 	memset(_drag_item, 0, sizeof(_drag_item));
 	// colors
-	_colors[BUTTON_COLOR_ACTIVE] = RGBA(128, 128, 128, 196);
-	_colors[BUTTON_COLOR] = RGBA(128, 128, 128, 96);
-	_colors[BUTTON_COLOR_FOCUSED] = RGBA(128, 128, 128, 120);
-	_colors[EDIT_COLOR] = _colors[BUTTON_COLOR];
-	_colors[EDIT_COLOR_ACTIVE] = _colors[BUTTON_COLOR_ACTIVE];
-	_colors[COLLAPSE_COLOR] = RGBA(0, 0, 0, 196);
-	_colors[COLLAPSE_COLOR_ACTIVE] = RGBA(0, 0, 0, 220);
-	_colors[TEXT_COLOR_HOT] = RGBA(255, 196, 0, 255);
-	_colors[TEXT_COLOR] = RGBA(255, 255, 255, 200);
-	_colors[TEXT_COLOR_CHECKED] = RGBA(255, 255, 255, 200);
-	_colors[TEXT_COLOR_DISABLED] = RGBA(128, 128, 128, 200);
-	_colors[ROLLOUT_COLOR] = RGBA(0, 0, 0, 192);
-	_colors[ROLLOUT_CAPTION_COLOR] = RGBA(0, 0, 0, 0); // non visible by default
-	_colors[DRAG_COLOR] = RGBA(80, 80, 80, 40);
-	_colors[SLIDER_BG] = RGBA(0, 0, 0, 126);
+	_theme.button_color_active = RGBA(128, 128, 128, 196);
+	_theme.button_color = RGBA(128, 128, 128, 96);
+	_theme.button_color_focused = RGBA(128, 128, 128, 120);
+	_theme.edit_color = _theme.button_color;
+	_theme.edit_color_active = _theme.button_color_active;
+	_theme.collapse_color = RGBA(0, 0, 0, 196);
+	_theme.collapse_color_active = RGBA(0, 0, 0, 220);
+	_theme.text_color_hot = RGBA(255, 196, 0, 255);
+	_theme.text_color = RGBA(255, 255, 255, 200);
+	_theme.text_color_checked = RGBA(255, 255, 255, 200);
+	_theme.text_color_disabled = RGBA(128, 128, 128, 200);
+	_theme.rollout_color = RGBA(0, 0, 0, 192);
+	_theme.rollout_caption_color = RGBA(0, 0, 0, 0); // non visible by default
+	_theme.drag_color = RGBA(80, 80, 80, 40);
+	_theme.slider_bg = RGBA(0, 0, 0, 126);
 	_toolbar_root = new Toolbar(NULL);
 	_rollout_last = _toolbar_root;
 	_rqueue = &_rqueues[0];
@@ -538,7 +538,7 @@ bool Ui::begin_rollout(Rollout* pr, bool focused) {
 
 	if (!(r.options & ROLLOUT_HOLLOW)) {
 		_rqueue->add_depth(r.z);
-		_rqueue->add_rect(x, y, w, h, _colors[ROLLOUT_COLOR]);
+		_rqueue->add_rect(x, y, w, h, _theme.rollout_color);
 		if (key_pressed(KEY_MOUSE_LEFT) && in_rect(x, y, w, h)) {
 			// click on rollout -> increase depth
 			_focused_rollout_id = pr;
@@ -728,7 +728,7 @@ bool Ui::begin_rollout(Rollout* pr, bool focused) {
 				}
 			}
 			else if (caption_height) {
-				_rqueue->add_rect(x, caption_y, w, caption_height, _colors[ROLLOUT_CAPTION_COLOR]);
+				_rqueue->add_rect(x, caption_y, w, caption_height, _theme.rollout_caption_color);
 				_rqueue->add_text(x, y + h - area_header + _item_height / 2 - 2, _widget_w,
 								  _item_height, ALIGN_LEFT, r.name.c_str(),
 								  RGBA(255, 255, 255, 128));
@@ -887,23 +887,23 @@ bool Ui::start_control(bool enabled, int& x, int& y, int& w, int& h, uint& id, b
 }
 color Ui::text_color_hot(uint id, bool enabled, bool focused) {
 	if (enabled)
-		return (is_item_hot(id) || focused) ? _colors[TEXT_COLOR_HOT] : _colors[TEXT_COLOR];
-	return _colors[TEXT_COLOR_DISABLED];
+		return (is_item_hot(id) || focused) ? _theme.text_color_hot : _theme.text_color;
+	return _theme.text_color_disabled;
 }
 color Ui::text_color(uint id, bool enabled) {
-	return enabled ? _colors[TEXT_COLOR] : _colors[TEXT_COLOR_DISABLED];
+	return enabled ? _theme.text_color : _theme.text_color_disabled;
 }
 color Ui::button_color(uint id, bool enabled) {
 	if (is_item_active(id))
-		return _colors[BUTTON_COLOR_ACTIVE];
+		return _theme.button_color_active;
 
-	return is_item_focused(id) ? _colors[BUTTON_COLOR_FOCUSED] : _colors[BUTTON_COLOR];
+	return is_item_focused(id) ? _theme.button_color_focused : _theme.button_color;
 }
 color Ui::edit_color(uint id, bool enabled) {
 	if (!is_item_focused(id))
-		return is_item_active(id) ? _colors[EDIT_COLOR_ACTIVE] : _colors[EDIT_COLOR];
+		return is_item_active(id) ? _theme.edit_color_active : _theme.edit_color;
 
-	return RGBA(_colors[EDIT_COLOR_ACTIVE], 150);
+	return RGBA(_theme.edit_color_active, 150);
 }
 bool Ui::button(const char* text, bool enabled) {
 	int x, y, w, h;
@@ -958,7 +958,7 @@ bool Ui::system_tab(const char* text, int x, int y, int w, int h, bool checked, 
 		_drag_y = _my;
 	}
 	if (is_item_hot(id) || checked)
-		_rqueue->add_rect(x, y, w, h, _colors[ROLLOUT_CAPTION_COLOR]);
+		_rqueue->add_rect(x, y, w, h, _theme.rollout_caption_color);
 
 	_rqueue->add_text(x, y, w, _item_height, _text_align, text, text_color_hot(id, checked));
 	return res;
@@ -976,7 +976,7 @@ bool Ui::system_drag(int x, int y, int w, int h, int& xdiff, int& ydiff, bool& o
 	}
 	bool res = button_logic(id, over);
 	if (is_item_active(id)) {
-		_rqueue->add_rect(x, y, w, h, _colors[DRAG_COLOR]);
+		_rqueue->add_rect(x, y, w, h, _theme.drag_color);
 		xdiff = _mx - _drag_x;
 		ydiff = _my - _drag_y;
 		_drag_x = _mx;
@@ -1096,7 +1096,7 @@ bool Ui::item_dropped(char* text, uint buffer_len, int& mouse_x, int& mouse_y) {
 	_rqueue->add_rect(x, y, w, h, RGBA(255, 196, 0, 96));
 	_rqueue->add_scissor(x, y, w - _item_height, h);
 	_rqueue->add_text(x + w - _item_height / 2, y, _widget_w, _item_height, ALIGN_RIGHT, _drag_item,
-					  _colors[TEXT_COLOR]);
+					  _theme.text_color);
 	_rqueue->add_scissor(-1, -1, -1, -1); // disable scissor
 
 	// restore
@@ -1123,7 +1123,7 @@ bool Ui::check(const char* text, bool checked, bool enabled) {
 		if (enabled)
 			check_clr = RGBA(255, 255, 255, is_item_active(id) ? 255 : 200);
 		else
-			check_clr = _colors[TEXT_COLOR_DISABLED];
+			check_clr = _theme.text_color_disabled;
 
 		_rqueue->add_rounded_rect(x + CHECK_SIZE(), cy, CHECK_SIZE(), CHECK_SIZE(), DEF_ROUND(),
 								  check_clr);
@@ -1143,13 +1143,13 @@ bool Ui::button_check(const char* text, bool checked, bool enabled) {
 
 	// check behavior, but button look
 	_rqueue->add_rounded_rect(x, y, w, h, DEF_ROUND(), is_item_active(id) || checked
-														   ? _colors[BUTTON_COLOR_ACTIVE]
-														   : _colors[BUTTON_COLOR]);
+														   ? _theme.button_color_active
+														   : _theme.button_color);
 	uint text_clr;
 	if (is_item_focused(id))
-		text_clr = _colors[TEXT_COLOR_HOT];
+		text_clr = _theme.text_color_hot;
 	else if (checked)
-		text_clr = _colors[TEXT_COLOR_CHECKED];
+		text_clr = _theme.text_color_checked;
 	else
 		text_clr = text_color_hot(id, enabled, checked);
 
@@ -1187,8 +1187,8 @@ bool Ui::collapse(const char* text, bool checked, bool enabled) {
 	const int cx = x + CHECK_SIZE() / 2;
 	const int cy = y + CHECK_SIZE() / 2;
 	bool res = enabled && button_logic(id, over);
-	// _rqueue->add_rect(x, y, w, h, is_item_active(id) ? _colors[COLLAPSE_COLOR_ACTIVE]
-	//												 : _colors[COLLAPSE_COLOR]);
+	// _rqueue->add_rect(x, y, w, h, is_item_active(id) ? _theme.collapse_color_active
+	//												 : _theme.collapse_color);
 	unsigned char clr = enabled ? clr = 255 : clr = 128;
 	;
 	if (checked)
@@ -1350,7 +1350,7 @@ void Ui::label(const char* text) {
 	if (_widget_id > 10 && (y < _scroll_bottom || y > _scroll_top))
 		return;
 	// _rqueue->add_text(x, y, _text_align, text, RGBA(255,255,255,255));
-	_rqueue->add_text(x, y, _widget_w, _item_height, _text_align, text, _colors[TEXT_COLOR]);
+	_rqueue->add_text(x, y, _widget_w, _item_height, _text_align, text, _theme.text_color);
 }
 bool Ui::edit(char* text, int buffer_len, bool* edit_finished, bool enabled) {
 	int x, y, w, h;
@@ -1398,7 +1398,7 @@ void Ui::value(const char* text) {
 	if (_widget_id > 10 && (y < _scroll_bottom || y > _scroll_top))
 		return;
 	_rqueue->add_text(x + _item_height / 2, y, _widget_w, _item_height, ALIGN_RIGHT, text,
-					  _colors[TEXT_COLOR]);
+					  _theme.text_color);
 }
 bool Ui::slider(const char* text, float* val, float vmin, float vmax, float vinc, bool* last_change,
 				bool enabled) {
@@ -1408,7 +1408,7 @@ bool Ui::slider(const char* text, float* val, float vmin, float vmax, float vinc
 	if (!start_control(enabled, x, y, w, h, id, over, was_focused_temp))
 		return false;
 
-	_rqueue->add_rounded_rect(x, y, w, h, DEF_ROUND(), _colors[SLIDER_BG]);
+	_rqueue->add_rounded_rect(x, y, w, h, DEF_ROUND(), _theme.slider_bg);
 	const int range = w - SLIDER_MARKER_WIDTH();
 
 	float u = (*val - vmin) / (vmax - vmin);
@@ -1525,7 +1525,7 @@ void Ui::separator(bool draw_line) {
 		int y = _widget_y + _item_height / 2;
 		int w = _widget_w;
 		int h = _item_height / 4;
-		_rqueue->add_rect(x, y, w, h, _colors[BUTTON_COLOR]);
+		_rqueue->add_rect(x, y, w, h, _theme.button_color);
 	}
 }
 void Ui::draw_text(int x, int y, int align, const char* text, uint color) {
@@ -1580,7 +1580,7 @@ bool Ui::active_text(int x, int y, int align, const char* text, uint color, bool
 		char up[256];
 		for (size_t i = 0; i < len + 1; ++i) up[i] = toupper(text[i]);
 
-		_rqueue->add_text(x, y, _widget_w, _item_height, _text_align, up, _colors[TEXT_COLOR_HOT]);
+		_rqueue->add_text(x, y, _widget_w, _item_height, _text_align, up, _theme.text_color_hot);
 	}
 	else
 		_rqueue->add_text(x, y, _widget_w, _item_height, _text_align, text, color);
@@ -1657,23 +1657,14 @@ uint Ui::get_text_align() const {
 // 	callback(param, x, y, w, h, over, is_item_hot(id));
 // 	return res;
 // }
-
-void Ui::set_color(ColorScheme color_id, uint clr) {
-	if (color_id >= MAX_COLORS) {
-		assert(false && "ColorScheme and ColorScheme should be the same");
-		return;
-	}
-	_colors[color_id] = clr;
+const Theme& Ui::get_theme() const{
+	return _theme;
+}
+void Ui::set_theme(const Theme& theme){
+	_theme = theme;
 }
 void Ui::set_depth(int depth) {
 	_rqueue->add_depth(depth);
-}
-uint Ui::get_color(ColorScheme id) const {
-	if (id >= MAX_COLORS) {
-		assert(false && "ColorScheme and ColorScheme should be the same");
-		return 0;
-	}
-	return _colors[id];
 }
 void Ui::set_cursor(CURSOR cursor) {
 	if (!_platform) {
@@ -1726,6 +1717,86 @@ void Ui::set_focus_rollout(Rollout* r) {
 }
 Rollout* Ui::get_focus_rollout() {
 	return _focus_rollout;
+}
+void Ui::set_color(ColorScheme color_id, color_t clr) {
+	if (color_id >= MAX_COLORS) {
+		assert(false && "ColorScheme and ColorScheme should be the same");
+		return;
+	}
+	switch(color_id){
+		case ROLLOUT_COLOR:
+			_theme.rollout_color = clr;
+		case ROLLOUT_CAPTION_COLOR:
+			_theme.rollout_caption_color = clr;
+		case BUTTON_COLOR:
+			_theme.button_color = clr;
+		case BUTTON_COLOR_ACTIVE:
+			_theme.button_color_active = clr;
+		case BUTTON_COLOR_FOCUSED:
+			_theme.button_color_focused = clr;
+		case EDIT_COLOR:
+			_theme.edit_color = clr;
+		case EDIT_COLOR_ACTIVE:
+			_theme.edit_color_active = clr;
+		case COLLAPSE_COLOR:
+			_theme.collapse_color = clr;
+		case COLLAPSE_COLOR_ACTIVE:
+			_theme.collapse_color_active = clr;
+		case TEXT_COLOR:
+			_theme.text_color = clr;
+		case TEXT_COLOR_HOT:
+			_theme.text_color_hot = clr;
+		case TEXT_COLOR_CHECKED:
+			_theme.text_color_checked = clr;
+		case TEXT_COLOR_DISABLED:
+			_theme.text_color_disabled = clr;
+		case DRAG_COLOR:
+			_theme.drag_color = clr;
+		case SLIDER_BG:
+			_theme.slider_bg = clr;
+		default:
+			assert(false && "color is undefined");
+	};
+}
+color_t Ui::get_color(ColorScheme id) const {
+	if (id >= MAX_COLORS) {
+		assert(false && "ColorScheme and ColorScheme should be the same");
+		return 0;
+	}
+	switch(id){
+		case ROLLOUT_COLOR:
+			return _theme.rollout_color;
+		case ROLLOUT_CAPTION_COLOR:
+			return _theme.rollout_caption_color;
+		case BUTTON_COLOR:
+			return _theme.button_color;
+		case BUTTON_COLOR_ACTIVE:
+			return _theme.button_color_active;
+		case BUTTON_COLOR_FOCUSED:
+			return _theme.button_color_focused;
+		case EDIT_COLOR:
+			return _theme.edit_color;
+		case EDIT_COLOR_ACTIVE:
+			return _theme.edit_color_active;
+		case COLLAPSE_COLOR:
+			return _theme.collapse_color;
+		case COLLAPSE_COLOR_ACTIVE:
+			return _theme.collapse_color_active;
+		case TEXT_COLOR:
+			return _theme.text_color;
+		case TEXT_COLOR_HOT:
+			return _theme.text_color_hot;
+		case TEXT_COLOR_CHECKED:
+			return _theme.text_color_checked;
+		case TEXT_COLOR_DISABLED:
+			return _theme.text_color_disabled;
+		case DRAG_COLOR:
+			return _theme.drag_color;
+		case SLIDER_BG:
+			return _theme.slider_bg;
+		default:
+			assert(false && "color is undefined");
+	};
 }
 }
 

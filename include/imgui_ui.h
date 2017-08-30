@@ -65,7 +65,7 @@ static const int SCROLL_DISABLED = INT_MAX;
 
 enum UiMode { MODE_BATCH_DRAW_CALLS = 0x1 };
 
-// direct correspondence with ColorScheme, check iui.h
+// change Theme struct, if ColorScheme changed
 enum ColorScheme {
 	ROLLOUT_COLOR = 0,
 	ROLLOUT_CAPTION_COLOR,
@@ -117,6 +117,26 @@ struct texture_t {
 struct font_t;
 struct Toolbar;
 struct Rollout;
+
+typedef unsigned int color_t;
+
+struct Theme{
+	color_t rollout_color;
+	color_t rollout_caption_color;
+	color_t button_color;
+	color_t button_color_active;
+	color_t button_color_focused;
+	color_t edit_color;
+	color_t edit_color_active;
+	color_t collapse_color;
+	color_t collapse_color_active;
+	color_t text_color;
+	color_t text_color_hot;
+	color_t text_color_checked;
+	color_t text_color_disabled;
+	color_t drag_color;
+	color_t slider_bg;
+};
 
 class Ui {
 public:
@@ -219,9 +239,13 @@ public:
 	bool system_drag(int x, int y, int w, int h, int& xdiff, int& ydiff, bool& over);
 	bool system_button(const char* text, int x, int y, int w, int h, bool enabled);
 
-	void set_color(ColorScheme color_id, uint clr);
+	void set_color(ColorScheme color_id, color_t clr);
+	color_t get_color(ColorScheme color) const;
+	const Theme& get_theme() const;
+	void set_theme(const Theme& theme);
+
 	void set_depth(int depth);
-	uint get_color(ColorScheme color) const;
+
 	bool texture(const char* path, const frect& rc, bool blend = false);
 	bool texture(const char* path);
 	void end_texture();
@@ -350,7 +374,7 @@ private:
 
 	char _drag_item[256]; // used for holding buffer for current draging item
 	uint _edit_buffer_id;
-	uint _colors[MAX_COLORS];
+
 	RolloutMoveSide _target_side;
 	Rollout* _target_rollout;
 	div_drag _rollout_drag_div;
@@ -375,6 +399,7 @@ private:
 
 	uint _atlas;
 	TextureAtlas* _texture_atlas;
+	Theme _theme;
 
 	Rollout* _focus_rollout;
 };

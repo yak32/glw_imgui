@@ -42,7 +42,7 @@
 #endif
 
 /* To prevent unnecessary window recreation,
- * these should match the defaults selected in SDL_GL_ResetAttributes 
+ * these should match the defaults selected in SDL_GL_ResetAttributes
  */
 #define RENDERER_CONTEXT_MAJOR 2
 #define RENDERER_CONTEXT_MINOR 0
@@ -1306,7 +1306,7 @@ GLES2_RenderClear(SDL_Renderer * renderer)
        /* Select the color to clear with */
        g = renderer->g;
        a = renderer->a;
-   
+
        if (renderer->target &&
             (renderer->target->format == SDL_PIXELFORMAT_ARGB8888 ||
              renderer->target->format == SDL_PIXELFORMAT_RGB888)) {

@@ -61,9 +61,14 @@ void setup_ui() {
 	ui.insert_rollout(vert_rollout, -200, true, root_rollout);
 
 	char font_path[512];
-	sprintf(font_path, "%s/DroidSans.ttf", SDL_GetBasePath());
-
+	sprintf(font_path, "%sDroidSans.ttf", SDL_GetBasePath());
 	ui.font(font_path, 15);
+
+	char theme_path[512];
+	sprintf(theme_path, "%sdefault.theme", SDL_GetBasePath());
+	imgui::Theme theme;
+	imgui::load_theme(theme, theme_path);
+	ui.set_theme(theme);
 }
 bool init() {
 	bool success = true;
