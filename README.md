@@ -17,6 +17,8 @@ All logic is hidden in the Gui::button() call, rendering commands are issued and
 The library has basic suppot for layouting (attachable toolbars, layout serialization), themes (right now colors only), lock-free multithreading (triple buffering).
 
 #### Build and run:
+
+**Windows:**
 Prerequisites: cmake, C++ compiler
 ```
 mkdir build
@@ -24,8 +26,44 @@ cd build
 cmake ..
 cmake --build . --target install
 ```
+Run demo.exe from demo/install/ folder.
 
-Run from demo/install/ folder.
+**Linux:**
+Prerequisites: cmake, C++ compiler, SDL2
+
+Install SDL2
+```
+sudo apt-get install libsdl2-dev
+```
+
+Build:
+```
+mkdir build
+cd build
+cmake ..
+cmake --build . --target install
+cd ../demo/install/
+./demo
+```
+
+**MacOS:**
+Prerequisites: cmake, C++ compiler, SDL2
+
+Install SDL2
+```
+brew update SDL2
+```
+
+Build:
+```
+mkdir build
+cd build
+cmake ..
+cmake --build . --target install
+cd ../demo/install/
+./demo
+```
+
 
 ### Gallery
 Basic GUI manipulations, various controls, resizable and movable toolbars. Entire UI is built using IMGUI.
