@@ -23,21 +23,17 @@ private:
 
 class RenderSDL : public IRenderer {
 public:
-	bool		 create();
-	bool		 begin(uint width, uint height);
-	bool		 end();
+	bool create();
+	bool begin(uint width, uint height);
+	bool end();
 
-	unsigned char* load_image(const char* filename, int* width, int* height,
-			int* channels);
-	unsigned int create_texture(unsigned int width, unsigned int height, unsigned int channels, void* bmp);
+	unsigned char* load_image(const char* filename, int* width, int* height, int* channels);
+	unsigned int create_texture(unsigned int width, unsigned int height, unsigned int channels,
+								void* bmp);
 	bool remove_texture(unsigned int texture);
 	bool bind_texture(unsigned int texture);
-	bool copy_sub_texture(	unsigned int target,
-							unsigned int x,
-							unsigned int y,
-							unsigned int width,
-							unsigned int height,
-							void* bmp);
+	bool copy_sub_texture(unsigned int target, unsigned int x, unsigned int y, unsigned int width,
+						  unsigned int height, void* bmp);
 
 	bool render_mesh(const render_vertex_3d_t* tries, int count, bool b);
 	void set_blend_mode(BlendMode mode);
