@@ -189,7 +189,7 @@ Rendering - almost allocation-free (and I will try to make it allocation-free co
 ### Compartibility
   Working on Windows (tested with Visual Studio 2013, 2015), MacOS and Linux.
 
-The library is based on IMGUI implementation Recast library
-from https://github.com/recastnavigation/recastnavigation
+The library is based on IMGUI implementation from Recast library by Mikko Mononen
+https://github.com/recastnavigation/recastnavigation
 
 
