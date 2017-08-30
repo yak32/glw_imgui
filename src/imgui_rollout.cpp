@@ -16,8 +16,9 @@ static const int MOVE_SIGN_DEPTH = 3; // should be less then MAX_UI_LAYER_COUNT 
 
 static const int MAX_TABS = 20;
 Rollout::Rollout(int _x, int _y, int _w, int _h, int _z)
-	: x(_x), y(_y), w(_w), h(_h), z(_z), scroll(0), target_scroll(0), animation_speed(0), alpha(255),
-	animation_type(ANIMATION_NONE),	minimized(false), name(""), options(0), id(0), focused(false){}
+	: x(_x), y(_y), w(_w), h(_h), z(_z), scroll(0), target_scroll(0), animation_speed(0),
+	  alpha(255), animation_type(ANIMATION_NONE), minimized(false), name(""), options(0), id(0),
+	  focused(false) {}
 
 void Rollout::set(int _x, int _y, int _w, int _h, int _z, bool _visible, bool _minimized,
 				  int _alpha_inc) {
@@ -52,7 +53,7 @@ void Rollout::process_animations(Ui& ui) {
 		return;
 
 	if (animation_type == Rollout::ANIMATION_SHOW) {
-		int alpha_speed = (int)(0.016f * 255.0f * 3.0f);// 60 fps - TODO: add timer
+		int alpha_speed = (int)(0.016f * 255.0f * 3.0f); // 60 fps - TODO: add timer
 		if (alpha_speed > 255)
 			alpha_speed = 45;
 
@@ -70,13 +71,13 @@ void Rollout::process_animations(Ui& ui) {
 		}
 	}
 	else if (animation_type == Rollout::ANIMATION_SCROLL) {
-		int speed = (int)(0.016f * 255.0f * 3.0f);// 60 fps - TODO: add timer
+		int speed = (int)(0.016f * 255.0f * 3.0f); // 60 fps - TODO: add timer
 		if (speed > 255)
 			speed = 45;
 
 		scroll += animation_speed * speed;
 		if ((animation_speed < 0.0f && scroll < target_scroll) ||
-			(animation_speed >  0.0f && scroll > target_scroll)) {
+			(animation_speed > 0.0f && scroll > target_scroll)) {
 			scroll = target_scroll;
 			animation_type = ANIMATION_NONE;
 		}
@@ -170,7 +171,6 @@ bool Ui::hide_rollout(Rollout* r, bool animate) {
 }
 
 void Ui::scroll_rollout(Rollout* r, int scroll_val, bool animate, float animation_speed) {
-
 	if (r->scroll + scroll_val < 0)
 		scroll_val = -r->scroll;
 	if (!r) {
@@ -178,7 +178,6 @@ void Ui::scroll_rollout(Rollout* r, int scroll_val, bool animate, float animatio
 		return;
 	}
 	if (animate) {
-
 		// finish previous animation
 		if (r->animation_type == Rollout::ANIMATION_SCROLL)
 			r->scroll = r->target_scroll;
@@ -248,13 +247,13 @@ bool Ui::remove_rollout(Rollout* r) {
 	delete r;
 	return true;
 }
-Rollout* Ui::find_rollout(const char* name){
-	for( auto r: _rollouts)
+Rollout* Ui::find_rollout(const char* name) {
+	for (auto r : _rollouts)
 		if (r->name == name)
 			return r;
 	return nullptr;
 }
-bool Ui::is_rollout_visible(Rollout* r) const{
+bool Ui::is_rollout_visible(Rollout* r) const {
 	return r ? r->is_visible() : false;
 }
 void Ui::detach_tabbed_rollout(Rollout* r) {
@@ -332,7 +331,7 @@ bool Ui::get_rollout_rect(Rollout* r, int& x, int& y, int& w, int& h) {
 	h = r->h;
 	return true;
 }
-const char* Ui::get_rollout_name(Rollout* r) const{
+const char* Ui::get_rollout_name(Rollout* r) const {
 	return r ? r->name.c_str() : NULL;
 }
 bool Ui::scroll_rollout(Rollout* r, int scroll, SCROLL_MODE mode) {
@@ -351,7 +350,7 @@ bool Ui::scroll_rollout(Rollout* r, int scroll, SCROLL_MODE mode) {
 	}
 	return true;
 }
-bool Ui::hit_test(int x, int y) const{
+bool Ui::hit_test(int x, int y) const {
 	size_t size = _rollouts.size();
 	for (size_t i = 0; i < size; ++i) {
 		Rollout& r = *_rollouts[i];

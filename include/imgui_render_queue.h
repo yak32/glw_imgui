@@ -101,6 +101,7 @@ struct RenderQueue {
 	bool ready_to_render() const;
 	void set_alpha(unsigned int alpha);
 	void set_render_options(int options);
+
 private:
 	gfx_cmd _queue[GFXCMD_QUEUE_SIZE];
 	size_t _size, _mem_size;

@@ -31,43 +31,30 @@ namespace imgui {
 
 static const int MIN_SCROLL_HEIGHT = 10;
 
-
-
 // moved
 const int DEF_BUTTON_HEIGHT = 16;
 const int ROLLOUT_START_WIDGET_ID = 10;
 
 Ui::Ui(uint mode)
-		: _width(0), _height(0), _left(false), _double_left(false),
-		_keys_state(0), _prev_keys_state(0),
-		_mx(-1), _my(-1), _scroll(0), _render_options(0), _item_height(DEF_BUTTON_HEIGHT),
-		_active(0), _hot(0), _hot_to_be(0), _prev_enabled_id(0), _is_hot(false), _is_active(false),
-		_went_active(false), _search_next_focus(false), _drag_x(0), _drag_y(0), _drag_orig(0),
-		_widget_x(0), _widget_y(0), _widget_w(100), _rollout_width(0), _rollout_height(0),
-		_rollout_left(0), _rollout_top(0), _inside_current_scroll(false), _area_id(0),
-		_character(0), _widget_id(0), _focus(0), _row(0), _drag_item_width(0),
-		_options(0), _alpha(255), _text_align(ALIGN_LEFT),
-		_padding_left(DEFAULT_PADDING()), _padding_right(DEFAULT_PADDING()),
-		_padding_top(DEFAULT_PADDING()), _padding_bottom(DEFAULT_PADDING()),
-		_item_padding_left(DEFAULT_PADDING()), _item_padding_right(DEFAULT_PADDING()),
-		_item_padding_top(DEFAULT_PADDING()), _item_padding_bottom(DEFAULT_PADDING()),
-		_property_width(0.5f), _dragged_rollout_id(NULL),
-		_focused_rollout_id(NULL), _cursor(0), _cursor_over_drag(0), _scroll_right(0),
-		_scroll_area_top(0), _scroll_val(NULL), _focus_top(0), _focus_bottom(0),
-		_scroll_id(0), _inside_scroll_area(false), _scroll_top(0), _scroll_bottom(0), _platform(nullptr),
-		_edit_buffer_id(0),
-		_target_side(ROLLOUT_UNDEFINED),
-		_target_rollout(NULL),
-		_rollout_drag_div(),
-		_toolbar_root(NULL), _rollout_last(NULL),
-		_rqueue(nullptr), _rqueue_display(nullptr),
-		_renderer(nullptr),
-		_blend_texture(false),
-		_depth(0),	 // ui depth (need to sorting windows properly, especially during moving rollouts)
-		_mode(mode),
-		_atlas(UNDEFINED_TEXTURE),
-		_focus_rollout(nullptr)
-{
+	: _width(0), _height(0), _left(false), _double_left(false), _keys_state(0), _prev_keys_state(0),
+	  _mx(-1), _my(-1), _scroll(0), _render_options(0), _item_height(DEF_BUTTON_HEIGHT), _active(0),
+	  _hot(0), _hot_to_be(0), _prev_enabled_id(0), _is_hot(false), _is_active(false),
+	  _went_active(false), _search_next_focus(false), _drag_x(0), _drag_y(0), _drag_orig(0),
+	  _widget_x(0), _widget_y(0), _widget_w(100), _rollout_width(0), _rollout_height(0),
+	  _rollout_left(0), _rollout_top(0), _inside_current_scroll(false), _area_id(0), _character(0),
+	  _widget_id(0), _focus(0), _row(0), _drag_item_width(0), _options(0), _alpha(255),
+	  _text_align(ALIGN_LEFT), _padding_left(DEFAULT_PADDING()), _padding_right(DEFAULT_PADDING()),
+	  _padding_top(DEFAULT_PADDING()), _padding_bottom(DEFAULT_PADDING()),
+	  _item_padding_left(DEFAULT_PADDING()), _item_padding_right(DEFAULT_PADDING()),
+	  _item_padding_top(DEFAULT_PADDING()), _item_padding_bottom(DEFAULT_PADDING()),
+	  _property_width(0.5f), _dragged_rollout_id(NULL), _focused_rollout_id(NULL), _cursor(0),
+	  _cursor_over_drag(0), _scroll_right(0), _scroll_area_top(0), _scroll_val(NULL), _focus_top(0),
+	  _focus_bottom(0), _scroll_id(0), _inside_scroll_area(false), _scroll_top(0),
+	  _scroll_bottom(0), _platform(nullptr), _edit_buffer_id(0), _target_side(ROLLOUT_UNDEFINED),
+	  _target_rollout(NULL), _rollout_drag_div(), _toolbar_root(NULL), _rollout_last(NULL),
+	  _rqueue(nullptr), _rqueue_display(nullptr), _renderer(nullptr), _blend_texture(false),
+	  _depth(0), // ui depth (need to sorting windows properly, especially during moving rollouts)
+	  _mode(mode), _atlas(UNDEFINED_TEXTURE), _focus_rollout(nullptr) {
 	memset(_edit_buffer, 0, sizeof(_edit_buffer));
 	memset(_drag_item, 0, sizeof(_drag_item));
 	// colors
@@ -100,11 +87,11 @@ Ui::Ui(uint mode)
 Ui::~Ui() {
 	destroy();
 }
-bool Ui::create(IPlatform* p, IRenderer* r){
+bool Ui::create(IPlatform* p, IRenderer* r) {
 	_platform = p;
 	return render_init(r);
 }
-void Ui::destroy(){
+void Ui::destroy() {
 	if (_toolbar_root) {
 		clear_toolbars(_toolbar_root);
 		_toolbar_root = nullptr;
@@ -131,8 +118,7 @@ bool Ui::is_edit_buffer(uint id) const {
 	return _edit_buffer_id == id;
 }
 bool Ui::in_rect(int x, int y, int w, int h, bool checkScroll) const {
-	return (!checkScroll || _toolbar_root) && _mx >= x && _mx <= x + w && _my >= y &&
-		   _my <= y + h;
+	return (!checkScroll || _toolbar_root) && _mx >= x && _mx <= x + w && _my >= y && _my <= y + h;
 }
 void Ui::clear_input() {
 	// trick to have double click flag in input
@@ -172,7 +158,7 @@ bool Ui::button_logic(uint id, bool over) {
 		return false;
 
 	bool was_focused = false;
-	//if ((key_pressed(KEY_MOUSE_LEFT) || key_pressed(KEY_ENTER)) && is_item_focused(id)) {
+	// if ((key_pressed(KEY_MOUSE_LEFT) || key_pressed(KEY_ENTER)) && is_item_focused(id)) {
 	//	set_focused(0);
 	//	was_focused = true;
 	//}
@@ -182,10 +168,10 @@ bool Ui::button_logic(uint id, bool over) {
 	if (!any_active()) {
 		if (over)
 			set_hot(id);
-		if ( is_item_hot(id) && key_pressed(KEY_MOUSE_LEFT) ){
-				set_active(id);
-				if (!was_focused)
-					set_focused(id);
+		if (is_item_hot(id) && key_pressed(KEY_MOUSE_LEFT)) {
+			set_active(id);
+			if (!was_focused)
+				set_focused(id);
 		}
 		// keyboard control
 		if (is_item_focused(id) && key_pressed(KEY_ENTER)) {
@@ -326,14 +312,13 @@ bool Ui::key_released(Key key) const {
 }
 
 bool Ui::update_input(int mx, int my, int scroll, uint character, uint keys_state) {
-	if (!_platform)
-	{
+	if (!_platform) {
 		assert(false && "platform is not set");
 		return false;
 	}
 	bool left = (keys_state & KEY_MOUSE_LEFT) != 0;
 	bool double_left = false;
-	//if (keys_state & MBUT_LEFT_DBL)
+	// if (keys_state & MBUT_LEFT_DBL)
 	//	double_left = true;
 	_mx = mx;
 	_my = my;
@@ -354,8 +339,8 @@ bool Ui::update_input(int mx, int my, int scroll, uint character, uint keys_stat
 	return true;
 }
 
-bool Ui::begin_frame(uint width, uint height, int mx, int my, int scroll,
-		uint character, uint keys_state) {
+bool Ui::begin_frame(uint width, uint height, int mx, int my, int scroll, uint character,
+					 uint keys_state) {
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
 		if (_rqueue->ready_to_render())
@@ -364,7 +349,7 @@ bool Ui::begin_frame(uint width, uint height, int mx, int my, int scroll,
 
 	_width = width;
 	_height = height;
-	update_input(mx, _height-my, scroll, character, keys_state);
+	update_input(mx, _height - my, scroll, character, keys_state);
 
 	_hot = _hot_to_be;
 	_hot_to_be = 0;
@@ -421,14 +406,14 @@ void Ui::end_frame() {
 	clear_input();
 	_rqueue->on_frame_finished();
 }
-void Ui::on_render_finished(){
+void Ui::on_render_finished() {
 	std::lock_guard<std::mutex> lock(_mutex);
 	if (_rqueue->ready_to_render()) {
 		// we can swap buffers
 		_rqueue->prepare_render();
 		_rqueue_display->on_frame_finished();
 		std::swap(_rqueue, _rqueue_display); // swap render buffers to display new queue
-		_rqueue->reset_gfx_cmd_queue(); // former display queue can be reset
+		_rqueue->reset_gfx_cmd_queue();		 // former display queue can be reset
 	}
 }
 void Ui::cleanup() {
@@ -505,11 +490,11 @@ bool Ui::begin_rollout(Rollout* pr, bool focused) {
 	_options = r.options;
 
 	bool draw_scroll = true;
-	if (r.scroll == SCROLL_DISABLED || _options & DISABLE_SCROLL ) {
+	if (r.scroll == SCROLL_DISABLED || _options & DISABLE_SCROLL) {
 		r.scroll = 0;
 		draw_scroll = false;
 	}
-	if ( !(_options & DISPLAY_SCROLL_BARS) )
+	if (!(_options & DISPLAY_SCROLL_BARS))
 		draw_scroll = false;
 
 	_rollout_left = r.x + _padding_left;
@@ -541,7 +526,7 @@ bool Ui::begin_rollout(Rollout* pr, bool focused) {
 
 	bool ret_val = false;
 	int caption_y = y + h - area_header + _item_height / 2 - 2;
-	int caption_height = toolbar ? 0: _item_height + 3;
+	int caption_height = toolbar ? 0 : _item_height + 3;
 
 	// setup rollout depth
 	if (_focused_rollout_id == pr)
@@ -585,23 +570,23 @@ bool Ui::begin_rollout(Rollout* pr, bool focused) {
 					insert_rollout(drollout, 0.0f, false, _target_rollout);
 				}
 				if (_target_side == ROLLOUT_LEFT_FIXED) {
-					int neww = drollout->w > _target_rollout->w / 2 ? _target_rollout->w / 2
-																	 : drollout->w;
+					int neww =
+						drollout->w > _target_rollout->w / 2 ? _target_rollout->w / 2 : drollout->w;
 					insert_rollout(drollout, (float)neww, true, _target_rollout);
 				}
 				else if (_target_side == ROLLOUT_TOP_FIXED) {
-					int newh = drollout->h > _target_rollout->h / 2 ? _target_rollout->h / 2
-																	 : drollout->h;
+					int newh =
+						drollout->h > _target_rollout->h / 2 ? _target_rollout->h / 2 : drollout->h;
 					insert_rollout(drollout, -(float)newh, false, _target_rollout);
 				}
 				else if (_target_side == ROLLOUT_RIGHT_FIXED) {
-					int neww = drollout->w > _target_rollout->w / 2 ? _target_rollout->w / 2
-																	 : drollout->w;
+					int neww =
+						drollout->w > _target_rollout->w / 2 ? _target_rollout->w / 2 : drollout->w;
 					insert_rollout(drollout, -(float)neww, true, _target_rollout);
 				}
 				else if (_target_side == ROLLOUT_BOTTOM_FIXED) {
-					int newh = drollout->h > _target_rollout->h / 2 ? _target_rollout->h / 2
-																	 : drollout->h;
+					int newh =
+						drollout->h > _target_rollout->h / 2 ? _target_rollout->h / 2 : drollout->h;
 					insert_rollout(drollout, (float)newh, false, _target_rollout);
 				}
 				clear_active(); // clear state to prevent
@@ -742,7 +727,7 @@ bool Ui::begin_rollout(Rollout* pr, bool focused) {
 					xx += width;
 				}
 			}
-			else if (caption_height){
+			else if (caption_height) {
 				_rqueue->add_rect(x, caption_y, w, caption_height, _colors[ROLLOUT_CAPTION_COLOR]);
 				_rqueue->add_text(x, y + h - area_header + _item_height / 2 - 2, _widget_w,
 								  _item_height, ALIGN_LEFT, r.name.c_str(),
@@ -781,7 +766,6 @@ void Ui::end_rollout() {
 	// Disable scissoring.
 	_rqueue->add_scissor(-1, -1, -1, -1);
 	if (!(_options & DISABLE_SCROLL)) {
-
 		// Draw scroll bar
 		int x = _scroll_right + SCROLL_AREA_PADDING() / 2;
 		int y = _scroll_bottom;
@@ -834,8 +818,9 @@ void Ui::end_rollout() {
 					if (is_item_active(hid))
 						_rqueue->add_rect(hx, hy, hw, hh, RGBA(255, 196, 0, 196));
 					else
-						_rqueue->add_rect(hx, hy, hw, hh, is_item_hot(hid) ? RGBA(255, 196, 0, 96)
-							: RGBA(255, 255, 255, 64));
+						_rqueue->add_rect(hx, hy, hw, hh, is_item_hot(hid)
+															  ? RGBA(255, 196, 0, 96)
+															  : RGBA(255, 255, 255, 64));
 				}
 			}
 
@@ -848,10 +833,9 @@ void Ui::end_rollout() {
 					if (*_scroll_val > (sh - h))
 						*_scroll_val = (sh - h);
 				}
-
 			}
-//			else
-//				*_scroll_val = SCROLL_DISABLED; // memorize state - no scroll
+			//			else
+			//				*_scroll_val = SCROLL_DISABLED; // memorize state - no scroll
 		}
 	}
 	_inside_current_scroll = false;
@@ -863,7 +847,6 @@ uint Ui::get_control_id(uint widget_id) const {
 }
 bool Ui::start_control(bool enabled, int& x, int& y, int& w, int& h, uint& id, bool& over,
 					   bool& was_focused) {
-
 	id = get_control_id(_widget_id++);
 
 	x = _widget_x;
@@ -886,10 +869,10 @@ bool Ui::start_control(bool enabled, int& x, int& y, int& w, int& h, uint& id, b
 		_search_next_focus = false;
 		set_focused(id);
 	}
-	else if (is_item_focused(id) ) {
-		if (key_released(KEY_UP) || key_released(KEY_LEFT) ) {
+	else if (is_item_focused(id)) {
+		if (key_released(KEY_UP) || key_released(KEY_LEFT)) {
 			// don't allow to move focus up, if first control is focused
-			if ( _prev_enabled_id >= get_control_id(ROLLOUT_START_WIDGET_ID))
+			if (_prev_enabled_id >= get_control_id(ROLLOUT_START_WIDGET_ID))
 				set_focused(_prev_enabled_id);
 		}
 		if (key_released(KEY_DOWN) || key_released(KEY_RIGHT)) {
@@ -914,7 +897,7 @@ color Ui::button_color(uint id, bool enabled) {
 	if (is_item_active(id))
 		return _colors[BUTTON_COLOR_ACTIVE];
 
-	return is_item_focused(id) ? _colors[BUTTON_COLOR_FOCUSED]: _colors[BUTTON_COLOR];
+	return is_item_focused(id) ? _colors[BUTTON_COLOR_FOCUSED] : _colors[BUTTON_COLOR];
 }
 color Ui::edit_color(uint id, bool enabled) {
 	if (!is_item_focused(id))
@@ -944,8 +927,7 @@ bool Ui::button(const char* text, int x, int y, int w, int h, bool enabled) {
 	bool res = enabled && button_logic(id, over);
 
 	_rqueue->add_rounded_rect(x, y, w, h, DEF_ROUND(), button_color(id));
-	_rqueue->add_text(x, y, _widget_w, _item_height, _text_align, text,
-					  text_color(id, enabled));
+	_rqueue->add_text(x, y, _widget_w, _item_height, _text_align, text, text_color(id, enabled));
 	return res;
 }
 bool Ui::system_button(const char* text, int x, int y, int w, int h, bool enabled) {
@@ -1020,8 +1002,7 @@ bool Ui::item(const char* text, bool selected, bool enabled) {
 	else if (selected)
 		_rqueue->add_rect(x, y, w, h, RGBA(255, 196, 0, 70));
 
-	_rqueue->add_text(x, y, _widget_w, _item_height, _text_align, text,
-					  text_color(id, enabled));
+	_rqueue->add_text(x, y, _widget_w, _item_height, _text_align, text, text_color(id, enabled));
 	return res;
 }
 bool Ui::combo_item(const char* text, bool enabled) {
@@ -1114,8 +1095,8 @@ bool Ui::item_dropped(char* text, uint buffer_len, int& mouse_x, int& mouse_y) {
 
 	_rqueue->add_rect(x, y, w, h, RGBA(255, 196, 0, 96));
 	_rqueue->add_scissor(x, y, w - _item_height, h);
-	_rqueue->add_text(x + w - _item_height / 2, y, _widget_w, _item_height, ALIGN_RIGHT,
-					  _drag_item, _colors[TEXT_COLOR]);
+	_rqueue->add_text(x + w - _item_height / 2, y, _widget_w, _item_height, ALIGN_RIGHT, _drag_item,
+					  _colors[TEXT_COLOR]);
 	_rqueue->add_scissor(-1, -1, -1, -1); // disable scissor
 
 	// restore
@@ -1203,8 +1184,8 @@ bool Ui::collapse(const char* text, bool checked, bool enabled) {
 	if (!start_control(enabled, x, y, w, h, id, over, was_focused))
 		return false;
 
-	const int cx = x + CHECK_SIZE()/2;
-	const int cy = y + CHECK_SIZE()/2	;
+	const int cx = x + CHECK_SIZE() / 2;
+	const int cy = y + CHECK_SIZE() / 2;
 	bool res = enabled && button_logic(id, over);
 	// _rqueue->add_rect(x, y, w, h, is_item_active(id) ? _colors[COLLAPSE_COLOR_ACTIVE]
 	//												 : _colors[COLLAPSE_COLOR]);
@@ -1321,8 +1302,7 @@ bool Ui::color_edit(const char* text, color clr, bool enabled, bool is_property)
 	if (is_property) {
 		twidth = (int)(_widget_w * _property_width);
 		vwidth = (int)(w * (1.0f - _property_width));
-		_rqueue->add_text(x, y, twidth, _item_height, _text_align, text,
-						  text_color_hot(id, true));
+		_rqueue->add_text(x, y, twidth, _item_height, _text_align, text, text_color_hot(id, true));
 	}
 	const uint red = clr & 0xff;
 	const uint green = (clr >> 8) & 0xff;
@@ -1338,7 +1318,7 @@ bool Ui::color_edit(const char* text, color clr, bool enabled, bool is_property)
 
 	return focused;
 }
-void Ui::rectangle(int height, uint color){
+void Ui::rectangle(int height, uint color) {
 	int x, y, w, h;
 	uint id;
 	bool over, was_focused;
@@ -1351,8 +1331,7 @@ void Ui::rectangle(int height, uint color){
 	_item_height = button_height;
 }
 void Ui::rectangle(int x, int y, int width, int height, uint color) {
-	if (y + height < 0 || y > _height ||
-		x + width < 0 ||  x > _width)
+	if (y + height < 0 || y > _height || x + width < 0 || x > _width)
 		return;
 	_rqueue->add_rect(x, y, width, height, color);
 }
@@ -1399,8 +1378,7 @@ bool Ui::property(const char* name, char* text, int buffer_len, bool* edit_finis
 
 	// property name
 	int twidth = (int)(_widget_w * _property_width);
-	_rqueue->add_text(x, y, twidth, _item_height, _text_align, name,
-					  text_color_hot(id, enabled));
+	_rqueue->add_text(x, y, twidth, _item_height, _text_align, name, text_color_hot(id, enabled));
 
 	// property value
 	int vwidth = (int)(w * (1.0f - _property_width));
@@ -1567,7 +1545,7 @@ uint Ui::set_item_height(uint button_height) {
 	_padding_bottom = DEFAULT_PADDING();
 	return mem;
 }
-uint Ui::get_item_height() const{
+uint Ui::get_item_height() const {
 	return _item_height;
 }
 void Ui::set_padding(int left, int top, int right, int bottom) {
@@ -1602,8 +1580,7 @@ bool Ui::active_text(int x, int y, int align, const char* text, uint color, bool
 		char up[256];
 		for (size_t i = 0; i < len + 1; ++i) up[i] = toupper(text[i]);
 
-		_rqueue->add_text(x, y, _widget_w, _item_height, _text_align, up,
-						  _colors[TEXT_COLOR_HOT]);
+		_rqueue->add_text(x, y, _widget_w, _item_height, _text_align, up, _colors[TEXT_COLOR_HOT]);
 	}
 	else
 		_rqueue->add_text(x, y, _widget_w, _item_height, _text_align, text, color);
@@ -1630,16 +1607,16 @@ bool Ui::font(const char* path, float height) {
 	_rqueue->add_font(path, height);
 	return true;
 }
-//check before item
-bool Ui::check_rect(int mouse_x, int mouse_y, uint id) const{
-	//if (id == CHECK_ITEM_RECT) {
+// check before item
+bool Ui::check_rect(int mouse_x, int mouse_y, uint id) const {
+	// if (id == CHECK_ITEM_RECT) {
 	//	int x = _widget_x;
 	//	int y = _widget_y - _item_height;
 	//	int w = _widget_w;
 	//	int h = _item_height;
 	//	return mouse_x >= x && mouse_x <= x + w && mouse_y >= y && mouse_y <= y + h;
 	//}
-	//else if (id == CHECK_ROLLOUT_RECT) {
+	// else if (id == CHECK_ROLLOUT_RECT) {
 	//	int x = _rollout_left;
 	//	int y = _rollout_top - _item_height;
 	//	int w = _rollout_width;
@@ -1651,7 +1628,7 @@ bool Ui::check_rect(int mouse_x, int mouse_y, uint id) const{
 void Ui::set_text_align(uint align) {
 	_text_align = align;
 }
-uint Ui::get_text_align() const{
+uint Ui::get_text_align() const {
 	return _text_align;
 }
 // bool Ui::custom(CUSTOM_RENDER_CALLBACK callback, int param, bool enabled) {
@@ -1691,7 +1668,7 @@ void Ui::set_color(ColorScheme color_id, uint clr) {
 void Ui::set_depth(int depth) {
 	_rqueue->add_depth(depth);
 }
-uint Ui::get_color(ColorScheme id) const{
+uint Ui::get_color(ColorScheme id) const {
 	if (id >= MAX_COLORS) {
 		assert(false && "ColorScheme and ColorScheme should be the same");
 		return 0;
@@ -1699,8 +1676,7 @@ uint Ui::get_color(ColorScheme id) const{
 	return _colors[id];
 }
 void Ui::set_cursor(CURSOR cursor) {
-	if (!_platform)
-	{
+	if (!_platform) {
 		assert(false && "platform is not set");
 		return;
 	}
@@ -1717,8 +1693,8 @@ bool Ui::clear_focus() {
 	_search_next_focus = false;
 	return true;
 }
-void Ui::get_input(int* mouse_x, int* mouse_y, uint* keys_state,
-		uint* character, bool& left_pressed, bool& left_released) const{
+void Ui::get_input(int* mouse_x, int* mouse_y, uint* keys_state, uint* character,
+				   bool& left_pressed, bool& left_released) const {
 	*keys_state = _keys_state;
 	*mouse_x = _mx;
 	*mouse_y = _my;

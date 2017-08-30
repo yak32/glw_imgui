@@ -6,11 +6,7 @@
 namespace imgui {
 struct Rollout {
 	// same as Options
-	enum ANIMATION_TYPE {
-		ANIMATION_NONE,
-		ANIMATION_SHOW,
-		ANIMATION_SCROLL
-	};
+	enum ANIMATION_TYPE { ANIMATION_NONE, ANIMATION_SHOW, ANIMATION_SCROLL };
 	static const int MAX_TABS = 20;
 	Rollout(int _x = 0, int _y = 0, int _w = 0, int _h = 0, int _z = 0);
 	void set(int _x, int _y, int _w, int _h, int _z, bool _visible, bool _minimized,

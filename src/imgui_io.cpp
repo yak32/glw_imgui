@@ -1,7 +1,6 @@
 // glw_imgui
 // Copyright (C) 2016 Iakov Sumygin - BSD license
 
-
 #include "imgui_io.h"
 #include "imgui_toolbars.h"
 #include "glw_json/glw_json.h"

@@ -63,9 +63,7 @@ inline uint RGBA(uint rgb, unsigned char a) {
 }
 static const int SCROLL_DISABLED = INT_MAX;
 
-enum UiMode{
-	MODE_BATCH_DRAW_CALLS = 0x1
-};
+enum UiMode { MODE_BATCH_DRAW_CALLS = 0x1 };
 
 // direct correspondence with ColorScheme, check iui.h
 enum ColorScheme {
@@ -111,7 +109,7 @@ enum SCROLL_MODE { SCROLL_START = 0, SCROLL_END, SCROLL_CURRENT };
 
 static const int MAX_UI_LAYER_COUNT = 10;
 
-struct texture_t{
+struct texture_t {
 	uint id;
 	float x, y, width, height;
 };
@@ -130,14 +128,13 @@ public:
 public:
 	bool create(IPlatform* p, IRenderer* r);
 	void destroy();
-	bool begin_frame(uint width, uint height, int mx, int my, int scroll,
-					 uint character, uint key);
+	bool begin_frame(uint width, uint height, int mx, int my, int scroll, uint character, uint key);
 	void end_frame();
 	void cleanup();
 	void set_options(size_t options);
 	void indent();
 	void unindent();
-	void separator(bool draw_line=false);
+	void separator(bool draw_line = false);
 	bool clear_focus();
 
 	// rollouts
@@ -154,7 +151,8 @@ public:
 	bool show_rollout(Rollout* r, bool animate = true);
 	bool hide_rollout(Rollout* r, bool animate = true);
 
-	void scroll_rollout(Rollout* r, int scroll_val, bool animate = false, float animation_speed = 0.0f);
+	void scroll_rollout(Rollout* r, int scroll_val, bool animate = false,
+						float animation_speed = 0.0f);
 
 	void set_focus_rollout(Rollout* r);
 	Rollout* get_focus_rollout();
@@ -166,7 +164,7 @@ public:
 	const char* get_rollout_name(Rollout* r) const;
 	bool is_rollout_visible(Rollout* r) const;
 
-	unsigned int mode() const { return _mode;}
+	unsigned int mode() const { return _mode; }
 
 	bool scroll_rollout(Rollout* r, int scroll, SCROLL_MODE mode);
 	bool hit_test(int x, int y) const;
@@ -193,7 +191,7 @@ public:
 	void row(uint count);
 	void end_row();
 	void set_widget_width(int width);
-	int  get_widget_width() const;
+	int get_widget_width() const;
 	bool property(const char* name, char* text, int buffer_len, bool* edit_finished,
 				  bool enabled = true);
 	bool combo(const char* text, const char* value, bool enabled = true);
@@ -215,8 +213,8 @@ public:
 	RolloutMoveSide rollout_move(Rollout* dr, Rollout* r, int x, int y);
 	bool rollout_move_rect(int x, int y, int w, int h);
 	bool update_input(int mx, int my, int scroll, uint character, uint keys_state);
-	void get_input(int* mouse_x, int* mouse_y, uint* keys_state,
-			uint* character, bool& left_pressed, bool& left_released) const;
+	void get_input(int* mouse_x, int* mouse_y, uint* keys_state, uint* character,
+				   bool& left_pressed, bool& left_released) const;
 
 	bool system_drag(int x, int y, int w, int h, int& xdiff, int& ydiff, bool& over);
 	bool system_button(const char* text, int x, int y, int w, int h, bool enabled);
@@ -245,7 +243,6 @@ public:
 	void play_sound(SOUNDS s);
 	void render_draw(bool transparency);
 
-
 private:
 	bool any_active() const;
 	bool is_item_active(uint id) const;
@@ -271,7 +268,6 @@ private:
 	color button_color(uint id, bool enabled = true);
 	color edit_color(uint id, bool enabled = true);
 
-
 	void detach_tabbed_rollout(Rollout* r);
 
 	// render
@@ -283,14 +279,13 @@ private:
 	bool bind_texture(const char* path);
 
 	void render_text(const font_t& font, float x, float y, float w, float h, const char* text,
-			int align, unsigned int col, float depth);
-
+					 int align, unsigned int col, float depth);
 
 	inline const int SLIDER_HEIGHT() const;
 	inline const int SLIDER_MARKER_WIDTH() const;
 	inline const int CHECK_SIZE() const;
 	inline const int DEFAULT_SPACING() const;
-	//inline const int ITEM_SPACING(ITEM side) const;
+	// inline const int ITEM_SPACING(ITEM side) const;
 	inline const int SCROLL_AREA_PADDING() const;
 	inline const int INTEND_SIZE() const;
 	inline const int AREA_HEADER() const;
@@ -299,6 +294,7 @@ private:
 	inline const int DEFAULT_PADDING() const;
 
 	uint get_control_id(uint widget_id) const;
+
 private:
 	uint _width;
 	uint _height;
@@ -330,7 +326,7 @@ private:
 
 	char _edit_buffer[256]; // used for holding buffer for current edited control
 	int _row;
-	uint _drag_item_width;  // width of dragging item
+	uint _drag_item_width; // width of dragging item
 	uint _options;
 	int _alpha;
 	uint _text_align;
@@ -352,7 +348,7 @@ private:
 	int _scroll_bottom;
 	IPlatform* _platform;
 
-	char _drag_item[256];   // used for holding buffer for current draging item
+	char _drag_item[256]; // used for holding buffer for current draging item
 	uint _edit_buffer_id;
 	uint _colors[MAX_COLORS];
 	RolloutMoveSide _target_side;
@@ -360,12 +356,11 @@ private:
 	div_drag _rollout_drag_div;
 	Toolbar *_toolbar_root, *_rollout_last;
 
-
 	Rollouts _rollouts;
 
 	RenderQueue _rqueues[2];
-	RenderQueue* _rqueue, *_rqueue_display;
-	std::mutex	_mutex;
+	RenderQueue *_rqueue, *_rqueue_display;
+	std::mutex _mutex;
 	IRenderer* _renderer;
 	std::unordered_map<std::string, font_t*> _fonts;
 	std::unordered_map<std::string, texture_t> _textures;

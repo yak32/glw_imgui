@@ -38,12 +38,12 @@ unsigned char get_alpha(unsigned int color) {
 	return (unsigned char)(color >> 24);
 }
 
-RenderQueue::RenderQueue() : _size(0), _mem_size(0), _ready_to_render(false){
+RenderQueue::RenderQueue() : _size(0), _mem_size(0), _ready_to_render(false) {
 	_render_options = 0;
 	_alpha = 255;
 	// _render_options(RENDER_OPTIONS_NONROUNDED_RECT)
 }
-void RenderQueue::set_render_options(int options){
+void RenderQueue::set_render_options(int options) {
 	_render_options = options;
 }
 // to support multithreaded rendering, 2 render queue is added
