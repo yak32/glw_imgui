@@ -16,6 +16,14 @@ All logic is hidden in the Gui::button() call, rendering commands are issued and
 
 The library has basic suppot for layouting (attachable toolbars, layout serialization), themes (right now colors only), lock-free multithreading (triple buffering).
 
+### Gallery
+Basic GUI manipulations, various controls, resizable and movable toolbars. Entire UI is built using IMGUI.
+[![ScreenShot](/../feature-screenshots/screenshots/IMGUI_toolbars.png)](https://www.youtube.com/watch?v=TlJiuguyLVo)
+
+The Editor of [Glow game engine](http://www.glow3d.com)
+
+
+
 #### Build and run:
 
 **Windows:**
@@ -64,12 +72,6 @@ cd ../demo/install/
 ./demo
 ```
 
-
-### Gallery
-Basic GUI manipulations, various controls, resizable and movable toolbars. Entire UI is built using IMGUI.
-[![ScreenShot](/../feature-screenshots/screenshots/IMGUI_toolbars.png)](https://www.youtube.com/watch?v=TlJiuguyLVo)
-
-The Editor of [Glow game engine](http://www.glow3d.com)
 
 ### Sample UI update loop with various controls
 ```c++
