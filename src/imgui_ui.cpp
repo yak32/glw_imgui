@@ -1567,7 +1567,7 @@ uint Ui::set_item_height(uint button_height) {
 	_padding_bottom = DEFAULT_PADDING();
 	return mem;
 }
-uint Ui::get_button_height() const{
+uint Ui::get_item_height() const{
 	return _item_height;
 }
 void Ui::set_padding(int left, int top, int right, int bottom) {
