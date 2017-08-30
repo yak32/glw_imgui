@@ -1203,8 +1203,8 @@ bool Ui::collapse(const char* text, bool checked, bool enabled) {
 	if (!start_control(enabled, x, y, w, h, id, over, was_focused))
 		return false;
 
-	const int cx = x + CHECK_SIZE() / 2;
-	const int cy = y + _item_height / 4;
+	const int cx = x + CHECK_SIZE()/2;
+	const int cy = y + CHECK_SIZE()/2	;
 	bool res = enabled && button_logic(id, over);
 	// _rqueue->add_rect(x, y, w, h, is_item_active(id) ? _colors[COLLAPSE_COLOR_ACTIVE]
 	//												 : _colors[COLLAPSE_COLOR]);
