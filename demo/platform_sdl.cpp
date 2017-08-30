@@ -89,7 +89,7 @@ bool RenderSDL::create() {
 	bool success = true;
 
 	const GLchar* vertexShaderSource[] = {
-		"#version 150\n"
+		"#version 140\n"
 		"uniform vec2 screen_size;\n"
 		"in vec3 in_vertex;\n"
 		"in vec2 in_texcoord;\n"
@@ -102,7 +102,7 @@ bool RenderSDL::create() {
 		"2*in_vertex.y/screen_size.y-1.0, in_vertex.z, 1 );var_color = "
 		"in_color;}"};
 
-	const GLchar* fragmentShaderSource[] = {"#version 150\n"
+	const GLchar* fragmentShaderSource[] = {"#version 140\n"
 											"precision highp float;\n"
 											"in vec2 Texcoord;\n"
 											"in  vec4 var_color;\n"

@@ -113,13 +113,6 @@ The Editor of [Glow game engine](http://www.glow3d.com)
 
 		static char str_property[100] = "Property Val";
 		ui.property("Property", str_property, 100, NULL);
-
-		// if (ui.button_collapse("button collapse", true)) {
-		// 	ui.item("item1");
-		// 	ui.item("item2");
-		// 	ui.item("item3");
-		// }
-
 		ui.draw_text(5, 5, 0, "Draw item", 0xffffffff);
 
 		ui.unindent();

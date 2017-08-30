@@ -70,7 +70,7 @@ bool init() {
 
 	// Use OpenGL 3.2 core
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
@@ -109,22 +109,7 @@ bool init() {
 		printf("Unable to initialize OpenGL!\n");
 		success = false;
 	}
-
 	setup_ui();
-	// if ( save_layout(ui, "C:\\projects\\glw_imgui\\test.imgui") )
-	//    if (!load_layout(ui, "C:\\projects\\glw_imgui\\test.imgui"))
-	//        printf("failed to load");
-
-
-	// TextureAtlas a;
-	// a.create(20,100);
-	// unsigned int x, y;
-	// a.add_box(10,10, &x, &y);
-	// a.add_box(20, 20, &x, &y);
-	// a.add_box(10, 10, &x, &y);
-	// a.add_box(18, 18, &x, &y);
-	// a.add_box(20, 90, &x, &y);
-
 	return success;
 }
 
@@ -249,13 +234,6 @@ void update_ui() {
 
 		static char str_property[100] = "Property Val";
 		ui.property("Property", str_property, 100, NULL);
-
-		// if (ui.button_collapse("button collapse", true)) {
-		// 	ui.item("item1");
-		// 	ui.item("item2");
-		// 	ui.item("item3");
-		// }
-
 		ui.draw_text(5, 5, 0, "Draw item", 0xffffffff);
 
 		ui.unindent();
