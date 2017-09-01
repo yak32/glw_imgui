@@ -488,6 +488,7 @@ bool Ui::begin_rollout(Rollout* pr, bool focused) {
 	_rqueue->set_alpha(r.alpha);
 	_scroll_id = get_control_id(_widget_id);
 	_options = r.options;
+    _alpha = r.alpha;
 
 	bool draw_scroll = true;
 	if (r.scroll == SCROLL_DISABLED || _options & DISABLE_SCROLL) {
@@ -693,39 +694,10 @@ bool Ui::begin_rollout(Rollout* pr, bool focused) {
 				set_cursor(cursor);
 		}
 		// caption and close buttons
-		int xdiff, ydiff;
 		if (!toolbar) {
 			if (!r.tabs.empty()) {
-				// several rollouts in tabbed interface
-				int width = _widget_w / r.tabs.size();
-				int xx = _widget_x;
-				for (int rollout_id : r.tabs) {
-					Rollout* tr = _rollouts[rollout_id];
-					if (system_tab(tr->name.c_str(), xx, caption_y, width - 2, caption_height,
-								   tr == &r, xdiff, ydiff)) {
-						if (tr != &r) {
-							for (int r_id : r.tabs) _rollouts[r_id]->alpha = 0;
-							tr->alpha = 255;
-						}
-					}
-					if (xdiff || ydiff) {
-						detach_rollout(tr);
-						break;
-					}
-					// close button
-					if (tr == &r || in_rect(xx, caption_y, width - 2, caption_height)) {
-						int bx = xx + width - int(_item_height * 1.5f); // button position
-						if (system_button("x", bx, y + h - area_header + _item_height / 2,
-										  (int)(_item_height * 1.2f), _item_height, true)) {
-							detach_rollout(tr);
-							hide_rollout(tr);
-							if (tr->is_visible())
-								ret_val = true;
-							break;
-						}
-					}
-					xx += width;
-				}
+				if (!render_rollout_tabs(r, x, y, h, caption_y, caption_height, area_header))
+					ret_val = false;
 			}
 			else if (caption_height) {
 				_rqueue->add_rect(x, caption_y, w, caption_height, _theme.rollout_caption_color);
@@ -757,6 +729,44 @@ bool Ui::begin_rollout(Rollout* pr, bool focused) {
 	}
 
 	// return _inside_scroll_area;
+	return ret_val;
+}
+int Ui::render_rollout_tabs(Rollout& r, int x, int y, int h, int caption_y, int caption_height, int area_header){
+	int ret_val = false;
+	int xdiff, ydiff;
+
+	// several rollouts in tabbed interface
+	int width = _widget_w / r.tabs.size();
+	int xx = _widget_x;
+	for (int rollout_id: r.tabs) {
+		Rollout* tab_rollout = _rollouts[rollout_id];
+		if (system_tab(tab_rollout->name.c_str(), xx, caption_y, width - 2, caption_height,
+					   tab_rollout == &r, xdiff, ydiff)) {
+			if (tab_rollout != &r) {
+				r.alpha = 0;
+				tab_rollout->alpha = 255;
+                swap(r.tabs, tab_rollout->tabs);
+                break;
+			}
+		}
+		if (xdiff || ydiff) {
+			detach_rollout(tab_rollout);
+			break;
+		}
+		// close button
+		if (tab_rollout == &r || in_rect(xx, caption_y, width - 2, caption_height)) {
+			int bx = xx + width - int(_item_height * 1.5f); // button position
+			if (system_button("x", bx, y + h - area_header + _item_height / 2,
+							  (int)(_item_height * 1.2f), _item_height, true)) {
+				detach_rollout(tab_rollout);
+				hide_rollout(tab_rollout);
+				if (tab_rollout->is_visible())
+					ret_val = true;
+				break;
+			}
+		}
+		xx += width;
+	}
 	return ret_val;
 }
 void Ui::end_rollout() {
@@ -847,6 +857,9 @@ uint Ui::get_control_id(uint widget_id) const {
 }
 bool Ui::start_control(bool enabled, int& x, int& y, int& w, int& h, uint& id, bool& over,
 					   bool& was_focused) {
+    if (!_alpha)
+        return false; // rollout is invisible
+
 	id = get_control_id(_widget_id++);
 
 	x = _widget_x;
@@ -960,7 +973,7 @@ bool Ui::system_tab(const char* text, int x, int y, int w, int h, bool checked, 
 	if (is_item_hot(id) || checked)
 		_rqueue->add_rect(x, y, w, h, _theme.rollout_caption_color);
 
-	_rqueue->add_text(x, y, w, _item_height, _text_align, text, text_color_hot(id, checked));
+	_rqueue->add_text(x, y, w, _item_height, _text_align, text, text_color_hot(id, true, checked));
 	return res;
 }
 bool Ui::system_drag(int x, int y, int w, int h, int& xdiff, int& ydiff, bool& over) {

@@ -318,6 +318,7 @@ private:
 	inline const int DEFAULT_PADDING() const;
 
 	uint get_control_id(uint widget_id) const;
+	int render_rollout_tabs(Rollout& r, int x, int y, int h, int caption_y, int caption_height, int area_header);
 
 private:
 	uint _width;

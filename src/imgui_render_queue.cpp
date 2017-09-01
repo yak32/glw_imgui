@@ -81,7 +81,7 @@ void RenderQueue::reset_gfx_cmd_queue() {
 	_ready_to_render = false;
 }
 void RenderQueue::add_scissor(int x, int y, int w, int h) {
-	if (_size >= GFXCMD_QUEUE_SIZE)
+	if (_size >= GFXCMD_QUEUE_SIZE || !_alpha)
 		return;
 	gfx_cmd& cmd = _queue[_size++];
 	cmd.type = GFX_CMD_SCISSOR;
@@ -90,7 +90,7 @@ void RenderQueue::add_scissor(int x, int y, int w, int h) {
 	set_gfx_rect(cmd.rect, x, y, w, h);
 }
 void RenderQueue::add_rect(int x, int y, int w, int h, unsigned int color) {
-	if (_size >= GFXCMD_QUEUE_SIZE)
+	if (_size >= GFXCMD_QUEUE_SIZE || !_alpha)
 		return;
 
 	gfx_cmd& cmd = _queue[_size++];
@@ -100,7 +100,7 @@ void RenderQueue::add_rect(int x, int y, int w, int h, unsigned int color) {
 	set_gfx_rect(cmd.rect, x, y, w, h);
 }
 void RenderQueue::add_rounded_rect(int x, int y, int w, int h, int r, unsigned int color) {
-	if (_size >= GFXCMD_QUEUE_SIZE)
+	if (_size >= GFXCMD_QUEUE_SIZE || !_alpha)
 		return;
 
 	gfx_cmd& cmd = _queue[_size++];
@@ -114,7 +114,7 @@ void RenderQueue::add_rounded_rect(int x, int y, int w, int h, int r, unsigned i
 		set_gfx_rect(cmd.rect, x, y, w, h, r);
 }
 void RenderQueue::add_triangle(int x, int y, int w, int h, int flags, unsigned int color) {
-	if (_size >= GFXCMD_QUEUE_SIZE)
+	if (_size >= GFXCMD_QUEUE_SIZE || !_alpha)
 		return;
 
 	gfx_cmd& cmd = _queue[_size++];
@@ -134,7 +134,7 @@ void RenderQueue::add_depth(int depth) {
 }
 void RenderQueue::add_text(int x, int y, int width, int height, int align, const char* text,
 						   unsigned int color) {
-	if (_size >= GFXCMD_QUEUE_SIZE)
+	if (_size >= GFXCMD_QUEUE_SIZE || !_alpha)
 		return;
 	gfx_cmd& cmd = _queue[_size++];
 	cmd.type = GFX_CMD_TEXT;
@@ -148,7 +148,7 @@ void RenderQueue::add_text(int x, int y, int width, int height, int align, const
 	cmd.text.text = alloc_text(text);
 }
 void RenderQueue::add_texture(const char* path, const frect& rc, bool blend) {
-	if (_size >= GFXCMD_QUEUE_SIZE)
+	if (_size >= GFXCMD_QUEUE_SIZE || !_alpha)
 		return;
 
 	gfx_cmd& cmd = _queue[_size++];
