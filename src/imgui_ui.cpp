@@ -43,10 +43,10 @@ Ui::Ui(uint mode)
 	  _widget_x(0), _widget_y(0), _widget_w(100), _rollout_width(0), _rollout_height(0),
 	  _rollout_left(0), _rollout_top(0), _inside_current_scroll(false), _area_id(0), _character(0),
 	  _widget_id(0), _focus(0), _row(0), _drag_item_width(0), _options(0), _alpha(255),
-	  _text_align(ALIGN_LEFT), _padding_left(DEFAULT_PADDING()), _padding_right(DEFAULT_PADDING()),
-	  _padding_top(DEFAULT_PADDING()), _padding_bottom(DEFAULT_PADDING()),
-	  _item_padding_left(DEFAULT_PADDING()), _item_padding_right(DEFAULT_PADDING()),
-	  _item_padding_top(DEFAULT_PADDING()), _item_padding_bottom(DEFAULT_PADDING()),
+	  _text_align(ALIGN_LEFT), _padding_left(default_padding()), _padding_right(default_padding()),
+	  _padding_top(default_padding()), _padding_bottom(default_padding()),
+	  _item_padding_left(default_padding()), _item_padding_right(default_padding()),
+	  _item_padding_top(default_padding()), _item_padding_bottom(default_padding()),
 	  _property_width(0.5f), _dragged_rollout_id(NULL), _focused_rollout_id(NULL), _cursor(0),
 	  _cursor_over_drag(0), _scroll_right(0), _scroll_area_top(0), _scroll_val(NULL), _focus_top(0),
 	  _focus_bottom(0), _scroll_id(0), _inside_scroll_area(false), _scroll_top(0),
@@ -54,7 +54,7 @@ Ui::Ui(uint mode)
 	  _target_rollout(NULL), _rollout_drag_div(), _toolbar_root(NULL), _rollout_last(NULL),
 	  _rqueue(nullptr), _rqueue_display(nullptr), _renderer(nullptr), _blend_texture(false),
 	  _depth(0), // ui depth (need to sorting windows properly, especially during moving rollouts)
-	  _mode(mode), _atlas(UNDEFINED_TEXTURE), _focus_rollout(nullptr) {
+	  _mode(mode), _atlas(UNDEFINED_TEXTURE), _focus_rollout(nullptr), _rollout_root(nullptr) {
 	memset(_edit_buffer, 0, sizeof(_edit_buffer));
 	memset(_drag_item, 0, sizeof(_drag_item));
 	// colors
@@ -70,7 +70,7 @@ Ui::Ui(uint mode)
 	_theme.text_color_checked = RGBA(255, 255, 255, 200);
 	_theme.text_color_disabled = RGBA(128, 128, 128, 200);
 	_theme.rollout_color = RGBA(0, 0, 0, 192);
-	_theme.rollout_caption_color = RGBA(0, 0, 0, 0); // non visible by default
+	_theme.rollout_caption_color = RGBA(0, 122, 204, 200); // non visible by default
 	_theme.drag_color = RGBA(80, 80, 80, 40);
 	_theme.slider_bg = RGBA(0, 0, 0, 126);
 	_toolbar_root = new Toolbar(NULL);
@@ -82,7 +82,9 @@ Ui::Ui(uint mode)
 	_current_font = _fonts.end();
 
 	int size = sizeof(_rqueues[0]);
-	int n = 10;
+
+	_rollout_root = create_rollout("root", ROLLOUT_HOLLOW | WND_STYLE);
+	insert_rollout(_rollout_root, 1, true, NULL);
 }
 Ui::~Ui() {
 	destroy();
@@ -94,9 +96,14 @@ bool Ui::create(IPlatform* p, IRenderer* r) {
 void Ui::destroy() {
 	if (_toolbar_root) {
 		clear_toolbars(_toolbar_root);
-		_toolbar_root = nullptr;
 		delete (_toolbar_root);
+		_toolbar_root = nullptr;
 	}
+	size_t size = _rollouts.size();
+	for (size_t i = 0; i < size; ++i)
+		delete _rollouts[i];
+
+	_rollout_root = nullptr;
 	render_destroy();
 }
 bool Ui::any_active() const {
@@ -424,34 +431,34 @@ void Ui::cleanup() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // static const int _item_height = 20;
 
-const int Ui::SLIDER_HEIGHT() const {
+const int Ui::slider_height() const {
 	return _item_height + _item_height / 3;
 }
-const int Ui::SLIDER_MARKER_WIDTH() const {
+const int Ui::slider_marker_width() const {
 	return _item_height / 3 * 2;
 }
-const int Ui::CHECK_SIZE() const {
+const int Ui::check_size() const {
 	return _item_height / 2;
 }
-const int Ui::DEFAULT_SPACING() const {
+const int Ui::default_spacing() const {
 	return _item_padding_left;
 }
-const int Ui::SCROLL_AREA_PADDING() const {
+const int Ui::padding() const {
 	return _item_height / 2;
 }
-const int Ui::INTEND_SIZE() const {
+const int Ui::intend_size() const {
 	return _item_height;
 }
-const int Ui::AREA_HEADER() const {
+const int Ui::area_header() const {
 	return _item_height * 2;
 }
-const int Ui::TOOLBAR_HEADER() const {
+const int Ui::toolbar_header() const {
 	return _item_height / 4;
 }
-const int Ui::DEF_ROUND() const {
+const int Ui::default_round() const {
 	return _item_height / 5;
 }
-const int Ui::DEFAULT_PADDING() const {
+const int Ui::default_padding() const {
 	return _item_height / 2;
 }
 const int DEFAULT_ROLLOUT_DEPTH = 0;
@@ -465,8 +472,9 @@ static const char* cursorMap[] = {"default", "resize_horz", "resize_vert", "resi
 bool Ui::begin_rollout(Rollout* pr, bool focused) {
 	if (!pr)
 		return false;
+
 	Rollout& r = *pr;
-	int area_header = AREA_HEADER();
+	int areaheader = area_header();
 
 	bool toolbar = (r.options & TOOLBAR) != 0;
 	bool rollout_attached = (r.options & ROLLOUT_ATTACHED) != 0;
@@ -475,11 +483,11 @@ bool Ui::begin_rollout(Rollout* pr, bool focused) {
 
 	// if toolbar
 	if (toolbar)
-		area_header = TOOLBAR_HEADER();
+		areaheader = toolbar_header();
 
 	int h;
 	if (r.minimized)
-		h = area_header + r.scroll;
+		h = areaheader + r.scroll;
 	else
 		h = r.h;
 
@@ -502,10 +510,10 @@ bool Ui::begin_rollout(Rollout* pr, bool focused) {
 	_rollout_top = r.y + _padding_top;
 	_rollout_width = r.w - _padding_left - _padding_right;
 	if (draw_scroll)
-		_rollout_width = r.w - SCROLL_AREA_PADDING() * 2 - _padding_left - _padding_right;
+		_rollout_width = r.w - padding() * 2 - _padding_left - _padding_right;
 	_rollout_height = h - _padding_bottom - _padding_top;
 	_widget_x = _rollout_left;
-	_widget_y = r.y + h - area_header + r.scroll;
+	_widget_y = r.y + h - areaheader + r.scroll;
 	_widget_w = _rollout_width;
 	// _row = _options & TOOLBAR ? 1 : 0;
 	_row = 0;
@@ -513,207 +521,48 @@ bool Ui::begin_rollout(Rollout* pr, bool focused) {
 	int x = r.x, y = r.y, w = r.w;
 
 	_scroll_right = _rollout_left + _rollout_width;
-	_scroll_top = y - area_header + h;
+	_scroll_top = y - areaheader + h;
 	_scroll_bottom = y + _padding_bottom;
 	_scroll_val = &r.scroll;
 
 	_scroll_area_top = _widget_y;
 
-	_focus_top = y - area_header;
-	_focus_bottom = y - area_header + h;
+	_focus_top = y - areaheader;
+	_focus_bottom = y - areaheader + h;
 
 	_inside_scroll_area = in_rect(x, y, w, h, false);
 	_inside_current_scroll = _inside_scroll_area;
 
 	bool ret_val = false;
-	int caption_y = y + h - area_header + _item_height / 2 - 2;
+	int caption_y = y + h - areaheader + _item_height / 2 - 2;
 	int caption_height = toolbar ? 0 : _item_height + 3;
 
 	// setup rollout depth
-	if (_focused_rollout_id == pr)
+	if (_focused_rollout_id == &r)
 		r.z = FOCUSED_ROLLOUT_DEPTH;
 	else if (rollout_attached)
 		r.z = ATTACHED_ROLLOUT_DEPTH;
 	else
 		r.z = FLOATING_ROLLOUT_DEPTH;
 
-	if (!(r.options & ROLLOUT_HOLLOW)) {
+	// caption and close buttons
+	if (!toolbar)
+		if (!render_caption(r, x, y, w, h, caption_y, caption_height, areaheader))
+			ret_val = false;
+
+	if (!(r.options & ROLLOUT_HOLLOW) && r.alpha) {
+
 		_rqueue->add_depth(r.z);
 		_rqueue->add_rect(x, y, w, h, _theme.rollout_color);
+
 		if (key_pressed(KEY_MOUSE_LEFT) && in_rect(x, y, w, h)) {
 			// click on rollout -> increase depth
-			_focused_rollout_id = pr;
+			_focused_rollout_id = &r;
 		}
 
-		bool cursor_over_drag;
-		Rollout* draggedRolloutId = _dragged_rollout_id;
-		// resize area
-		if (!(_options & TOOLBAR) && _options & RESIZE_AREA && !r.minimized) {
-			// dragging area
-			int drag_id = -1;
-			int ydiff = 0, xdiff = 0;
-			// if area is active, then react on left up
-			if (draggedRolloutId && key_released(KEY_MOUSE_LEFT)) {
-				Rollout* drollout = _dragged_rollout_id;
-				if (_target_side == ROLLOUT_LEFT) {
-					insert_rollout(drollout, 0.5f, true, _target_rollout);
-				}
-				else if (_target_side == ROLLOUT_TOP) {
-					insert_rollout(drollout, -0.5f, false, _target_rollout);
-				}
-				else if (_target_side == ROLLOUT_RIGHT) {
-					insert_rollout(drollout, -0.5f, true, _target_rollout);
-				}
-				else if (_target_side == ROLLOUT_BOTTOM) {
-					insert_rollout(drollout, 0.5f, false, _target_rollout);
-				}
-				else if (_target_side == ROLLOUT_CENTER) {
-					insert_rollout(drollout, 0.0f, false, _target_rollout);
-				}
-				if (_target_side == ROLLOUT_LEFT_FIXED) {
-					int neww =
-						drollout->w > _target_rollout->w / 2 ? _target_rollout->w / 2 : drollout->w;
-					insert_rollout(drollout, (float)neww, true, _target_rollout);
-				}
-				else if (_target_side == ROLLOUT_TOP_FIXED) {
-					int newh =
-						drollout->h > _target_rollout->h / 2 ? _target_rollout->h / 2 : drollout->h;
-					insert_rollout(drollout, -(float)newh, false, _target_rollout);
-				}
-				else if (_target_side == ROLLOUT_RIGHT_FIXED) {
-					int neww =
-						drollout->w > _target_rollout->w / 2 ? _target_rollout->w / 2 : drollout->w;
-					insert_rollout(drollout, -(float)neww, true, _target_rollout);
-				}
-				else if (_target_side == ROLLOUT_BOTTOM_FIXED) {
-					int newh =
-						drollout->h > _target_rollout->h / 2 ? _target_rollout->h / 2 : drollout->h;
-					insert_rollout(drollout, (float)newh, false, _target_rollout);
-				}
-				clear_active(); // clear state to prevent
-			}
-			if (_options & DRAG_AREA && !r.minimized) {
-				if (r.tabs.empty()) {
-					if (system_drag(x, caption_y - caption_height / 2 + 5, w, caption_height, xdiff,
-									ydiff, cursor_over_drag)) {
-						r.x += xdiff;
-						r.y += ydiff;
-						if (key_pressed(KEY_MOUSE_LEFT)) {
-							_target_side = ROLLOUT_UNDEFINED;
-							_target_rollout = NULL;
-							_dragged_rollout_id = pr;
-							detach_rollout(&r); // if rollout attached, detach it
-						}
-					}
-				}
-			}
-			cursor_over_drag = false;
-			CURSOR cursor = CURSOR_DEFAULT;
-			if (system_drag(x, y, SCROLL_AREA_PADDING() * 2, h, xdiff, ydiff, cursor_over_drag)) {
-				if (!rollout_attached) {
-					r.x += xdiff;
-					r.w -= xdiff;
-				}
-				else if (_rollout_drag_div.div) {
-					_rollout_drag_div.shift(xdiff);
-				}
-			}
-			if (cursor_over_drag) {
-				if (!rollout_attached ||
-					find_div(_mx, _my, _toolbar_root, 0, 0, _width, _height, DEFAULT_PADDING())
-						.div) {
-					cursor = CURSOR_RESIZE_HORZ;
-					_cursor_over_drag = true;
-				}
-			}
-			if (system_drag(x + w - SCROLL_AREA_PADDING(), y, SCROLL_AREA_PADDING() * 2, h, xdiff,
-							ydiff, cursor_over_drag)) {
-				if (!rollout_attached) {
-					r.w += xdiff;
-				}
-				else if (_rollout_drag_div.div) {
-					_rollout_drag_div.shift(xdiff);
-				}
-			}
-			if (cursor_over_drag) {
-				if (!rollout_attached ||
-					find_div(_mx, _my, _toolbar_root, 0, 0, _width, _height, DEFAULT_PADDING())
-						.div) {
-					cursor = CURSOR_RESIZE_HORZ;
-					_cursor_over_drag = true;
-				}
-			}
-			if (system_drag(x, y + h - SCROLL_AREA_PADDING() * 2 + 5, w,
-							SCROLL_AREA_PADDING() * 2 - 5, xdiff, ydiff, cursor_over_drag)) {
-				if (!rollout_attached)
-					r.h += ydiff;
-				else if (_rollout_drag_div.div)
-					_rollout_drag_div.shift(ydiff);
-			}
-			if (cursor_over_drag) {
-				if (!rollout_attached ||
-					find_div(_mx, _my, _toolbar_root, 0, 0, _width, _height, DEFAULT_PADDING())
-						.div) {
-					cursor = CURSOR_RESIZE_VERT;
-					_cursor_over_drag = true;
-				}
-			}
-			if (system_drag(x, y - SCROLL_AREA_PADDING(), w, SCROLL_AREA_PADDING() * 2, xdiff,
-							ydiff, cursor_over_drag)) {
-				if (!rollout_attached) {
-					r.y += ydiff;
-					r.h -= ydiff;
-				}
-				else if (_rollout_drag_div.div)
-					_rollout_drag_div.shift(ydiff);
-			}
-			if (cursor_over_drag) {
-				if (!rollout_attached ||
-					find_div(_mx, _my, _toolbar_root, 0, 0, _width, _height, DEFAULT_PADDING())
-						.div) {
-					cursor = CURSOR_RESIZE_VERT;
-					_cursor_over_drag = true;
-				}
-			}
-			int padd = SCROLL_AREA_PADDING() * 2;
-			if (system_drag(x + w - padd, y - padd, padd * 2, padd * 2, xdiff, ydiff,
-							cursor_over_drag)) {
-				if (!rollout_attached) {
-					r.w += xdiff;
-					r.y += ydiff;
-					r.h -= ydiff;
-				}
-			}
-			if (cursor_over_drag) {
-				if (!rollout_attached) {
-					cursor = CURSOR_RESIZE_CORNER;
-					_cursor_over_drag = true;
-				}
-			}
-			if (!_left && cursor != CURSOR_DEFAULT)
-				set_cursor(cursor);
-		}
-		// caption and close buttons
-		if (!toolbar) {
-			if (!r.tabs.empty()) {
-				if (!render_rollout_tabs(r, x, y, h, caption_y, caption_height, area_header))
-					ret_val = false;
-			}
-			else if (caption_height) {
-				_rqueue->add_rect(x, caption_y, w, caption_height, _theme.rollout_caption_color);
-				_rqueue->add_text(x, y + h - area_header + _item_height / 2 - 2, _widget_w,
-								  _item_height, ALIGN_LEFT, r.name.c_str(),
-								  RGBA(255, 255, 255, 128));
-				// close button
-				if (system_button("x", x + w - (int)(_item_height * 2.0f),
-								  y + h - area_header + _item_height / 2, _item_height,
-								  _item_height, true)) {
-					hide_rollout(pr);
-					ret_val = true;
-				}
-			}
-		}
+		process_rollout_resize(r, x, y, w, h, caption_y, caption_height);
 	}
+
 	// no clipping if dragging item is possible
 	// if ( !(_options & DRAG_ITEM) )
 	_rqueue->add_scissor(_rollout_left, _scroll_bottom, _scroll_right - _rollout_left,
@@ -731,6 +580,192 @@ bool Ui::begin_rollout(Rollout* pr, bool focused) {
 	// return _inside_scroll_area;
 	return ret_val;
 }
+
+bool Ui::render_caption(Rollout& r, int x, int y, int w, int h, int caption_y, int caption_height, int area_header){
+	bool ret_val = false;
+	if (!r.tabs.empty()) {
+		if (!render_rollout_tabs(r, x, y, h, caption_y, caption_height, area_header))
+			ret_val = false;
+	}
+	else if (caption_height) {
+		_rqueue->add_rect(x, caption_y, w, caption_height, _theme.rollout_caption_color);
+		_rqueue->add_text(x, y + h - area_header + _item_height / 2 - 2, _widget_w,
+						  _item_height, ALIGN_LEFT, r.name.c_str(),
+						  RGBA(255, 255, 255, 128));
+		// close button
+		if (system_button("x", x + w - (int)(_item_height * 2.0f),
+						  y + h - area_header + _item_height / 2, _item_height,
+						  _item_height, true)) {
+			hide_rollout(&r);
+			ret_val = true;
+		}
+	}
+	bool cursor_over_drag = false;
+
+	int ydiff = 0, xdiff = 0;
+	if (_options & DRAG_AREA && !r.minimized) {
+		if (r.tabs.empty()) {
+			if (system_drag(x, caption_y - caption_height / 2 + 5, w, caption_height, xdiff,
+							ydiff, cursor_over_drag)) {
+				r.x += xdiff;
+				r.y += ydiff;
+				if (key_pressed(KEY_MOUSE_LEFT)) {
+					_target_side = ROLLOUT_UNDEFINED;
+					_target_rollout = NULL;
+					_dragged_rollout_id = &r;
+					detach_rollout(&r); // if rollout attached, detach it
+				}
+			}
+		}
+	}
+	bool rollout_attached = (r.options & ROLLOUT_ATTACHED) != 0;
+	if (cursor_over_drag) {
+		if (!rollout_attached)
+			_cursor_over_drag = true;
+	}
+	return ret_val;
+}
+
+void Ui::process_rollout_resize(Rollout& r, int x, int y, int w, int h, int caption_y, int caption_height){
+	bool cursor_over_drag;
+	Rollout* draggedRolloutId = _dragged_rollout_id;
+
+	bool rollout_attached = (r.options & ROLLOUT_ATTACHED) != 0;
+
+	// resize area
+	if (!(_options & TOOLBAR) && _options & RESIZE_AREA && !r.minimized) {
+		// dragging area
+		int drag_id = -1;
+		int ydiff = 0, xdiff = 0;
+		// if area is active, then react on left up
+		if (draggedRolloutId && key_released(KEY_MOUSE_LEFT)) {
+			Rollout* drollout = _dragged_rollout_id;
+			if (_target_side == ROLLOUT_LEFT) {
+				insert_rollout(drollout, 0.5f, true, _target_rollout);
+			}
+			else if (_target_side == ROLLOUT_TOP) {
+				insert_rollout(drollout, -0.5f, false, _target_rollout);
+			}
+			else if (_target_side == ROLLOUT_RIGHT) {
+				insert_rollout(drollout, -0.5f, true, _target_rollout);
+			}
+			else if (_target_side == ROLLOUT_BOTTOM) {
+				insert_rollout(drollout, 0.5f, false, _target_rollout);
+			}
+			else if (_target_side == ROLLOUT_CENTER) {
+				insert_rollout(drollout, 0.0f, false, _target_rollout);
+			}
+			if (_target_side == ROLLOUT_LEFT_FIXED) {
+				int neww =
+					drollout->w > _target_rollout->w / 2 ? _target_rollout->w / 2 : drollout->w;
+				insert_rollout(drollout, (float)neww, true, _target_rollout);
+			}
+			else if (_target_side == ROLLOUT_TOP_FIXED) {
+				int newh =
+					drollout->h > _target_rollout->h / 2 ? _target_rollout->h / 2 : drollout->h;
+				insert_rollout(drollout, -(float)newh, false, _target_rollout);
+			}
+			else if (_target_side == ROLLOUT_RIGHT_FIXED) {
+				int neww =
+					drollout->w > _target_rollout->w / 2 ? _target_rollout->w / 2 : drollout->w;
+				insert_rollout(drollout, -(float)neww, true, _target_rollout);
+			}
+			else if (_target_side == ROLLOUT_BOTTOM_FIXED) {
+				int newh =
+					drollout->h > _target_rollout->h / 2 ? _target_rollout->h / 2 : drollout->h;
+				insert_rollout(drollout, (float)newh, false, _target_rollout);
+			}
+			clear_active(); // clear state to prevent
+		}
+
+		cursor_over_drag = false;
+		CURSOR cursor = CURSOR_DEFAULT;
+		if (system_drag(x, y, padding() * 2, h, xdiff, ydiff, cursor_over_drag)) {
+			if (!rollout_attached) {
+				r.x += xdiff;
+				r.w -= xdiff;
+			}
+			else if (_rollout_drag_div.div) {
+				_rollout_drag_div.shift(xdiff);
+			}
+		}
+		if (cursor_over_drag) {
+			if (!rollout_attached ||
+				find_div(_mx, _my, _toolbar_root, 0, 0, _width, _height, default_padding())
+					.div) {
+				cursor = CURSOR_RESIZE_HORZ;
+				_cursor_over_drag = true;
+			}
+		}
+		if (system_drag(x + w - padding(), y, padding() * 2, h, xdiff,
+						ydiff, cursor_over_drag)) {
+			if (!rollout_attached) {
+				r.w += xdiff;
+			}
+			else if (_rollout_drag_div.div) {
+				_rollout_drag_div.shift(xdiff);
+			}
+		}
+		if (cursor_over_drag) {
+			if (!rollout_attached ||
+				find_div(_mx, _my, _toolbar_root, 0, 0, _width, _height, default_padding())
+					.div) {
+				cursor = CURSOR_RESIZE_HORZ;
+				_cursor_over_drag = true;
+			}
+		}
+		if (system_drag(x, y + h - padding() * 2 + 5, w,
+						padding() * 2 - 5, xdiff, ydiff, cursor_over_drag)) {
+			if (!rollout_attached)
+				r.h += ydiff;
+			else if (_rollout_drag_div.div)
+				_rollout_drag_div.shift(ydiff);
+		}
+		if (cursor_over_drag) {
+			if (!rollout_attached ||
+				find_div(_mx, _my, _toolbar_root, 0, 0, _width, _height, default_padding())
+					.div) {
+				cursor = CURSOR_RESIZE_VERT;
+				_cursor_over_drag = true;
+			}
+		}
+		if (system_drag(x, y - padding(), w, padding() * 2, xdiff,
+						ydiff, cursor_over_drag)) {
+			if (!rollout_attached) {
+				r.y += ydiff;
+				r.h -= ydiff;
+			}
+			else if (_rollout_drag_div.div)
+				_rollout_drag_div.shift(ydiff);
+		}
+		if (cursor_over_drag) {
+			if (!rollout_attached ||
+				find_div(_mx, _my, _toolbar_root, 0, 0, _width, _height, default_padding())
+					.div) {
+				cursor = CURSOR_RESIZE_VERT;
+				_cursor_over_drag = true;
+			}
+		}
+		int padd = padding() * 2;
+		if (system_drag(x + w - padd, y - padd, padd * 2, padd * 2, xdiff, ydiff,
+						cursor_over_drag)) {
+			if (!rollout_attached) {
+				r.w += xdiff;
+				r.y += ydiff;
+				r.h -= ydiff;
+			}
+		}
+		if (cursor_over_drag) {
+			if (!rollout_attached) {
+				cursor = CURSOR_RESIZE_CORNER;
+				_cursor_over_drag = true;
+			}
+		}
+		if (!_left && cursor != CURSOR_DEFAULT)
+			set_cursor(cursor);
+	}
+}
+
 int Ui::render_rollout_tabs(Rollout& r, int x, int y, int h, int caption_y, int caption_height, int area_header){
 	int ret_val = false;
 	int xdiff, ydiff;
@@ -740,21 +775,27 @@ int Ui::render_rollout_tabs(Rollout& r, int x, int y, int h, int caption_y, int 
 	int xx = _widget_x;
 	for (int rollout_id: r.tabs) {
 		Rollout* tab_rollout = _rollouts[rollout_id];
-		if (system_tab(tab_rollout->name.c_str(), xx, caption_y, width - 2, caption_height,
-					   tab_rollout == &r, xdiff, ydiff)) {
-			if (tab_rollout != &r) {
-				r.alpha = 0;
-				tab_rollout->alpha = 255;
-                swap(r.tabs, tab_rollout->tabs);
-                break;
-			}
+		if (tab_rollout != &r)
+			continue;
+
+		if (system_tab(r.name.c_str(), xx, caption_y, width - 2, caption_height,
+					   r.alpha, xdiff, ydiff)) {
+
+			for (int id: r.tabs)
+				_rollouts[id]->alpha = 0;
+
+			r.alpha = 255;
+			Toolbar* n = search_rollout_node(_toolbar_root, &r);
+			if (n)
+				n->rollout = &r;
+            break;
 		}
 		if (xdiff || ydiff) {
 			detach_rollout(tab_rollout);
 			break;
 		}
 		// close button
-		if (tab_rollout == &r || in_rect(xx, caption_y, width - 2, caption_height)) {
+		if (in_rect(xx, caption_y, width - 2, caption_height)) {
 			int bx = xx + width - int(_item_height * 1.5f); // button position
 			if (system_button("x", bx, y + h - area_header + _item_height / 2,
 							  (int)(_item_height * 1.2f), _item_height, true)) {
@@ -777,9 +818,9 @@ void Ui::end_rollout() {
 	_rqueue->add_scissor(-1, -1, -1, -1);
 	if (!(_options & DISABLE_SCROLL)) {
 		// Draw scroll bar
-		int x = _scroll_right + SCROLL_AREA_PADDING() / 2;
+		int x = _scroll_right + padding() / 2;
 		int y = _scroll_bottom;
-		int w = SCROLL_AREA_PADDING() * 2;
+		int w = padding() * 2;
 		int h = _scroll_top - _scroll_bottom;
 		if (h > 0) {
 			int stop = _scroll_area_top;
@@ -867,11 +908,11 @@ bool Ui::start_control(bool enabled, int& x, int& y, int& w, int& h, uint& id, b
 	w = _widget_w;
 	h = _item_height;
 	if (!_row)
-		_widget_y -= _item_height + DEFAULT_SPACING();
+		_widget_y -= _item_height + default_spacing();
 	else
-		_widget_x += w + DEFAULT_SPACING();
+		_widget_x += w + default_spacing();
 
-	if (_widget_id > 10 && (y + h < _scroll_bottom || y > _scroll_top))
+	if (_widget_id > 10 && (y < _scroll_bottom || y+h > _scroll_top))
 		return false;
 
 	over = enabled && in_rect(x, y, w, h);
@@ -926,7 +967,7 @@ bool Ui::button(const char* text, bool enabled) {
 		return false;
 
 	bool res = enabled && button_logic(id, over);
-	_rqueue->add_rounded_rect(x, y, w, h, DEF_ROUND(), button_color(id));
+	_rqueue->add_rounded_rect(x, y, w, h, default_round(), button_color(id));
 	_rqueue->add_text(x, y, w, h, _text_align, text, text_color_hot(id, enabled));
 	return res;
 }
@@ -939,7 +980,7 @@ bool Ui::button(const char* text, int x, int y, int w, int h, bool enabled) {
 	bool over = enabled && in_rect(x, y, w, h);
 	bool res = enabled && button_logic(id, over);
 
-	_rqueue->add_rounded_rect(x, y, w, h, DEF_ROUND(), button_color(id));
+	_rqueue->add_rounded_rect(x, y, w, h, default_round(), button_color(id));
 	_rqueue->add_text(x, y, _widget_w, _item_height, _text_align, text, text_color(id, enabled));
 	return res;
 }
@@ -962,7 +1003,7 @@ bool Ui::system_tab(const char* text, int x, int y, int w, int h, bool checked, 
 		_drag_x = _mx;
 		_drag_y = _my;
 		_rollout_drag_div =
-			find_div(_mx, _my, _toolbar_root, 0, 0, _width, _height, DEFAULT_PADDING());
+			find_div(_mx, _my, _toolbar_root, 0, 0, _width, _height, default_padding());
 	}
 	if (is_item_active(id)) {
 		xmove = _mx - _drag_x;
@@ -985,7 +1026,7 @@ bool Ui::system_drag(int x, int y, int w, int h, int& xdiff, int& ydiff, bool& o
 		_drag_x = _mx;
 		_drag_y = _my;
 		_rollout_drag_div =
-			find_div(_mx, _my, _toolbar_root, 0, 0, _width, _height, DEFAULT_PADDING());
+			find_div(_mx, _my, _toolbar_root, 0, 0, _width, _height, default_padding());
 	}
 	bool res = button_logic(id, over);
 	if (is_item_active(id)) {
@@ -1127,9 +1168,9 @@ bool Ui::check(const char* text, bool checked, bool enabled) {
 	bool res = enabled && button_logic(id, over);
 
 	const int cx = x;
-	const int cy = y + CHECK_SIZE() / 2;
-	_rqueue->add_rounded_rect(x + CHECK_SIZE() - 3, cy - 3, CHECK_SIZE() + 6, CHECK_SIZE() + 6,
-							  DEF_ROUND(), button_color(id, enabled));
+	const int cy = y + check_size() / 2;
+	_rqueue->add_rounded_rect(x + check_size() - 3, cy - 3, check_size() + 6, check_size() + 6,
+							  default_round(), button_color(id, enabled));
 
 	if (checked) {
 		uint check_clr;
@@ -1138,7 +1179,7 @@ bool Ui::check(const char* text, bool checked, bool enabled) {
 		else
 			check_clr = _theme.text_color_disabled;
 
-		_rqueue->add_rounded_rect(x + CHECK_SIZE(), cy, CHECK_SIZE(), CHECK_SIZE(), DEF_ROUND(),
+		_rqueue->add_rounded_rect(x + check_size(), cy, check_size(), check_size(), default_round(),
 								  check_clr);
 	}
 	_rqueue->add_text(x + _item_height, y, _widget_w, _item_height, _text_align, text,
@@ -1155,7 +1196,7 @@ bool Ui::button_check(const char* text, bool checked, bool enabled) {
 	bool res = enabled && button_logic(id, over);
 
 	// check behavior, but button look
-	_rqueue->add_rounded_rect(x, y, w, h, DEF_ROUND(), is_item_active(id) || checked
+	_rqueue->add_rounded_rect(x, y, w, h, default_round(), is_item_active(id) || checked
 														   ? _theme.button_color_active
 														   : _theme.button_color);
 	uint text_clr;
@@ -1172,7 +1213,7 @@ bool Ui::button_check(const char* text, bool checked, bool enabled) {
 void Ui::row(uint count) {
 	// set new widget width
 	int remainder = _row ? (_rollout_width - _widget_w) : _rollout_width;
-	_widget_w = (remainder + DEFAULT_SPACING()) / count - DEFAULT_SPACING();
+	_widget_w = (remainder + default_spacing()) / count - default_spacing();
 	_row++;
 }
 void Ui::set_widget_width(int width) {
@@ -1186,7 +1227,7 @@ void Ui::end_row() {
 	if (_row == 1) {
 		_widget_w = _rollout_width;
 		_widget_x = _rollout_left;
-		_widget_y -= _item_height + DEFAULT_SPACING();
+		_widget_y -= _item_height + default_spacing();
 	}
 	_row--;
 }
@@ -1197,21 +1238,21 @@ bool Ui::collapse(const char* text, bool checked, bool enabled) {
 	if (!start_control(enabled, x, y, w, h, id, over, was_focused))
 		return false;
 
-	const int cx = x + CHECK_SIZE() / 2;
-	const int cy = y + CHECK_SIZE() / 2;
+	const int cx = x + check_size() / 2;
+	const int cy = y + check_size() / 2;
 	bool res = enabled && button_logic(id, over);
 	// _rqueue->add_rect(x, y, w, h, is_item_active(id) ? _theme.collapse_color_active
 	//												 : _theme.collapse_color);
 	unsigned char clr = enabled ? clr = 255 : clr = 128;
 	;
 	if (checked)
-		_rqueue->add_triangle(cx, cy, CHECK_SIZE(), CHECK_SIZE(), 1,
+		_rqueue->add_triangle(cx, cy, check_size(), check_size(), 1,
 							  RGBA(clr, clr, clr, is_item_active(id) ? 255 : 200));
 	else
-		_rqueue->add_triangle(cx, cy, CHECK_SIZE(), CHECK_SIZE(), 2,
+		_rqueue->add_triangle(cx, cy, check_size(), check_size(), 2,
 							  RGBA(clr, clr, clr, is_item_active(id) ? 255 : 200));
 
-	_rqueue->add_text(x + CHECK_SIZE(), y, w, h, _text_align, text, text_color_hot(id, enabled));
+	_rqueue->add_text(x + check_size(), y, w, h, _text_align, text, text_color_hot(id, enabled));
 	return res;
 }
 bool Ui::combo(const char* text, const char* value, bool enabled) {
@@ -1221,7 +1262,7 @@ bool Ui::combo(const char* text, const char* value, bool enabled) {
 	if (!start_control(enabled, x, y, w, h, id, over, was_focused))
 		return false;
 
-	const int cx = x + CHECK_SIZE() / 2;
+	const int cx = x + check_size() / 2;
 	const int cy = y + _item_height / 4;
 	bool res = combo_button_logic(id, over);
 	bool focused = is_item_focused(id);
@@ -1230,14 +1271,14 @@ bool Ui::combo(const char* text, const char* value, bool enabled) {
 
 	unsigned char clr = enabled ? clr = 255 : clr = 128;
 	if (!focused)
-		_rqueue->add_triangle(cx, cy, CHECK_SIZE(), CHECK_SIZE(), 1,
+		_rqueue->add_triangle(cx, cy, check_size(), check_size(), 1,
 							  RGBA(clr, clr, clr, is_item_active(id) ? 255 : 200));
 	else
-		_rqueue->add_triangle(cx, cy, CHECK_SIZE(), CHECK_SIZE(), 2,
+		_rqueue->add_triangle(cx, cy, check_size(), check_size(), 2,
 							  RGBA(clr, clr, clr, is_item_active(id) ? 255 : 200));
 
-	_rqueue->add_rounded_rect(x + w / 2, y, w / 2, h, DEF_ROUND(), button_color(id, enabled));
-	_rqueue->add_text(x + CHECK_SIZE(), y, _widget_w, _item_height, _text_align, text,
+	_rqueue->add_rounded_rect(x + w / 2, y, w / 2, h, default_round(), button_color(id, enabled));
+	_rqueue->add_text(x + check_size(), y, _widget_w, _item_height, _text_align, text,
 					  text_color(id, true));
 	_rqueue->add_text(x + w / 2, y, _widget_w, _item_height, _text_align, value,
 					  text_color_hot(id, enabled, focused));
@@ -1260,7 +1301,7 @@ bool Ui::button_collapse(const char* text, bool enabled) {
 	bool focused = is_item_focused(id);
 	unsigned char clr;
 	clr = enabled ? 255 : 128;
-	_rqueue->add_rounded_rect(x, y, w, h, DEF_ROUND(), button_color(id, enabled));
+	_rqueue->add_rounded_rect(x, y, w, h, default_round(), button_color(id, enabled));
 	_rqueue->add_text(x + _item_height, y, _widget_w, _item_height, _text_align, text,
 					  text_color_hot(id, enabled));
 	if (!focused)
@@ -1282,14 +1323,14 @@ bool Ui::file(const char* text, const char* value, bool enabled) {
 	bool res = enabled && button_logic(id, over);
 
 	bool focused = is_item_focused(id);
-	const int cx = x - CHECK_SIZE() / 2;
-	const int cy = y - CHECK_SIZE() / 2;
+	const int cx = x - check_size() / 2;
+	const int cy = y - check_size() / 2;
 
 	_rqueue->add_text(x, y, _widget_w, _item_height, _text_align, text,
 					  text_color_hot(id, enabled));
 
 	// file value
-	_rqueue->add_rounded_rect(x + w / 2, y, w / 2, h, DEF_ROUND(), button_color(id, enabled));
+	_rqueue->add_rounded_rect(x + w / 2, y, w / 2, h, default_round(), button_color(id, enabled));
 	_rqueue->add_text(x + w / 2, y, _widget_w, _item_height, _text_align, value,
 					  text_color_hot(id, enabled, focused));
 
@@ -1322,7 +1363,7 @@ bool Ui::color_edit(const char* text, color clr, bool enabled, bool is_property)
 	const uint blue = (clr >> 16) & 0xff;
 
 	_rqueue->add_rounded_rect(
-		x + twidth, y, vwidth, h, DEF_ROUND(),
+		x + twidth, y, vwidth, h, default_round(),
 		RGBA(red, green, blue, is_item_hot(id) || is_item_active(id) ? 180 : 255));
 
 	// clear focus
@@ -1359,7 +1400,7 @@ void Ui::label(const char* text) {
 	if (!_row)
 		_widget_y -= _item_height;
 	else
-		_widget_x += _widget_w + DEFAULT_SPACING();
+		_widget_x += _widget_w + default_spacing();
 	if (_widget_id > 10 && (y < _scroll_bottom || y > _scroll_top))
 		return;
 	// _rqueue->add_text(x, y, _text_align, text, RGBA(255,255,255,255));
@@ -1374,7 +1415,7 @@ bool Ui::edit(char* text, int buffer_len, bool* edit_finished, bool enabled) {
 
 	button_logic(id, over);
 	bool res = edit_logic(id, was_focused, enabled, text, buffer_len, edit_finished);
-	_rqueue->add_rounded_rect(x, y, w, h, DEF_ROUND(), edit_color(id, enabled));
+	_rqueue->add_rounded_rect(x, y, w, h, default_round(), edit_color(id, enabled));
 	_rqueue->add_text(x, y, _widget_w, _item_height, _text_align, text,
 					  text_color_hot(id, enabled));
 	return res;
@@ -1395,7 +1436,7 @@ bool Ui::property(const char* name, char* text, int buffer_len, bool* edit_finis
 
 	// property value
 	int vwidth = (int)(w * (1.0f - _property_width));
-	_rqueue->add_rounded_rect(x + twidth, y, vwidth, h, DEF_ROUND(), edit_color(id, enabled));
+	_rqueue->add_rounded_rect(x + twidth, y, vwidth, h, default_round(), edit_color(id, enabled));
 	_rqueue->add_text(x + twidth, y, vwidth, _item_height, _text_align, text,
 					  text_color_hot(id, enabled));
 	return res;
@@ -1407,7 +1448,7 @@ void Ui::value(const char* text) {
 	if (!_row)
 		_widget_y -= _item_height;
 	else
-		_widget_x += w + DEFAULT_SPACING();
+		_widget_x += w + default_spacing();
 	if (_widget_id > 10 && (y < _scroll_bottom || y > _scroll_top))
 		return;
 	_rqueue->add_text(x + _item_height / 2, y, _widget_w, _item_height, ALIGN_RIGHT, text,
@@ -1421,8 +1462,8 @@ bool Ui::slider(const char* text, float* val, float vmin, float vmax, float vinc
 	if (!start_control(enabled, x, y, w, h, id, over, was_focused_temp))
 		return false;
 
-	_rqueue->add_rounded_rect(x, y, w, h, DEF_ROUND(), _theme.slider_bg);
-	const int range = w - SLIDER_MARKER_WIDTH();
+	_rqueue->add_rounded_rect(x, y, w, h, default_round(), _theme.slider_bg);
+	const int range = w - slider_marker_width();
 
 	float u = (*val - vmin) / (vmax - vmin);
 	if (u < 0)
@@ -1431,7 +1472,7 @@ bool Ui::slider(const char* text, float* val, float vmin, float vmax, float vinc
 		u = 1;
 	int m = (int)(u * range);
 
-	over = in_rect(x + m, y, SLIDER_MARKER_WIDTH(), SLIDER_HEIGHT());
+	over = in_rect(x + m, y, slider_marker_width(), slider_height());
 	bool was_focused_before = is_item_focused(id);
 	bool was_active_before = is_item_active(id);
 	bool res = enabled && button_logic(id, over);
@@ -1458,10 +1499,10 @@ bool Ui::slider(const char* text, float* val, float vmin, float vmax, float vinc
 	}
 
 	if (is_item_active(id))
-		_rqueue->add_rounded_rect(x + m, y, SLIDER_MARKER_WIDTH(), SLIDER_HEIGHT(), DEF_ROUND(),
+		_rqueue->add_rounded_rect(x + m, y, slider_marker_width(), slider_height(), default_round(),
 								  RGBA(255, 255, 255, 255));
 	else
-		_rqueue->add_rounded_rect(x + m, y, SLIDER_MARKER_WIDTH(), SLIDER_HEIGHT(), DEF_ROUND(),
+		_rqueue->add_rounded_rect(x + m, y, slider_marker_width(), slider_height(), default_round(),
 								  is_item_hot(id) ? RGBA(255, 196, 0, 128)
 												  : RGBA(255, 255, 255, 64));
 
@@ -1491,7 +1532,7 @@ bool Ui::progress(float val, float vmin, float vmax, float vinc, uint color, boo
 	if (!start_control(enabled, x, y, w, h, id, over, was_focused))
 		return false;
 
-	_rqueue->add_rounded_rect(x, y, w, h, DEF_ROUND(), RGBA(255, 255, 255, 64));
+	_rqueue->add_rounded_rect(x, y, w, h, default_round(), RGBA(255, 255, 255, 64));
 
 	const int range = w;
 	float u = (val - vmin) / (vmax - vmin);
@@ -1502,11 +1543,11 @@ bool Ui::progress(float val, float vmin, float vmax, float vinc, uint color, boo
 	int m = (int)(u * range);
 
 	// if (is_item_active(id))
-	//	_rqueue->add_rounded_rect(x+m, y, SLIDER_MARKER_WIDTH(), SLIDER_HEIGHT(), 4,
+	//	_rqueue->add_rounded_rect(x+m, y, slider_marker_width(), slider_height(), 4,
 	// RGBA(255,255,255,255));
 	// else
 	if (m > 0)
-		_rqueue->add_rounded_rect(x, y, m, _item_height, DEF_ROUND(), color);
+		_rqueue->add_rounded_rect(x, y, m, _item_height, default_round(), color);
 
 	return true;
 }
@@ -1515,20 +1556,20 @@ void Ui::set_options(size_t _options) {
 	_rqueue->set_render_options(_render_options);
 }
 void Ui::indent() {
-	_widget_x += INTEND_SIZE();
-	_rollout_left += INTEND_SIZE();
-	_widget_w -= INTEND_SIZE();
-	_rollout_width -= INTEND_SIZE();
+	_widget_x += intend_size();
+	_rollout_left += intend_size();
+	_widget_w -= intend_size();
+	_rollout_width -= intend_size();
 }
 void Ui::unindent() {
-	_widget_x -= INTEND_SIZE();
-	_rollout_left -= INTEND_SIZE();
-	_widget_w += INTEND_SIZE();
-	_rollout_width += INTEND_SIZE();
+	_widget_x -= intend_size();
+	_rollout_left -= intend_size();
+	_widget_w += intend_size();
+	_rollout_width += intend_size();
 }
 void Ui::separator(bool draw_line) {
 	if (!_row)
-		// _widget_y -= DEFAULT_SPACING()*3;
+		// _widget_y -= default_spacing()*3;
 		_widget_y -= _item_height;
 	else
 		_widget_x += _item_height;
@@ -1538,7 +1579,8 @@ void Ui::separator(bool draw_line) {
 		int y = _widget_y + _item_height / 2;
 		int w = _widget_w;
 		int h = _item_height / 4;
-		_rqueue->add_rect(x, y, w, h, _theme.button_color);
+		if (y > _scroll_bottom && y < _scroll_top)
+			_rqueue->add_rect(x, y, w, h, _theme.button_color);
 	}
 }
 void Ui::draw_text(int x, int y, int align, const char* text, uint color) {
@@ -1552,10 +1594,10 @@ uint Ui::set_item_height(uint button_height) {
 	if (button_height)
 		_item_height = button_height;
 
-	_padding_left = DEFAULT_PADDING();
-	_padding_top = DEFAULT_PADDING();
-	_padding_right = DEFAULT_PADDING();
-	_padding_bottom = DEFAULT_PADDING();
+	_padding_left = default_padding();
+	_padding_top = default_padding();
+	_padding_right = default_padding();
+	_padding_bottom = default_padding();
 	return mem;
 }
 uint Ui::get_item_height() const {
@@ -1654,9 +1696,9 @@ uint Ui::get_text_align() const {
 // 	int h = _item_height;
 
 // 	if (!_row)
-// 		_widget_y -= _item_height + DEFAULT_SPACING();
+// 		_widget_y -= _item_height + default_spacing();
 // 	else
-// 		_widget_x += w + DEFAULT_SPACING();
+// 		_widget_x += w + default_spacing();
 
 // 	bool over = enabled && in_rect(x, y, w, h);
 // 	bool res = enabled && button_logic(id, over);
@@ -1713,6 +1755,9 @@ const gfx_cmd* Ui::get_render_queue(int& size) {
 }
 Toolbar* Ui::get_root_toolbar() {
 	return _toolbar_root;
+}
+Rollout* Ui::get_root_rollout(){
+	return _rollout_root;
 }
 void Ui::set_root_toolbar(Toolbar* t) {
 	clear_toolbars(_toolbar_root); // remove current root toolbars

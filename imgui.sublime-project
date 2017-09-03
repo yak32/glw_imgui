@@ -67,6 +67,7 @@
 			"*.cpp",
 			"*.c",
 			"*.h",
+			"*.theme",
 			"*.json",
 			"*.types",
 			"*.txt",

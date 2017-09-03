@@ -206,8 +206,8 @@ bool Ui::insert_rollout(Rollout* r, float div, bool horz, Rollout* rollout) {
 
 			// add rollout to tabs of parent rollout
 			rollout->tabs.push_back(r->id);
-			//for (int rollout_id : rollout->tabs) _rollouts[rollout_id]->alpha = 0;
 			r->alpha = 0;
+			r->tabs = rollout->tabs;
 			r->options |= ROLLOUT_ATTACHED;
 			return true;
 		}

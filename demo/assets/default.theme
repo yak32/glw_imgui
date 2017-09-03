@@ -1,17 +1,17 @@
 {
-	"rollout_color": 3221225472,
-	"rollout_caption_color": 0,
 	"button_color": 1619034240,
 	"button_color_active": 3296755840,
 	"button_color_focused": 2021687424,
-	"edit_color": 1619034240,
-	"edit_color_active": 3296755840,
 	"collapse_color": 3288334336,
 	"collapse_color_active": 3690987520,
+	"drag_color": 676352080,
+	"edit_color": 1619034240,
+	"edit_color_active": 3296755840,
+	"rollout_caption_color": 676352080,
+	"rollout_color": 3221225472,
+	"slider_bg": 2113929216,
 	"text_color": 3372220415,
-	"text_color_hot": 4278240511,
 	"text_color_checked": 3372220415,
 	"text_color_disabled": 3363864704,
-	"drag_color": 676352080,
-	"slider_bg": 2113929216
+	"text_color_hot": 4278240511
 }

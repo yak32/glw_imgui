@@ -120,7 +120,7 @@ struct Rollout;
 
 typedef unsigned int color_t;
 
-struct Theme{
+struct Theme {
 	color_t rollout_color;
 	color_t rollout_caption_color;
 	color_t button_color;
@@ -261,6 +261,8 @@ public:
 	Toolbar* get_root_toolbar();
 	void set_root_toolbar(Toolbar* t);
 
+	Rollout* get_root_rollout();
+
 	bool system_tab(const char* text, int x, int y, int w, int h, bool checked, int& xmove,
 					int& ymove);
 
@@ -305,20 +307,25 @@ private:
 	void render_text(const font_t& font, float x, float y, float w, float h, const char* text,
 					 int align, unsigned int col, float depth);
 
-	inline const int SLIDER_HEIGHT() const;
-	inline const int SLIDER_MARKER_WIDTH() const;
-	inline const int CHECK_SIZE() const;
-	inline const int DEFAULT_SPACING() const;
+	inline const int slider_height() const;
+	inline const int slider_marker_width() const;
+	inline const int check_size() const;
+	inline const int default_spacing() const;
 	// inline const int ITEM_SPACING(ITEM side) const;
-	inline const int SCROLL_AREA_PADDING() const;
-	inline const int INTEND_SIZE() const;
-	inline const int AREA_HEADER() const;
-	inline const int TOOLBAR_HEADER() const;
-	inline const int DEF_ROUND() const;
-	inline const int DEFAULT_PADDING() const;
+	inline const int padding() const;
+	inline const int intend_size() const;
+	inline const int area_header() const;
+	inline const int toolbar_header() const;
+	inline const int default_round() const;
+	inline const int default_padding() const;
 
 	uint get_control_id(uint widget_id) const;
-	int render_rollout_tabs(Rollout& r, int x, int y, int h, int caption_y, int caption_height, int area_header);
+	int render_rollout_tabs(Rollout& r, int x, int y, int h, int caption_y, int caption_height,
+							int area_header);
+	void process_rollout_resize(Rollout& r, int x, int y, int w, int h, int caption_t,
+								int caption_height);
+	bool render_caption(Rollout& r, int x, int y, int w, int h, int caption_y, int caption_height,
+						int area_header);
 
 private:
 	uint _width;
@@ -403,6 +410,7 @@ private:
 	Theme _theme;
 
 	Rollout* _focus_rollout;
+	Rollout* _rollout_root;
 };
 }
 #endif // _IMGUI_H_

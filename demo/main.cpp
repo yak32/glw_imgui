@@ -33,7 +33,7 @@ using namespace imgui;
 
 PlatformSDL gPlatform;
 Ui ui;
-Rollout *root_rollout, *rollout, *vert_rollout;
+Rollout *rollout, *vert_rollout;
 RenderSDL renderer;
 
 void getDisplayScaleFactor(float& x, float& y) {
@@ -51,14 +51,11 @@ void setup_ui() {
 
 	ui.create(&gPlatform, &renderer);
 
-	root_rollout = ui.create_rollout("root", ROLLOUT_HOLLOW | WND_STYLE);
-	ui.insert_rollout(root_rollout, 1, true, NULL);
-
 	rollout = ui.create_rollout("TEST", WND_STYLE);
-	ui.insert_rollout(rollout, 0.2f, true, root_rollout);
+	ui.insert_rollout(rollout, 0.2f, true, ui.get_root_rollout());
 
 	vert_rollout = ui.create_rollout("VERT", WND_STYLE);
-	ui.insert_rollout(vert_rollout, -200, true, root_rollout);
+	ui.insert_rollout(vert_rollout, -200, true, ui.get_root_rollout());
 
 	char font_path[512];
 	sprintf(font_path, "DroidSans.ttf", SDL_GetBasePath());
@@ -66,16 +63,17 @@ void setup_ui() {
 
 	char theme_path[512];
 	sprintf(theme_path, "default.theme", SDL_GetBasePath());
-	imgui::Theme theme;
-	imgui::load_theme(theme, theme_path);
-	ui.set_theme(theme);
+	//imgui::Theme theme;
+	//imgui::load_theme(theme, theme_path);
+	//ui.set_theme(theme);
+	//imgui::save_theme(ui.get_theme(), theme_path);
 }
 bool init() {
 	bool success = true;
 
 	// Use OpenGL 3.2 core
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
