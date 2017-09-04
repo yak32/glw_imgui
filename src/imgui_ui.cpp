@@ -494,9 +494,8 @@ bool Ui::begin_rollout(Rollout* pr, bool focused) {
 	_area_id++;
 	_widget_id = 0;
 	_rqueue->set_alpha(r.alpha);
-	_scroll_id = get_control_id(_widget_id);
 	_options = r.options;
-    _alpha = r.alpha;
+	_alpha = r.alpha;
 
 	bool draw_scroll = true;
 	if (r.scroll == SCROLL_DISABLED || _options & DISABLE_SCROLL) {
@@ -545,22 +544,21 @@ bool Ui::begin_rollout(Rollout* pr, bool focused) {
 	else
 		r.z = FLOATING_ROLLOUT_DEPTH;
 
-	// caption and close buttons
-	if (!toolbar)
-		if (!render_caption(r, x, y, w, h, caption_y, caption_height, areaheader))
-			ret_val = false;
+	if (r.alpha) {
+		if (!(r.options & ROLLOUT_HOLLOW)) {
+			_rqueue->add_depth(r.z);
+			_rqueue->add_rect(x, y, w, h, _theme.rollout_color);
 
-	if (!(r.options & ROLLOUT_HOLLOW) && r.alpha) {
-
-		_rqueue->add_depth(r.z);
-		_rqueue->add_rect(x, y, w, h, _theme.rollout_color);
-
-		if (key_pressed(KEY_MOUSE_LEFT) && in_rect(x, y, w, h)) {
-			// click on rollout -> increase depth
-			_focused_rollout_id = &r;
+			if (key_pressed(KEY_MOUSE_LEFT) && in_rect(x, y, w, h)) {
+				// click on rollout -> increase depth
+				_focused_rollout_id = &r;
+			}
+			process_rollout_resize(r, x, y, w, h, caption_y, caption_height);
 		}
-
-		process_rollout_resize(r, x, y, w, h, caption_y, caption_height);
+		// caption and close buttons
+		if (!toolbar)
+			if (!render_caption(r, x, y, w, h, caption_y, caption_height, areaheader))
+				ret_val = false;
 	}
 
 	// no clipping if dragging item is possible
@@ -576,8 +574,8 @@ bool Ui::begin_rollout(Rollout* pr, bool focused) {
 		r.focused = true;
 		_search_next_focus = true;
 	}
-
-	// return _inside_scroll_area;
+	_scroll_id = get_control_id(_widget_id);
+	_scroll_id++;
 	return ret_val;
 }
 
@@ -600,195 +598,27 @@ bool Ui::render_caption(Rollout& r, int x, int y, int w, int h, int caption_y, i
 			ret_val = true;
 		}
 	}
-	bool cursor_over_drag = false;
-
-	int ydiff = 0, xdiff = 0;
-	if (_options & DRAG_AREA && !r.minimized) {
-		if (r.tabs.empty()) {
-			if (system_drag(x, caption_y - caption_height / 2 + 5, w, caption_height, xdiff,
-							ydiff, cursor_over_drag)) {
-				r.x += xdiff;
-				r.y += ydiff;
-				if (key_pressed(KEY_MOUSE_LEFT)) {
-					_target_side = ROLLOUT_UNDEFINED;
-					_target_rollout = NULL;
-					_dragged_rollout_id = &r;
-					detach_rollout(&r); // if rollout attached, detach it
-				}
-			}
-		}
-	}
-	bool rollout_attached = (r.options & ROLLOUT_ATTACHED) != 0;
-	if (cursor_over_drag) {
-		if (!rollout_attached)
-			_cursor_over_drag = true;
-	}
 	return ret_val;
 }
-
-void Ui::process_rollout_resize(Rollout& r, int x, int y, int w, int h, int caption_y, int caption_height){
-	bool cursor_over_drag;
-	Rollout* draggedRolloutId = _dragged_rollout_id;
-
-	bool rollout_attached = (r.options & ROLLOUT_ATTACHED) != 0;
-
-	// resize area
-	if (!(_options & TOOLBAR) && _options & RESIZE_AREA && !r.minimized) {
-		// dragging area
-		int drag_id = -1;
-		int ydiff = 0, xdiff = 0;
-		// if area is active, then react on left up
-		if (draggedRolloutId && key_released(KEY_MOUSE_LEFT)) {
-			Rollout* drollout = _dragged_rollout_id;
-			if (_target_side == ROLLOUT_LEFT) {
-				insert_rollout(drollout, 0.5f, true, _target_rollout);
-			}
-			else if (_target_side == ROLLOUT_TOP) {
-				insert_rollout(drollout, -0.5f, false, _target_rollout);
-			}
-			else if (_target_side == ROLLOUT_RIGHT) {
-				insert_rollout(drollout, -0.5f, true, _target_rollout);
-			}
-			else if (_target_side == ROLLOUT_BOTTOM) {
-				insert_rollout(drollout, 0.5f, false, _target_rollout);
-			}
-			else if (_target_side == ROLLOUT_CENTER) {
-				insert_rollout(drollout, 0.0f, false, _target_rollout);
-			}
-			if (_target_side == ROLLOUT_LEFT_FIXED) {
-				int neww =
-					drollout->w > _target_rollout->w / 2 ? _target_rollout->w / 2 : drollout->w;
-				insert_rollout(drollout, (float)neww, true, _target_rollout);
-			}
-			else if (_target_side == ROLLOUT_TOP_FIXED) {
-				int newh =
-					drollout->h > _target_rollout->h / 2 ? _target_rollout->h / 2 : drollout->h;
-				insert_rollout(drollout, -(float)newh, false, _target_rollout);
-			}
-			else if (_target_side == ROLLOUT_RIGHT_FIXED) {
-				int neww =
-					drollout->w > _target_rollout->w / 2 ? _target_rollout->w / 2 : drollout->w;
-				insert_rollout(drollout, -(float)neww, true, _target_rollout);
-			}
-			else if (_target_side == ROLLOUT_BOTTOM_FIXED) {
-				int newh =
-					drollout->h > _target_rollout->h / 2 ? _target_rollout->h / 2 : drollout->h;
-				insert_rollout(drollout, (float)newh, false, _target_rollout);
-			}
-			clear_active(); // clear state to prevent
-		}
-
-		cursor_over_drag = false;
-		CURSOR cursor = CURSOR_DEFAULT;
-		if (system_drag(x, y, padding() * 2, h, xdiff, ydiff, cursor_over_drag)) {
-			if (!rollout_attached) {
-				r.x += xdiff;
-				r.w -= xdiff;
-			}
-			else if (_rollout_drag_div.div) {
-				_rollout_drag_div.shift(xdiff);
-			}
-		}
-		if (cursor_over_drag) {
-			if (!rollout_attached ||
-				find_div(_mx, _my, _toolbar_root, 0, 0, _width, _height, default_padding())
-					.div) {
-				cursor = CURSOR_RESIZE_HORZ;
-				_cursor_over_drag = true;
-			}
-		}
-		if (system_drag(x + w - padding(), y, padding() * 2, h, xdiff,
-						ydiff, cursor_over_drag)) {
-			if (!rollout_attached) {
-				r.w += xdiff;
-			}
-			else if (_rollout_drag_div.div) {
-				_rollout_drag_div.shift(xdiff);
-			}
-		}
-		if (cursor_over_drag) {
-			if (!rollout_attached ||
-				find_div(_mx, _my, _toolbar_root, 0, 0, _width, _height, default_padding())
-					.div) {
-				cursor = CURSOR_RESIZE_HORZ;
-				_cursor_over_drag = true;
-			}
-		}
-		if (system_drag(x, y + h - padding() * 2 + 5, w,
-						padding() * 2 - 5, xdiff, ydiff, cursor_over_drag)) {
-			if (!rollout_attached)
-				r.h += ydiff;
-			else if (_rollout_drag_div.div)
-				_rollout_drag_div.shift(ydiff);
-		}
-		if (cursor_over_drag) {
-			if (!rollout_attached ||
-				find_div(_mx, _my, _toolbar_root, 0, 0, _width, _height, default_padding())
-					.div) {
-				cursor = CURSOR_RESIZE_VERT;
-				_cursor_over_drag = true;
-			}
-		}
-		if (system_drag(x, y - padding(), w, padding() * 2, xdiff,
-						ydiff, cursor_over_drag)) {
-			if (!rollout_attached) {
-				r.y += ydiff;
-				r.h -= ydiff;
-			}
-			else if (_rollout_drag_div.div)
-				_rollout_drag_div.shift(ydiff);
-		}
-		if (cursor_over_drag) {
-			if (!rollout_attached ||
-				find_div(_mx, _my, _toolbar_root, 0, 0, _width, _height, default_padding())
-					.div) {
-				cursor = CURSOR_RESIZE_VERT;
-				_cursor_over_drag = true;
-			}
-		}
-		int padd = padding() * 2;
-		if (system_drag(x + w - padd, y - padd, padd * 2, padd * 2, xdiff, ydiff,
-						cursor_over_drag)) {
-			if (!rollout_attached) {
-				r.w += xdiff;
-				r.y += ydiff;
-				r.h -= ydiff;
-			}
-		}
-		if (cursor_over_drag) {
-			if (!rollout_attached) {
-				cursor = CURSOR_RESIZE_CORNER;
-				_cursor_over_drag = true;
-			}
-		}
-		if (!_left && cursor != CURSOR_DEFAULT)
-			set_cursor(cursor);
-	}
-}
-
-int Ui::render_rollout_tabs(Rollout& r, int x, int y, int h, int caption_y, int caption_height, int area_header){
+int Ui::render_rollout_tabs(Rollout& r, int x, int y, int h, int caption_y, int caption_height, int area_header) {
 	int ret_val = false;
 	int xdiff, ydiff;
 
 	// several rollouts in tabbed interface
 	int width = _widget_w / r.tabs.size();
 	int xx = _widget_x;
-	for (int rollout_id: r.tabs) {
+	for (int rollout_id : r.tabs) {
 		Rollout* tab_rollout = _rollouts[rollout_id];
-		if (tab_rollout != &r)
-			continue;
+		if (system_tab(tab_rollout->name.c_str(), xx, caption_y, width - 2, caption_height,
+			tab_rollout == &r, xdiff, ydiff)) {
 
-		if (system_tab(r.name.c_str(), xx, caption_y, width - 2, caption_height,
-					   r.alpha, xdiff, ydiff)) {
-
-			for (int id: r.tabs)
-				_rollouts[id]->alpha = 0;
-
-			r.alpha = 255;
+			r.alpha = 0;
+			tab_rollout->alpha = 255;
+			r.tabs.swap(tab_rollout->tabs);
 			Toolbar* n = search_rollout_node(_toolbar_root, &r);
 			if (n)
-				n->rollout = &r;
-            break;
+				n->rollout = tab_rollout;
+			break;
 		}
 		if (xdiff || ydiff) {
 			detach_rollout(tab_rollout);
@@ -798,7 +628,7 @@ int Ui::render_rollout_tabs(Rollout& r, int x, int y, int h, int caption_y, int 
 		if (in_rect(xx, caption_y, width - 2, caption_height)) {
 			int bx = xx + width - int(_item_height * 1.5f); // button position
 			if (system_button("x", bx, y + h - area_header + _item_height / 2,
-							  (int)(_item_height * 1.2f), _item_height, true)) {
+				(int)(_item_height * 1.2f), _item_height, true)) {
 				detach_rollout(tab_rollout);
 				hide_rollout(tab_rollout);
 				if (tab_rollout->is_visible())
@@ -810,13 +640,174 @@ int Ui::render_rollout_tabs(Rollout& r, int x, int y, int h, int caption_y, int 
 	}
 	return ret_val;
 }
+void Ui::process_rollout_resize(Rollout& r, int x, int y, int w, int h, int caption_y, int caption_height){
+	Rollout* draggedRolloutId = _dragged_rollout_id;
+
+	bool rollout_attached = (r.options & ROLLOUT_ATTACHED) != 0;
+
+	// resize area
+	if ((_options & TOOLBAR) || !(_options & RESIZE_AREA) || r.minimized)
+		return;
+
+	// dragging area
+	int drag_id = -1;
+	int ydiff = 0, xdiff = 0;
+	// if area is active, then react on left up
+	if (draggedRolloutId && key_released(KEY_MOUSE_LEFT)) {
+		Rollout* drollout = _dragged_rollout_id;
+		if (_target_side == ROLLOUT_LEFT) {
+			insert_rollout(drollout, 0.5f, true, _target_rollout);
+		}
+		else if (_target_side == ROLLOUT_TOP) {
+			insert_rollout(drollout, -0.5f, false, _target_rollout);
+		}
+		else if (_target_side == ROLLOUT_RIGHT) {
+			insert_rollout(drollout, -0.5f, true, _target_rollout);
+		}
+		else if (_target_side == ROLLOUT_BOTTOM) {
+			insert_rollout(drollout, 0.5f, false, _target_rollout);
+		}
+		else if (_target_side == ROLLOUT_CENTER) {
+			insert_rollout(drollout, 0.0f, false, _target_rollout);
+		}
+		if (_target_side == ROLLOUT_LEFT_FIXED) {
+			int neww =
+				drollout->w > _target_rollout->w / 2 ? _target_rollout->w / 2 : drollout->w;
+			insert_rollout(drollout, (float)neww, true, _target_rollout);
+		}
+		else if (_target_side == ROLLOUT_TOP_FIXED) {
+			int newh =
+				drollout->h > _target_rollout->h / 2 ? _target_rollout->h / 2 : drollout->h;
+			insert_rollout(drollout, -(float)newh, false, _target_rollout);
+		}
+		else if (_target_side == ROLLOUT_RIGHT_FIXED) {
+			int neww =
+				drollout->w > _target_rollout->w / 2 ? _target_rollout->w / 2 : drollout->w;
+			insert_rollout(drollout, -(float)neww, true, _target_rollout);
+		}
+		else if (_target_side == ROLLOUT_BOTTOM_FIXED) {
+			int newh =
+				drollout->h > _target_rollout->h / 2 ? _target_rollout->h / 2 : drollout->h;
+			insert_rollout(drollout, (float)newh, false, _target_rollout);
+		}
+		clear_active(); // clear state to prevent
+	}
+
+	bool cursor_over_drag = false;
+	CURSOR cursor = CURSOR_DEFAULT;
+
+	if (_options & DRAG_AREA && !r.minimized) {
+		if (r.tabs.empty()) {
+			if (system_drag(x, caption_y - caption_height / 2 + 5, w, caption_height, xdiff,
+				ydiff, cursor_over_drag)) {
+				r.x += xdiff;
+				r.y += ydiff;
+				if (key_pressed(KEY_MOUSE_LEFT)) {
+					_target_side = ROLLOUT_UNDEFINED;
+					_target_rollout = NULL;
+					_dragged_rollout_id = &r;
+					detach_rollout(&r); // if rollout attached, detach it
+				}
+			}
+		}
+	}
+
+	if (system_drag(x, y, padding() * 2, h, xdiff, ydiff, cursor_over_drag)) {
+		if (!rollout_attached) {
+			r.x += xdiff;
+			r.w -= xdiff;
+		}
+		else if (_rollout_drag_div.div) {
+			_rollout_drag_div.shift(xdiff);
+		}
+	}
+	if (cursor_over_drag) {
+		if (!rollout_attached ||
+			find_div(_mx, _my, _toolbar_root, 0, 0, _width, _height, default_padding())
+				.div) {
+			cursor = CURSOR_RESIZE_HORZ;
+			_cursor_over_drag = true;
+		}
+	}
+
+	if (system_drag(x + w - padding(), y, padding() * 2, h, xdiff,
+					ydiff, cursor_over_drag)) {
+		if (!rollout_attached) {
+			r.w += xdiff;
+		}
+		else if (_rollout_drag_div.div) {
+			_rollout_drag_div.shift(xdiff);
+		}
+	}
+	if (cursor_over_drag) {
+		if (!rollout_attached ||
+			find_div(_mx, _my, _toolbar_root, 0, 0, _width, _height, default_padding())
+				.div) {
+			cursor = CURSOR_RESIZE_HORZ;
+			_cursor_over_drag = true;
+		}
+	}
+
+	if (system_drag(x, y + h - padding() * 2 + 5, w,
+					padding() * 2 - 5, xdiff, ydiff, cursor_over_drag)) {
+		if (!rollout_attached)
+			r.h += ydiff;
+		else if (_rollout_drag_div.div)
+			_rollout_drag_div.shift(ydiff);
+	}
+	if (cursor_over_drag) {
+		if (!rollout_attached ||
+			find_div(_mx, _my, _toolbar_root, 0, 0, _width, _height, default_padding())
+				.div) {
+			cursor = CURSOR_RESIZE_VERT;
+			_cursor_over_drag = true;
+		}
+	}
+
+	if (system_drag(x, y - padding(), w, padding() * 2, xdiff,
+					ydiff, cursor_over_drag)) {
+		if (!rollout_attached) {
+			r.y += ydiff;
+			r.h -= ydiff;
+		}
+		else if (_rollout_drag_div.div)
+			_rollout_drag_div.shift(ydiff);
+	}
+	if (cursor_over_drag) {
+		if (!rollout_attached ||
+			find_div(_mx, _my, _toolbar_root, 0, 0, _width, _height, default_padding())
+				.div) {
+			cursor = CURSOR_RESIZE_VERT;
+			_cursor_over_drag = true;
+		}
+	}
+
+	int padd = padding() * 2;
+	if (system_drag(x + w - padd, y - padd, padd * 2, padd * 2, xdiff, ydiff,
+					cursor_over_drag)) {
+		if (!rollout_attached) {
+			r.w += xdiff;
+			r.y += ydiff;
+			r.h -= ydiff;
+		}
+	}
+	if (cursor_over_drag) {
+		if (!rollout_attached) {
+			cursor = CURSOR_RESIZE_CORNER;
+			_cursor_over_drag = true;
+		}
+	}
+
+	if (!_left && cursor != CURSOR_DEFAULT)
+		set_cursor(cursor);
+}
 void Ui::end_rollout() {
 	// prevent focus searching at the end of rollout
 	_search_next_focus = false;
 
 	// Disable scissoring.
 	_rqueue->add_scissor(-1, -1, -1, -1);
-	if (!(_options & DISABLE_SCROLL)) {
+	if (!(_options & DISABLE_SCROLL) && _alpha) {
 		// Draw scroll bar
 		int x = _scroll_right + padding() / 2;
 		int y = _scroll_bottom;
@@ -873,20 +864,17 @@ void Ui::end_rollout() {
 															  ? RGBA(255, 196, 0, 96)
 															  : RGBA(255, 255, 255, 64));
 				}
-			}
-
-			// Handle mouse scrolling.
-			if (_inside_scroll_area) { // && !any_active())
-				if (_scroll) {
-					*_scroll_val += 20 * _scroll;
-					if (*_scroll_val < 0)
-						*_scroll_val = 0;
-					if (*_scroll_val > (sh - h))
-						*_scroll_val = (sh - h);
+				// Handle mouse scrolling.
+				if (_inside_scroll_area) { // && !any_active())
+					if (_scroll) {
+						*_scroll_val += 20 * _scroll;
+						if (*_scroll_val < 0)
+							*_scroll_val = 0;
+						if (*_scroll_val >(sh - h))
+							*_scroll_val = (sh - h);
+					}
 				}
 			}
-			//			else
-			//				*_scroll_val = SCROLL_DISABLED; // memorize state - no scroll
 		}
 	}
 	_inside_current_scroll = false;
@@ -898,8 +886,8 @@ uint Ui::get_control_id(uint widget_id) const {
 }
 bool Ui::start_control(bool enabled, int& x, int& y, int& w, int& h, uint& id, bool& over,
 					   bool& was_focused) {
-    if (!_alpha)
-        return false; // rollout is invisible
+	if (!_alpha)
+		return false; // rollout is invisible
 
 	id = get_control_id(_widget_id++);
 
@@ -972,6 +960,9 @@ bool Ui::button(const char* text, bool enabled) {
 	return res;
 }
 bool Ui::button(const char* text, int x, int y, int w, int h, bool enabled) {
+	if (!_alpha)
+		return false; // rollout is invisible
+
 	uint id = get_control_id(_widget_id++);
 
 	x += _rollout_left;
@@ -1395,6 +1386,9 @@ void Ui::triangle(int x1, int y1, int x2, int y2, int x3, int y3, uint color) {
 }
 void Ui::label(const char* text) {
 	_widget_id++;
+	if (!_alpha)
+		return;
+
 	int x = _widget_x;
 	int y = _widget_y - _item_height;
 	if (!_row)
@@ -1442,6 +1436,9 @@ bool Ui::property(const char* name, char* text, int buffer_len, bool* edit_finis
 	return res;
 }
 void Ui::value(const char* text) {
+	if (!_alpha)
+		return;
+
 	const int x = _widget_x;
 	const int y = _widget_y - _item_height;
 	const int w = _widget_w;
@@ -1855,6 +1852,8 @@ color_t Ui::get_color(ColorScheme id) const {
 		default:
 			assert(false && "color is undefined");
 	};
+	return 0;
+	
 }
 }
 

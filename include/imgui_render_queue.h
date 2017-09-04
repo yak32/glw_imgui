@@ -100,6 +100,7 @@ struct RenderQueue {
 
 	bool ready_to_render() const;
 	void set_alpha(unsigned int alpha);
+	unsigned int get_alpha() const;
 	void set_render_options(int options);
 
 private:
