@@ -303,6 +303,7 @@ private:
 	color edit_color(uint id, bool enabled = true);
 
 	void detach_tabbed_rollout(Toolbar* n, Rollout* r, Rollout* detach_rollout);
+	void switch_tab(Rollout* r);
 
 	bool system_drag(uint id, int x, int y, int w, int h, int& xdiff, int& ydiff, bool& over);
 	bool system_button(uint id, const char* text, int x, int y, int w, int h, bool enabled);

@@ -384,6 +384,10 @@ bool Ui::begin_frame(uint width, uint height, int mx, int my, int scroll, uint c
 
 	// if we have dragged rollout, setup depth testing
 	set_depth(0);
+
+	// lets render root rollout
+	begin_rollout(get_root_rollout(), false);
+	end_rollout();
 	return true;
 }
 void Ui::end_frame() {
@@ -577,18 +581,20 @@ bool Ui::begin_rollout(Rollout* pr, bool focused) {
 bool Ui::render_caption(Rollout& r, int x, int y, int w, int h, int caption_y, int caption_height, int area_header){
 	bool ret_val = false;
 	if (r.tabs.empty()) {
-        _rqueue->add_rect(x, caption_y, w, caption_height, _theme.rollout_caption_color);
-        _rqueue->add_text(x, y + h - area_header + _item_height / 2 - 2, _widget_w,
-                          _item_height, ALIGN_LEFT, r.name.c_str(),
-                          RGBA(255, 255, 255, 128));
-        // close button
-        if (system_button(get_control_id(ROLLOUT_CLOSE_WINDOW_ID),
-                          "x", x + w - (int)(_item_height * 2.0f),
-                          y + h - area_header + _item_height / 2, _item_height,
-                          _item_height, true)) {
-            hide_rollout(&r);
-            ret_val = true;
-        }
+		if (&r != get_root_rollout()) {
+			_rqueue->add_rect(x, caption_y, w, caption_height, _theme.rollout_caption_color);
+			_rqueue->add_text(x, y + h - area_header + _item_height / 2 - 2, _widget_w,
+				_item_height, ALIGN_LEFT, r.name.c_str(),
+				RGBA(255, 255, 255, 128));
+			// close button
+			if (system_button(get_control_id(ROLLOUT_CLOSE_WINDOW_ID),
+				"x", x + w - (int)(_item_height * 2.0f),
+				y + h - area_header + _item_height / 2, _item_height,
+				_item_height, true)) {
+				hide_rollout(&r);
+				ret_val = true;
+			}
+		}
 	}
 	else if (caption_height) {
         if (!render_rollout_tabs(r, x, y, h, caption_y, caption_height, area_header))
@@ -596,15 +602,33 @@ bool Ui::render_caption(Rollout& r, int x, int y, int w, int h, int caption_y, i
 	}
 	return ret_val;
 }
+void Ui::switch_tab(Rollout* r) {	
+	Toolbar* n = search_rollout_node(_toolbar_root, r);
+	if (n) {
+		n->rollout->alpha = 0;
+		n->rollout->tabs.swap(r->tabs);
+		n->rollout = r;
+		r->alpha = 255;
+	}
+}
+
 int Ui::render_rollout_tabs(Rollout& r, int x, int y, int h, int caption_y, int caption_height, int area_header) {
 	int ret_val = false;
 	int xdiff = 0, ydiff = 0;
 
+	int count = (int)r.tabs.size();
+	bool tabs_with_root = false;
+	for (int rollout_id : r.tabs)
+		if (rollout_id == get_root_rollout()->id)
+			count--;
+
 	// several rollouts in tabbed interface
-	int width = _widget_w / (int)r.tabs.size();
+	int width = _widget_w / count;
 	int xx = _widget_x;
 	for (int rollout_id : r.tabs) {
 		Rollout* tab_rollout = _rollouts[rollout_id];
+		if (tab_rollout == get_root_rollout())
+			continue;
 
 		bool cursor_over_drag = false;
 		CURSOR cursor = CURSOR_DEFAULT;
@@ -616,12 +640,12 @@ int Ui::render_rollout_tabs(Rollout& r, int x, int y, int h, int caption_y, int 
 						tab_rollout == &r, xdiff, ydiff, cursor_over_drag))
 		{
 			if (key_pressed(KEY_MOUSE_LEFT)){
-	            r.alpha = 0;
-	            tab_rollout->alpha = 255;
-	            r.tabs.swap(tab_rollout->tabs);
-	            Toolbar* n = search_rollout_node(_toolbar_root, &r);
-	            if (n)
-	                n->rollout = tab_rollout;
+				r.alpha = 0;
+				tab_rollout->alpha = 255;
+				r.tabs.swap(tab_rollout->tabs);
+				Toolbar* n = search_rollout_node(_toolbar_root, &r);
+				if (n)
+					n->rollout = tab_rollout;
 			}
             if (xdiff != 0 || ydiff != 0){
                 tab_rollout->x += xdiff;
@@ -680,7 +704,7 @@ void Ui::process_rollout_resize(Rollout& r, int x, int y, int w, int h, int capt
 		else if (_target_side == ROLLOUT_BOTTOM) {
 			insert_rollout(drollout, 0.5f, false, _target_rollout);
 		}
-		else if (_target_side == ROLLOUT_CENTER) {
+		else if (_target_side == ROLLOUT_CENTER && _target_rollout != get_root_rollout()) {
 			insert_rollout(drollout, 0.0f, false, _target_rollout);
 		}
 		if (_target_side == ROLLOUT_LEFT_FIXED) {

@@ -211,6 +211,12 @@ bool Ui::insert_rollout(Rollout* r, float div, bool horz, Rollout* rollout) {
 			rollout->tabs.push_back(r->id);
 			r->alpha = 0;
 			r->options |= ROLLOUT_ATTACHED;
+			
+			// switch to new tab
+			if (rollout == get_root_rollout()) {
+				r->alpha = 255;
+				get_root_toolbar()->rollout = r;
+			}
 			return true;
 		}
 		lastNode = search_rollout_node(_toolbar_root, rollout, true);
