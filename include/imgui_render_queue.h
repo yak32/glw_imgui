@@ -96,21 +96,21 @@ struct RenderQueue {
 	void add_font(const char* path, float height);
 
 	const gfx_cmd* get_queue() const;
-	size_t get_size() const;
+	unsigned int get_size() const;
 
 	bool ready_to_render() const;
 	void set_alpha(unsigned int alpha);
 	unsigned int get_alpha() const;
-	void set_render_options(int options);
+	void set_render_options(unsigned int options);
 
 private:
 	gfx_cmd _queue[GFXCMD_QUEUE_SIZE];
-	size_t _size, _mem_size;
+	unsigned int _size, _mem_size;
 
 	char _text_pool[TEXT_POOL_SIZE];
 	unsigned _text_pool_size;
 
-	int _render_options;
+	unsigned int _render_options;
 	unsigned int _alpha;
 
 	std::atomic<bool> _ready_to_render;

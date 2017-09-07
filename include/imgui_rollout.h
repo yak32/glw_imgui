@@ -15,6 +15,7 @@ struct Rollout {
 			 bool _minimized = false, int _alpha_inc = 0);
 	int top() const;
 	bool is_visible() const;
+	bool is_attached() const;
 	void process_animations(Ui& ui);
 
 	int x, y, w, h, z;

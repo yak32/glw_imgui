@@ -138,6 +138,19 @@ struct Theme {
 	color_t slider_bg;
 };
 
+enum ROLLOUT_CONTROLS{
+	ROLLOUT_TITLEBAR_ID = 0,
+	ROLLOUT_MOVE_ROLLOUT_ID,
+	ROLLOUT_RESIZE_LEFT_ID,
+	ROLLOUT_RESIZE_RIGHT_ID,
+	ROLLOUT_RESIZE_TOP_ID,
+	ROLLOUT_RESIZE_BOTTOM_ID,
+	ROLLOUT_RESIZE_CORNER_ID,
+	ROLLOUT_CLOSE_WINDOW_ID,
+	ROLLOUT_SCROLL_ID,
+	ROLLOUT_CONTROLS_COUNT
+};
+
 class Ui {
 public:
 	typedef std::vector<Rollout*> Rollouts;
@@ -151,7 +164,7 @@ public:
 	bool begin_frame(uint width, uint height, int mx, int my, int scroll, uint character, uint key);
 	void end_frame();
 	void cleanup();
-	void set_options(size_t options);
+	void set_options(uint options);
 	void indent();
 	void unindent();
 	void separator(bool draw_line = false);
@@ -236,8 +249,6 @@ public:
 	void get_input(int* mouse_x, int* mouse_y, uint* keys_state, uint* character,
 				   bool& left_pressed, bool& left_released) const;
 
-	bool system_drag(int x, int y, int w, int h, int& xdiff, int& ydiff, bool& over);
-	bool system_button(const char* text, int x, int y, int w, int h, bool enabled);
 
 	void set_color(ColorScheme color_id, color_t clr);
 	color_t get_color(ColorScheme color) const;
@@ -256,15 +267,12 @@ public:
 	uint get_text_align() const;
 	bool check_rect(int x, int y, uint id) const;
 
-	const gfx_cmd* get_render_queue(int& size);
+	const gfx_cmd* get_render_queue(uint& size);
 
 	Toolbar* get_root_toolbar();
 	void set_root_toolbar(Toolbar* t);
 
 	Rollout* get_root_rollout();
-
-	bool system_tab(const char* text, int x, int y, int w, int h, bool checked, int& xmove,
-					int& ymove);
 
 	void play_sound(SOUNDS s);
 	void render_draw(bool transparency);
@@ -294,7 +302,11 @@ private:
 	color button_color(uint id, bool enabled = true);
 	color edit_color(uint id, bool enabled = true);
 
-	void detach_tabbed_rollout(Rollout* r);
+	void detach_tabbed_rollout(Toolbar* n, Rollout* r, Rollout* detach_rollout);
+
+	bool system_drag(uint id, int x, int y, int w, int h, int& xdiff, int& ydiff, bool& over);
+	bool system_button(uint id, const char* text, int x, int y, int w, int h, bool enabled);
+	bool system_tab(uint id, const char* text, int x, int y, int w, int h, bool checked, int& xdiff, int& ydiff, bool& over);
 
 	// render
 	bool render_init(IRenderer* r);
@@ -320,6 +332,7 @@ private:
 	inline const int default_padding() const;
 
 	uint get_control_id(uint widget_id) const;
+	uint get_control_id(uint area_id, uint widget_id) const;
 	int render_rollout_tabs(Rollout& r, int x, int y, int h, int caption_y, int caption_height,
 							int area_header);
 	void process_rollout_resize(Rollout& r, int x, int y, int w, int h, int caption_t,
@@ -374,7 +387,6 @@ private:
 	int* _scroll_val;
 	int _focus_top;
 	int _focus_bottom;
-	uint _scroll_id;
 	bool _inside_scroll_area;
 	int _scroll_top;
 	int _scroll_bottom;

@@ -187,7 +187,7 @@ void Ui::render_draw(bool transparency) {
 	IRenderer* r = _renderer;
 	r->begin(_width, _height);
 
-	int size;
+	uint size;
 	const gfx_cmd* cmd = get_render_queue(size);
 	_current_texture = _white_texture;
 
@@ -307,7 +307,7 @@ void render_quads(IRenderer* r, const float* coords, float texture_x, float text
 		set(v++, coords[(i - 1) * 2], coords[(i - 1) * 2 + 1], col, depth);
 		set(v++, coords[i * 2], coords[i * 2 + 1], col, depth);
 	}
-	int k = v - &new_coords[0];
+	int k = (int)(v - &new_coords[0]);
 	for (int i = 0; i < k; ++i) {
 		new_coords[i].u = (new_coords[i].u - texture_x) / texture_scale_x;
 		new_coords[i].v = 1.0f - (new_coords[i].v - texture_y) / texture_scale_y;
@@ -371,7 +371,7 @@ void render_mesh(IRenderer* renderer, const float* coords, float txt_shift_x, fl
 		set(v++, coords[(i - 1) * 2], coords[(i - 1) * 2 + 1], col, depth);
 		set(v++, coords[i * 2], coords[i * 2 + 1], col, depth);
 	}
-	int k = v - &new_coords[0];
+	int k = (int)(v - &new_coords[0]);
 	for (int i = 0; i < k; ++i) {
 		new_coords[k].u = (new_coords[k].x - txt_shift_x) / txt_scale_x;
 		new_coords[k].v = 1.0f - (new_coords[k].y - txt_shift_y) / txt_scale_y;
@@ -603,7 +603,7 @@ void Ui::render_text(const font_t& font, float x, float y, float w, float h, con
 		//	assert(false&&"No yet support for non-english");
 		++text;
 	}
-	k = v - new_coords;
+	k = (int)(v - new_coords);
 	_renderer->render_mesh(new_coords, k, true);
 }
 }

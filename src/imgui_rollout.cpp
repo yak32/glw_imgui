@@ -47,6 +47,9 @@ int Rollout::top() const {
 bool Rollout::is_visible() const {
 	return alpha != 0;
 }
+bool Rollout::is_attached() const {
+	return (options & ROLLOUT_ATTACHED) != 0;
+}
 
 void Rollout::process_animations(Ui& ui) {
 	if (animation_type == Rollout::ANIMATION_NONE)
@@ -183,7 +186,7 @@ void Ui::scroll_rollout(Rollout* r, int scroll_val, bool animate, float animatio
 			r->scroll = r->target_scroll;
 
 		r->animation_type = Rollout::ANIMATION_SCROLL;
-		r->animation_speed = animation_speed;
+		r->animation_speed = (int)animation_speed;
 		r->target_scroll = r->scroll + scroll_val;
 	}
 	else {
@@ -228,7 +231,7 @@ bool Ui::insert_rollout(Rollout* r, float div, bool horz, Rollout* rollout) {
 }
 Rollout* Ui::create_rollout(const char* name, int options) {
 	Rollout* r = new Rollout;
-	r->id = _rollouts.size();
+	r->id = (int)_rollouts.size();
 
 	_rollouts.push_back(r);
 	r->name = name;
@@ -254,35 +257,42 @@ Rollout* Ui::find_rollout(const char* name) {
 bool Ui::is_rollout_visible(Rollout* r) const {
 	return r ? r->is_visible() : false;
 }
-void Ui::detach_tabbed_rollout(Rollout* r) {
+void Ui::detach_tabbed_rollout(Toolbar* toolbar, Rollout* r, Rollout* detach_rollout) {
+
 	// rollout can be in tabbed interface
 	auto& tabs = r->tabs;
-	tabs.erase(std::remove(tabs.begin(), tabs.end(), r->id), tabs.end());
+	assert(tabs.size()>1 && "tabs should be empty or have more than 1 elements");
+
+	tabs.erase(std::remove(tabs.begin(), tabs.end(), detach_rollout->id), tabs.end());
+	detach_rollout->alpha = 255;
+	for(auto id: tabs)
+		_rollouts[id]->alpha = 0;
+
 	_rollouts[tabs[0]]->alpha = 255;
+	_rollouts[tabs[0]]->z = ATTACHED_ROLLOUT_DEPTH;
+	toolbar->rollout = _rollouts[tabs.at(0)];
+
 	if (tabs.size() == 1) {
 		Rollout::tabs_array_t temp;
-		r->tabs.swap(temp);
+		tabs.swap(temp);
 	}
+	else
+		_rollouts[tabs[0]]->tabs.swap(tabs);
 
-	r->options &= ~ROLLOUT_ATTACHED;
-	r->z = FLOATING_ROLLOUT_DEPTH;
+	detach_rollout->options &= ~ROLLOUT_ATTACHED;
+	detach_rollout->z = FLOATING_ROLLOUT_DEPTH;
 }
 bool Ui::detach_rollout(Rollout* r) {
 	if (!r)
 		return false;
 
-	if (!r->tabs.empty()) {
-		if (r->tabs.at(0) == r->id) {
-			Toolbar* n = search_rollout_node(_toolbar_root, r);
-			if (n) {
-				// move second tabbed rollout to the node
-				std::swap(r->tabs.at(0), r->tabs.at(1));
-				n->rollout = _rollouts[r->tabs.at(0)];
-				n->rollout->alpha = 255;
-			}
+	Toolbar* toolbar = search_rollout_node(_toolbar_root, r);
+	if (toolbar) {
+		Rollout* parent_rollout = toolbar->rollout;
+		if (!parent_rollout->tabs.empty()){
+			detach_tabbed_rollout(toolbar, parent_rollout, r);
+			return true;
 		}
-		detach_tabbed_rollout(r);
-		return true;
 	}
 
 	Toolbar* n = search_rollout_parent_node(_toolbar_root, r);

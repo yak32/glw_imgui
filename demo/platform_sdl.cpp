@@ -212,7 +212,7 @@ bool RenderSDL::begin(uint width, uint height) {
 
 void RenderSDL::initialize_render(uint width, uint height) {
 	glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 	glDisable(GL_CULL_FACE);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
@@ -229,7 +229,7 @@ void RenderSDL::initialize_render(uint width, uint height) {
 }
 bool RenderSDL::render_mesh(const render_vertex_3d_t* tris, int count, bool b) {
 	_mesh.insert(_mesh.end(), tris, tris + count);
-	render(_mesh.size() - count, count);
+	render((int)_mesh.size() - count, count);
 	return true;
 }
 void RenderSDL::render(int start, int count) {
@@ -313,7 +313,7 @@ unsigned int RenderSDL::create_texture(unsigned int width, unsigned int height,
 		unsigned char* new_bmp = (unsigned char*)malloc(width * height * 3);
 		unsigned char* old_bmp = (unsigned char*)bmp;
 		int j = 0;
-		for (int i = 0; i < height * width; ++i) {
+		for (uint i = 0; i < height * width; ++i) {
 			new_bmp[j++] = old_bmp[i];
 			new_bmp[j++] = old_bmp[i];
 			new_bmp[j++] = old_bmp[i];
@@ -366,11 +366,11 @@ bool RenderSDL::bind_texture(unsigned int texture) {
 	return true;
 }
 void RenderSDL::set_scissor(int x, int y, int w, int h, bool set) {
-	// if (set)
-	//	glEnable(GL_SCISSOR_TEST);
-	// else
-	//	glDisable(GL_SCISSOR_TEST);
-	// glScissor(x, y, w, h);
+	if (set)
+		glEnable(GL_SCISSOR_TEST);
+	else
+		glDisable(GL_SCISSOR_TEST);
+	glScissor(x, y, w, h);
 }
 void printProgramLog(GLuint program) {
 	// Make sure name is shader

@@ -43,7 +43,7 @@ RenderQueue::RenderQueue() : _size(0), _mem_size(0), _ready_to_render(false) {
 	_alpha = 255;
 	// _render_options(RENDER_OPTIONS_NONROUNDED_RECT)
 }
-void RenderQueue::set_render_options(int options) {
+void RenderQueue::set_render_options(unsigned int options) {
 	_render_options = options;
 }
 // to support multithreaded rendering, 2 render queue is added
@@ -176,7 +176,7 @@ void RenderQueue::add_font(const char* path, float height) {
 const gfx_cmd* RenderQueue::get_queue() const {
 	return _queue;
 }
-size_t RenderQueue::get_size() const {
+unsigned int RenderQueue::get_size() const {
 	return _size;
 }
 }

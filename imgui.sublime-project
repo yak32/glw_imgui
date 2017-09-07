@@ -41,6 +41,20 @@
 			    "working_dir": "${project_path}/build/",
 			    "file_regex": "^[.\\\\/]*([A-Z]?:?[\\w.\\\\/]+)[:]([0-9]+)[:]([0-9]+)?:?(.*)$",
 			    "selector": "source.c, source.c++"
+	   		},
+	   	    {
+			    "shell_cmd": "cmake -G \"Visual Studio 14 2015 Win64\" -D GLW_IMGUI_DEMO=ON ..",
+			    "name": "project 64",
+			    "working_dir": "${project_path}/build/",
+			    "file_regex": "^[.\\\\/]*([A-Z]?:?[\\w.\\\\/]+)[:]([0-9]+)[:]([0-9]+)?:?(.*)$",
+			    "selector": "source.c, source.c++"
+	   		},
+	   	    {
+			    "shell_cmd": "cmake -G \"Visual Studio 14 2015 Win64\" -T\"LLVM-vs2014\" -D GLW_IMGUI_DEMO=ON ..",
+			    "name": "project clang64",
+			    "working_dir": "${project_path}/build/",
+			    "file_regex": "^[.\\\\/]*([A-Z]?:?[\\w.\\\\/]+)[:]([0-9]+)[:]([0-9]+)?:?(.*)$",
+			    "selector": "source.c, source.c++"
 	   		}
 
 	  	]

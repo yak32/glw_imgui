@@ -33,7 +33,7 @@ using namespace imgui;
 
 PlatformSDL gPlatform;
 Ui ui;
-Rollout *rollout, *vert_rollout;
+Rollout *rollout, *vert_rollout, *horz_rollout;
 RenderSDL renderer;
 
 void getDisplayScaleFactor(float& x, float& y) {
@@ -57,12 +57,15 @@ void setup_ui() {
 	vert_rollout = ui.create_rollout("VERT", WND_STYLE);
 	ui.insert_rollout(vert_rollout, -200, true, ui.get_root_rollout());
 
+	horz_rollout = ui.create_rollout("HORZ", WND_STYLE);
+	ui.insert_rollout(horz_rollout, 200, false, ui.get_root_rollout());
+
 	char font_path[512];
-	sprintf(font_path, "DroidSans.ttf", SDL_GetBasePath());
+	sprintf(font_path, "%sDroidSans.ttf", SDL_GetBasePath());
 	ui.font(font_path, 15);
 
 	char theme_path[512];
-	sprintf(theme_path, "default.theme", SDL_GetBasePath());
+	sprintf(theme_path, "%sdefault.theme", SDL_GetBasePath());
 	//imgui::Theme theme;
 	//imgui::load_theme(theme, theme_path);
 	//ui.set_theme(theme);
@@ -253,6 +256,16 @@ void update_ui() {
 			selected = i;
 	}
 
+	ui.end_rollout();
+
+	ui.begin_rollout(horz_rollout);
+
+	static int selected2 = -1;
+	for (int i = 0; i < 100; ++i) {
+		sprintf(str, "item %d", i);
+		if (ui.item(str, i == selected2))
+			selected2 = i;
+	}
 	ui.end_rollout();
 
 	ui.end_frame();
