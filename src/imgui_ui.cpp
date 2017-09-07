@@ -602,7 +602,7 @@ bool Ui::render_caption(Rollout& r, int x, int y, int w, int h, int caption_y, i
 	}
 	return ret_val;
 }
-void Ui::switch_tab(Rollout* r) {	
+void Ui::switch_tab(Rollout* r) {
 	Toolbar* n = search_rollout_node(_toolbar_root, r);
 	if (n) {
 		n->rollout->alpha = 0;
@@ -647,7 +647,7 @@ int Ui::render_rollout_tabs(Rollout& r, int x, int y, int h, int caption_y, int 
 				if (n)
 					n->rollout = tab_rollout;
 			}
-            if (xdiff != 0 || ydiff != 0){
+            if (abs(xdiff) > 4 || abs(ydiff) > 4){
                 tab_rollout->x += xdiff;
                 tab_rollout->y += ydiff;
                 _target_side = ROLLOUT_UNDEFINED;
@@ -1051,7 +1051,7 @@ bool Ui::system_tab(uint id, const char* text, int x, int y, int w, int h, bool 
 			find_div(_mx, _my, _toolbar_root, 0, 0, _width, _height, default_padding());
 	}
 	bool res = button_logic(id, over);
-	if (is_item_active(id)) {
+	if (is_item_active(id) && (abs(_mx - _drag_x) > 15 || abs(_my - _drag_y) > 15)) {
 		xdiff = _mx - _drag_x;
 		ydiff = _my - _drag_y;
 		_drag_x = _mx;
