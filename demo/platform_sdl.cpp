@@ -381,7 +381,7 @@ void RenderSDL::set_scissor(int x, int y, int w, int h, bool set) {
 		glEnable(GL_SCISSOR_TEST);
 	else
 		glDisable(GL_SCISSOR_TEST);
-	glScissor(scale_x*x, scale_y*y, scale_x*w, scale_y*h);
+	glScissor((int)(scale_x*x), (int)(scale_y*y), (int)(scale_x*w), (int)(scale_y*h));
 }
 void printProgramLog(GLuint program) {
 	// Make sure name is shader
