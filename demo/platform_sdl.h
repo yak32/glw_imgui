@@ -9,6 +9,8 @@
 
 namespace imgui {
 
+void getDisplayScaleFactor(float& x, float& y);
+
 class PlatformSDL : public IPlatform {
 public:
 	PlatformSDL();

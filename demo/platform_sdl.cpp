@@ -201,6 +201,14 @@ unsigned int compile_shader(const GLchar** vertex_source, const GLchar** fragmen
 	return programID;
 }
 
+void getDisplayScaleFactor(float& x, float& y) {
+	int w, h, low_dpi_w, low_dpi_h;
+	SDL_GL_GetDrawableSize(gWindow, &w, &h);
+	SDL_GetWindowSize(gWindow, &low_dpi_w, &low_dpi_h);
+	x = (float)w / low_dpi_w;
+	y = (float)h / low_dpi_h;
+}
+
 bool RenderSDL::begin(uint width, uint height) {
 	int wnd_width, wnd_height;
 	SDL_GL_GetDrawableSize(gWindow, &wnd_width, &wnd_height);
@@ -366,11 +374,14 @@ bool RenderSDL::bind_texture(unsigned int texture) {
 	return true;
 }
 void RenderSDL::set_scissor(int x, int y, int w, int h, bool set) {
+	float scale_x, scale_y;
+	getDisplayScaleFactor(scale_x, scale_y);
+
 	if (set)
 		glEnable(GL_SCISSOR_TEST);
 	else
 		glDisable(GL_SCISSOR_TEST);
-	glScissor(x, y, w, h);
+	glScissor(scale_x*x, scale_y*y, scale_x*w, scale_y*h);
 }
 void printProgramLog(GLuint program) {
 	// Make sure name is shader

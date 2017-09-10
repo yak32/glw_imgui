@@ -36,13 +36,7 @@ Ui ui;
 Rollout *rollout, *vert_rollout, *horz_rollout;
 RenderSDL renderer;
 
-void getDisplayScaleFactor(float& x, float& y) {
-	int w, h, low_dpi_w, low_dpi_h;
-	SDL_GL_GetDrawableSize(gWindow, &w, &h);
-	SDL_GetWindowSize(gWindow, &low_dpi_w, &low_dpi_h);
-	x = (float)w / low_dpi_w;
-	y = (float)h / low_dpi_h;
-}
+
 void setup_ui() {
 	// scale ui to support high dpi
 	float scaleX, scaleY;
