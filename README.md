@@ -5,6 +5,7 @@ IMGUI is a code-driven, simple and bloat-free GUI system, widely used in modern 
 Best explanation of IMGUI concept is [here](https://www.youtube.com/watch?v=Z1qyvQsjK5Y).
 
 #### IMGUI: creation, usage and rendering of a button in one line:
+![Alt text](/../feature-screenshots/screenshots/cancel_button.png)
 ```c++
 
 // simple button
