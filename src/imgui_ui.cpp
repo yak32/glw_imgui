@@ -1815,34 +1815,49 @@ void Ui::set_color(ColorScheme color_id, color_t clr) {
 	switch(color_id){
 		case ROLLOUT_COLOR:
 			_theme.rollout_color = clr;
+			break;
 		case ROLLOUT_CAPTION_COLOR:
 			_theme.rollout_caption_color = clr;
+			break;
 		case BUTTON_COLOR:
 			_theme.button_color = clr;
+			break;
 		case BUTTON_COLOR_ACTIVE:
 			_theme.button_color_active = clr;
+			break;
 		case BUTTON_COLOR_FOCUSED:
 			_theme.button_color_focused = clr;
+			break;
 		case EDIT_COLOR:
 			_theme.edit_color = clr;
+			break;
 		case EDIT_COLOR_ACTIVE:
 			_theme.edit_color_active = clr;
+			break;
 		case COLLAPSE_COLOR:
 			_theme.collapse_color = clr;
+			break;
 		case COLLAPSE_COLOR_ACTIVE:
 			_theme.collapse_color_active = clr;
+			break;
 		case TEXT_COLOR:
 			_theme.text_color = clr;
+			break;
 		case TEXT_COLOR_HOT:
 			_theme.text_color_hot = clr;
+			break;
 		case TEXT_COLOR_CHECKED:
 			_theme.text_color_checked = clr;
+			break;
 		case TEXT_COLOR_DISABLED:
 			_theme.text_color_disabled = clr;
+			break;
 		case DRAG_COLOR:
 			_theme.drag_color = clr;
+			break;
 		case SLIDER_BG:
 			_theme.slider_bg = clr;
+			break;
 		default:
 			assert(false && "color is undefined");
 	};
