@@ -118,15 +118,9 @@ cd ../demo/install/
 			checked = !checked;
 
 		ui.separator(true);
-		static bool button_checked1 = false;
-		if (ui.button_check("Checkbox button1", button_checked1))
-			button_checked1 = !button_checked1;
-		static bool button_checked2 = false;
-		if (ui.button_check("Checkbox button2", button_checked2))
-			button_checked2 = !button_checked2;
-		static bool button_checked3 = false;
-		if (ui.button_check("Checkbox button3", button_checked3))
-			button_checked3 = !button_checked3;
+		ui.texture("texture.jpg");
+		ui.rectangle(100);
+		ui.texture(nullptr);
 
 		ui.separator();
 		ui.separator(true);
