@@ -29,6 +29,12 @@ void set_gfx_rect(gfx_rect& r, int x, int y, int w, int h, int _r = 0) {
 	r.h = (short)h;
 	r.r = (short)_r;
 }
+void set_gfx_line(gfx_line& r, int x1, int y1, int x2, int y2) {
+	r.x1 = (short)x1;
+	r.y1 = (short)y1;
+	r.x2 = (short)x2;
+	r.y2 = (short)y2;
+}
 unsigned int apply_alpha_state(unsigned int color, unsigned int alpha) {
 	int a = ((color >> 24) * alpha) >> 8;
 	color &= 0x00ffffff;
@@ -115,6 +121,17 @@ void RenderQueue::add_rounded_rect(int x, int y, int w, int h, int r, unsigned i
 		set_gfx_rect(cmd.rect, x, y, w, h);
 	else
 		set_gfx_rect(cmd.rect, x, y, w, h, r);
+}
+void RenderQueue::add_line(int x1, int y1, int x2, int y2, unsigned int color){
+	if (_size >= GFXCMD_QUEUE_SIZE)
+		return;
+
+	gfx_cmd& cmd = _queue[_size++];
+	cmd.type = GFX_CMD_LINE;
+	cmd.flags = 0;
+	cmd.col = apply_alpha_state(color, _alpha);
+
+	set_gfx_line(cmd.line, x1, y1, x2, y2);
 }
 void RenderQueue::add_triangle(int x, int y, int w, int h, int flags, unsigned int color) {
 	if (_size >= GFXCMD_QUEUE_SIZE)

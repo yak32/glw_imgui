@@ -78,6 +78,8 @@ void draw_rect(IRenderer* r, float x, float y, float w, float h, float texture_x
 			   float texture_width, float texture_height, unsigned int col, float depth,
 			   bool flip_texture);
 
+void draw_line(IRenderer* r, float x1, float y1, float x2, float y2, unsigned int col, float depth);
+
 void draw_rounded_rect(IRenderer* render, float x, float y, float w, float h, float r, float fth,
 					   unsigned int col, float depth);
 void render_mesh(IRenderer* renderer, const float* coords, float txt_shift_x, float txt_shift_y,
@@ -170,6 +172,10 @@ bool Ui::bind_texture(const char* path) {
 	else {
 		int width, height, channels;
 		unsigned char* image = r->load_image(path, &width, &height, &channels);
+		if (!image){
+			IMGUI_LOG_ERROR("failed to load texture");
+			return false;
+		}
 		texture.id = r->create_texture(width, height, channels, image);
 		texture.x = 0.0f;
 		texture.y = 0.0f;
@@ -210,6 +216,17 @@ void Ui::render_draw(bool transparency) {
 								  (float)cmd->rect.h, (float)cmd->rect.r, 1.0f, cmd->col, _depth);
 			}
 			break;
+
+		case GFX_CMD_LINE:
+			r->bind_texture(_current_texture.id);
+			r->set_blend_mode(BLEND_RECT);
+			// if (!g_blend_texture)
+			//	r->set_state(RS_BLEND, RF_FALSE);
+
+			draw_line(r, (float)cmd->line.x1, (float)cmd->line.y1, (float)cmd->line.x2,
+							  (float)cmd->line.y2, cmd->col, _depth);
+			break;
+
 
 		case GFX_CMD_TRIANGLE:
 			r->set_blend_mode(BLEND_RECT);
@@ -441,6 +458,19 @@ void draw_rounded_rect(IRenderer* render, float x, float y, float w, float h, fl
 	*v++ = x + w - r + cverts[0] * r;
 	*v++ = y + r + cverts[1] * r;
 	render_mesh(render, verts, x, y, w, h, (n + 1) * 4, fth, col, depth);
+}
+
+void draw_line(IRenderer* render, float x0, float y0, float x1, float y1, unsigned int col, float depth) {
+	
+	render_vertex_3d_t* v = new_coords;
+	
+	// triangles
+	set(v++, x0, y0, 0, 0, col, depth);
+	set(v++, x1, y1, 0, 0, col, depth);
+	set(v++, x1, y1, 0, 0, col, depth);
+	set(v++, x0, y0, 0, 0, col, depth);
+	unsigned int k = (int)(v - new_coords);
+	render->render_mesh(new_coords, k, true);
 }
 void draw_line(IRenderer* render, float x0, float y0, float x1, float y1, float r, float fth,
 			   unsigned int col, float depth) {

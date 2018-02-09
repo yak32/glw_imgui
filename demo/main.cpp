@@ -56,6 +56,7 @@ void setup_ui() {
 
 	char font_path[512];
 	sprintf(font_path, "%sDroidSans.ttf", SDL_GetBasePath());
+	//sprintf(font_path, "DroidSans.ttf");
 	ui.font(font_path, 15);
 
 	char theme_path[512];
@@ -198,15 +199,9 @@ void update_ui() {
 			checked = !checked;
 
 		ui.separator(true);
-		static bool button_checked1 = false;
-		if (ui.button_check("Checkbox button1", button_checked1))
-			button_checked1 = !button_checked1;
-		static bool button_checked2 = false;
-		if (ui.button_check("Checkbox button2", button_checked2))
-			button_checked2 = !button_checked2;
-		static bool button_checked3 = false;
-		if (ui.button_check("Checkbox button3", button_checked3))
-			button_checked3 = !button_checked3;
+		ui.texture("texture.jpg");
+		ui.rectangle(100);
+		ui.texture(nullptr);
 
 		ui.separator();
 		ui.separator(true);
@@ -231,6 +226,11 @@ void update_ui() {
 		ui.button("Item2");
 		ui.button("Item3");
 		ui.end_row();
+
+		float values[360];
+		for (int i=0;i<360;i++)
+			values[i] = sinf(i*3.1415/180.0f);
+		ui.graph(values, sizeof(values)/sizeof(float), 100, -1.0f, 1.0f);
 
 		static char str_property[100] = "Property Val";
 		ui.property("Property", str_property, 100, NULL);

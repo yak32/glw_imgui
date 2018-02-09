@@ -212,8 +212,8 @@ public:
 	bool button_check(const char* text, bool checked, bool enabled = true);
 	bool collapse(const char* text, bool checked, bool enabled = true);
 	void label(const char* text);
-	void rectangle(int x, int y, int width, int height, uint color);
-	void rectangle(int height, uint color);
+	void rectangle(int x, int y, int width, int height, uint color=0xffffffff);
+	void rectangle(int height, uint color=0xffffffff);
 	void triangle(int x1, int y1, int x2, int y2, int x3, int y3, uint color);
 	void value(const char* text);
 	bool slider(const char* text, float* val, float vmin, float vmax, float vinc,
@@ -266,6 +266,8 @@ public:
 	void set_text_align(uint align);
 	uint get_text_align() const;
 	bool check_rect(int x, int y, uint id) const;
+
+	bool graph(const float* values, unsigned int size, unsigned int height, float minimum_value, float maximum_value, bool enabled = true);
 
 	const gfx_cmd* get_render_queue(uint& size);
 

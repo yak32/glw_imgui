@@ -1000,6 +1000,7 @@ bool Ui::button(const char* text, bool enabled) {
 	_rqueue->add_text(x, y, w, h, _text_align, text, text_color_hot(id, enabled));
 	return res;
 }
+
 bool Ui::button(const char* text, int x, int y, int w, int h, bool enabled) {
 	if (!_alpha)
 		return false; // rollout is invisible
@@ -1016,6 +1017,40 @@ bool Ui::button(const char* text, int x, int y, int w, int h, bool enabled) {
 	_rqueue->add_text(x, y, _widget_w, _item_height, _text_align, text, text_color(id, enabled));
 	return res;
 }
+
+bool Ui::graph(const float* values, unsigned int size, unsigned int height, float minimum_value, float maximum_value, bool enabled) {
+	int x, y, w, h;
+	uint id;
+	bool over, was_focused;
+
+	if (!values){
+		assert(false && "Ui::graph(): values are null");
+		return false;
+	}
+
+	uint old_item_height = _item_height;
+	_item_height = height;
+
+	if (!start_control(enabled, x, y, w, h, id, over, was_focused))
+		return false;
+
+	bool res = enabled && button_logic(id, over);
+	
+	float scale_vert = (float)h/(maximum_value-minimum_value);
+	float scale_horz = (float)w/size;
+	int y_start = -(int)(minimum_value * scale_vert);
+
+	for (unsigned int i=0;i<size;++i){
+		float v = values[i];
+		int xx = (unsigned int)(i*scale_horz);
+		int yy = (unsigned int)(v*scale_vert);
+		_rqueue->add_rect(x+xx, y, ceil(scale_horz), yy+y_start, button_color(id));
+		//_rqueue->add_line(x+xx1, y+yy1, x+xx2, y+yy1, button_color(id));
+	}
+	_item_height = old_item_height;
+	return res;
+}
+
 bool Ui::system_button(uint id, const char* text, int x, int y, int w, int h, bool enabled) {
 	bool over = enabled && in_rect(x, y, w, h);
 	bool res = enabled && button_logic(id, over);

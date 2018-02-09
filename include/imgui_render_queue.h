@@ -30,6 +30,7 @@ static const unsigned TEXT_POOL_SIZE = 8000;
 enum gfx_cmdType {
 	GFX_CMD_UNDEFINED = 0,
 	GFX_CMD_RECT,
+	GFX_CMD_LINE,
 	GFX_CMD_TRIANGLE,
 	GFX_CMD_TEXT,
 	GFX_CMD_DEPTH,
@@ -40,6 +41,9 @@ enum gfx_cmdType {
 enum RENDER_OPTIONS { RENDER_OPTIONS_NONROUNDED_RECT = 1 };
 struct gfx_rect {
 	short x, y, w, h, r;
+};
+struct gfx_line {
+	short x1, y1, x2, y2;
 };
 struct gfx_text {
 	short x, y, width, height, align;
@@ -71,6 +75,7 @@ struct gfx_cmd {
 	unsigned int col;
 	union {
 		gfx_rect rect;
+		gfx_line line;
 		gfx_text text;
 		gfx_depth depth;
 		gfx_font font;
@@ -89,6 +94,7 @@ struct RenderQueue {
 	void add_rect(int x, int y, int w, int h, unsigned int color);
 	void add_rounded_rect(int x, int y, int w, int h, int r, unsigned int color);
 	void add_triangle(int x, int y, int w, int h, int flags, unsigned int color);
+	void add_line(int x1, int y1, int x2, int y2, unsigned int color);
 	void add_depth(int depth);
 	void add_text(int x, int y, int width, int height, int align, const char* text,
 				  unsigned int color);
