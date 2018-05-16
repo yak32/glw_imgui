@@ -1031,8 +1031,10 @@ bool Ui::graph(const float* values, unsigned int size, unsigned int height, floa
 	uint old_item_height = _item_height;
 	_item_height = height;
 
-	if (!start_control(enabled, x, y, w, h, id, over, was_focused))
+	if (!start_control(enabled, x, y, w, h, id, over, was_focused)){
+		_item_height = old_item_height;
 		return false;
+	}
 
 	bool res = enabled && button_logic(id, over);
 	
@@ -1438,8 +1440,10 @@ void Ui::rectangle(int height, uint color) {
 	bool over, was_focused;
 	int button_height = _item_height;
 	_item_height = height;
-	if (!start_control(false, x, y, w, h, id, over, was_focused))
+	if (!start_control(false, x, y, w, h, id, over, was_focused)){
+		_item_height = button_height;
 		return;
+	}
 
 	_rqueue->add_rect(x, y, w, h, color);
 	_item_height = button_height;
