@@ -227,9 +227,9 @@ void update_ui() {
 		ui.button("Item3");
 		ui.end_row();
 
-		float values[360];
-		for (int i=0;i<360;i++)
-			values[i] = sinf(i*3.1415/180.0f);
+		float values[60];
+		for (int i=0;i<60;i++)
+			values[i] = sinf(6*i*3.1415/180.0f);
 		ui.graph(values, sizeof(values)/sizeof(float), 100, -1.0f, 1.0f);
 
 		static char str_property[100] = "Property Val";
