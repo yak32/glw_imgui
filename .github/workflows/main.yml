@@ -9,6 +9,8 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
+    - name: install_dependencies
+      run: sudo apt-get install libsdl2-dev
     - name: configure
       run: mkdir build; cd build; cmake ..
     - name: build
@@ -31,6 +33,8 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
+    - name: install_dependencies
+      run: brew update SDL2   
     - name: configure
       run: mkdir build; cd build; cmake ..
     - name: build
