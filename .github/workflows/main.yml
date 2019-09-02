@@ -1,0 +1,43 @@
+name: C/C++ CI
+
+on: [push]
+
+jobs:
+  build_on_ubuntu:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: configure
+      run: mkdir build; cd build; cmake ..
+    - name: build
+      run: cd build; cmake --build . --target install
+    - name: test
+      run: ./install/tests
+      
+  build_on_windows:
+
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: configure
+      run: mkdir build && cd build && cmake ..
+    - name: build
+      run: cd build && cmake --build . --target install
+    - name: test
+      run: cd install && tests.exe
+      
+  build_on_macOS:
+
+    runs-on: macOS-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: configure
+      run: mkdir build; cd build; cmake ..
+    - name: build
+      run: cd build; cmake --build . --target install
+    - name: test
+      run: ./install/tests
