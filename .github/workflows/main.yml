@@ -13,8 +13,6 @@ jobs:
       run: mkdir build; cd build; cmake ..
     - name: build
       run: cd build; cmake --build . --target install
-    - name: test
-      run: ./install/tests
       
   build_on_windows:
 
@@ -25,9 +23,7 @@ jobs:
     - name: configure
       run: mkdir build && cd build && cmake ..
     - name: build
-      run: cd build && cmake --build . --target install
-    - name: test
-      run: cd install && tests.exe
+      run: cd build && cmake --build . --target install    
       
   build_on_macOS:
 
@@ -39,5 +35,4 @@ jobs:
       run: mkdir build; cd build; cmake ..
     - name: build
       run: cd build; cmake --build . --target install
-    - name: test
-      run: ./install/tests
+    
