@@ -34,7 +34,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: install_dependencies
-      run: brew update SDL2   
+      run: brew install SDL2   
     - name: configure
       run: mkdir build; cd build; cmake ..
     - name: build
