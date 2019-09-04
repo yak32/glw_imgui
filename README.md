@@ -13,6 +13,7 @@ if (gui.button("Cancel"))
 	do_cancel_action();
 
 ```
+
 All logic is hidden in the Gui::button() call, rendering commands are issued and added to the render queue. String pooling is used to pack strings in render queue and avoid memory allocation during rendering. Rendering is graphics API independent, platform specific rendering should be implemented (the reference implementation by SDL is provided in the demo project.)
 
 The library has basic suppot for layouting (attachable toolbars, layout serialization), themes (right now colors only), lock-free multithreading (triple buffering).
