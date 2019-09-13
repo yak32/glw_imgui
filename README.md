@@ -1,3 +1,5 @@
+![](https://github.com/yak32/glw_imgui/workflows/status/badge.svg)
+
 # glw_imgui - C++ IMGUI implementation
 Immediate Mode UI C++ implementation.
 
