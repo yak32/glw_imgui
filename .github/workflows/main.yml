@@ -27,9 +27,9 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: configure
-      run: mkdir build && cd build && cmake ..
+      run: mkdir build; cd build; cmake ..
     - name: build
-      run: cd build && cmake --build . --target install    
+      run: cd build; cmake --build . --target install    
       
   build_on_macOS:
 
