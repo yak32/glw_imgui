@@ -1,4 +1,4 @@
-![](https://github.com/yak32/glw_imgui/workflows/status/badge.svg)[![License](https://img.shields.io/badge/License-BSD%202--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
+![](https://github.com/yak32/glw_imgui/workflows/status/badge.svg) [![License](https://img.shields.io/badge/License-BSD%202--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
 
 # glw_imgui - C++ IMGUI implementation
 Immediate Mode UI C++ implementation.
