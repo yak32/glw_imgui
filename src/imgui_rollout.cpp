@@ -147,7 +147,7 @@ RolloutMoveSide Ui::rollout_move(Rollout* dr, Rollout* r, int x, int y) {
 
 bool Ui::show_rollout(Rollout* r, bool animate) {
 	// rollout is closing
-	if (r->is_visible())
+	if (!r || r->is_visible())
 		return false;
 	if (animate) {
 		r->animation_speed = 1;
@@ -252,6 +252,7 @@ bool Ui::remove_rollout(Rollout* r) {
 	}
 	detach_rollout(r);
 	delete r;
+	_rollouts.erase(i);
 	return true;
 }
 Rollout* Ui::find_rollout(const char* name) {

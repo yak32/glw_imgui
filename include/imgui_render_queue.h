@@ -30,20 +30,17 @@ static const unsigned TEXT_POOL_SIZE = 8000;
 enum gfx_cmdType {
 	GFX_CMD_UNDEFINED = 0,
 	GFX_CMD_RECT,
-	GFX_CMD_LINE,
 	GFX_CMD_TRIANGLE,
 	GFX_CMD_TEXT,
 	GFX_CMD_DEPTH,
 	GFX_CMD_SCISSOR,
 	GFX_CMD_TEXTURE,
+	GFX_CMD_TRANSFORM,
 	GFX_CMD_FONT
 };
 enum RENDER_OPTIONS { RENDER_OPTIONS_NONROUNDED_RECT = 1 };
 struct gfx_rect {
 	short x, y, w, h, r;
-};
-struct gfx_line {
-	short x1, y1, x2, y2;
 };
 struct gfx_text {
 	short x, y, width, height, align;
@@ -68,6 +65,11 @@ struct gfx_texture {
 	frect rc;
 	const char* path;
 };
+
+struct gfx_transform {
+	float matrix[16];
+};
+
 struct gfx_cmd {
 	char type;
 	char flags;
@@ -75,11 +77,11 @@ struct gfx_cmd {
 	unsigned int col;
 	union {
 		gfx_rect rect;
-		gfx_line line;
 		gfx_text text;
 		gfx_depth depth;
 		gfx_font font;
 		gfx_texture texture;
+		gfx_transform transform;
 	};
 };
 
@@ -94,13 +96,13 @@ struct RenderQueue {
 	void add_rect(int x, int y, int w, int h, unsigned int color);
 	void add_rounded_rect(int x, int y, int w, int h, int r, unsigned int color);
 	void add_triangle(int x, int y, int w, int h, int flags, unsigned int color);
-	void add_line(int x1, int y1, int x2, int y2, unsigned int color);
 	void add_depth(int depth);
 	void add_text(int x, int y, int width, int height, int align, const char* text,
 				  unsigned int color);
-	void add_texture(const char* path, const frect& rc, bool blend);
+	void add_texture(const char* path, const frect& rc, bool blend, bool wrap);
 	void add_font(const char* path, float height);
-
+	bool add_texture_options(bool wrap);
+	void add_transform(const float matrix[16]);
 	const gfx_cmd* get_queue() const;
 	unsigned int get_size() const;
 
@@ -111,7 +113,7 @@ struct RenderQueue {
 
 private:
 	gfx_cmd _queue[GFXCMD_QUEUE_SIZE];
-	unsigned int _size, _mem_size;
+	unsigned int _size;
 
 	char _text_pool[TEXT_POOL_SIZE];
 	unsigned _text_pool_size;

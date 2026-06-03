@@ -103,8 +103,8 @@ enum CURSOR {
 	CURSOR_RESIZE_CORNER,
 	CURSOR_COUNT
 };
-enum ALIGN { ALIGN_LEFT = 0, ALIGN_RIGHT, ALIGN_TOP, ALIGN_BOTTOM, ALIGN_CENTER, ALIGN_VCENTER };
-enum SOUNDS { SOUND_MOUSE_HOVER = 0, SOUND_CLICK };
+enum ALIGN { ALIGN_LEFT = 1, ALIGN_RIGHT=2, ALIGN_TOP=4, ALIGN_BOTTOM=8, ALIGN_CENTER=16, ALIGN_VCENTER=32 };
+enum SOUNDS { SOUND_MOUSE_HOVER = 0, SOUND_CLICK, SOUND_MAX };
 enum SCROLL_MODE { SCROLL_START = 0, SCROLL_END, SCROLL_CURRENT };
 
 static const int MAX_UI_LAYER_COUNT = 10;
@@ -112,6 +112,27 @@ static const int MAX_UI_LAYER_COUNT = 10;
 struct texture_t {
 	uint id;
 	float x, y, width, height;
+};
+
+struct ui_state_t{
+	uint width;
+	uint height;
+	int scroll;
+	uint item_height;
+	uint options;
+	int alpha;
+	uint text_align;
+	int padding_left, padding_right, padding_top, padding_bottom;
+	int item_padding_left, item_padding_right, item_padding_top, item_padding_bottom;
+	float property_width;
+	int scroll_right;
+	int scroll_area_top;
+	int focus_top;
+	int focus_bottom;
+	int scroll_top;
+	int scroll_bottom;
+	float depth;
+	uint mode;
 };
 
 struct font_t;
@@ -164,7 +185,7 @@ public:
 	bool begin_frame(uint width, uint height, int mx, int my, int scroll, uint character, uint key);
 	void end_frame();
 	void cleanup();
-	void set_options(uint options);
+	uint set_options(uint options);
 	void indent();
 	void unindent();
 	void separator(bool draw_line = false);
@@ -212,8 +233,8 @@ public:
 	bool button_check(const char* text, bool checked, bool enabled = true);
 	bool collapse(const char* text, bool checked, bool enabled = true);
 	void label(const char* text);
-	void rectangle(int x, int y, int width, int height, uint color=0xffffffff);
-	void rectangle(int height, uint color=0xffffffff);
+	bool rectangle(int x, int y, int width, int height, uint color, bool enabled=false);
+	bool rectangle(int height, uint color, bool enabled=false);
 	void triangle(int x1, int y1, int x2, int y2, int x3, int y3, uint color);
 	void value(const char* text);
 	bool slider(const char* text, float* val, float vmin, float vmax, float vinc,
@@ -232,16 +253,20 @@ public:
 	bool file(const char* text, const char* value, bool enabled = true);
 	bool color_edit(const char* text, color color, bool enabled = true, bool is_property = true);
 	bool item_dropped(char* text, uint buffer_len, int& mouse_x, int& mouse_y);
-	void draw_text(int x, int y, int align, const char* text, uint color);
+	void draw_text(int x, int y, int align, const char* text, uint color, int width=0);
 	bool active_text(int x, int y, int align, const char* text, uint color, bool selected = false);
+
+	bool transformation(const float matrix[16]);
 
 	bool key_pressed(Key key) const;
 	bool key_released(Key key) const;
 
 	uint set_item_height(uint button_height);
 	uint get_item_height() const;
+	uint get_item_width() const;
 	void set_padding(int left, int top, int right, int bottom);
 	void set_item_padding(int left, int top, int right, int bottom);
+	void get_item_padding(int& left, int& top, int& right, int& bottom) const;
 	void set_property_width(float w);
 	RolloutMoveSide rollout_move(Rollout* dr, Rollout* r, int x, int y);
 	bool rollout_move_rect(int x, int y, int w, int h);
@@ -257,8 +282,8 @@ public:
 
 	void set_depth(int depth);
 
-	bool texture(const char* path, const frect& rc, bool blend = false);
-	bool texture(const char* path);
+	bool texture(const char* path, const frect& rc, bool blend = false, bool wrap=true);
+	bool texture(const char* path, bool wrap=true);
 	void end_texture();
 	void set_cursor(CURSOR cursor);
 	bool font(const char* path, float height);
@@ -266,8 +291,6 @@ public:
 	void set_text_align(uint align);
 	uint get_text_align() const;
 	bool check_rect(int x, int y, uint id) const;
-
-	bool graph(const float* values, unsigned int size, unsigned int height, float minimum_value, float maximum_value, bool enabled = true);
 
 	const gfx_cmd* get_render_queue(uint& size);
 
@@ -278,6 +301,11 @@ public:
 
 	void play_sound(SOUNDS s);
 	void render_draw(bool transparency);
+
+	void push_state();
+	bool pop_state();
+
+	void set_sound(SOUNDS s, const char* sound);
 
 private:
 	bool any_active() const;
@@ -312,12 +340,13 @@ private:
 	bool system_tab(uint id, const char* text, int x, int y, int w, int h, bool checked, int& xdiff, int& ydiff, bool& over);
 
 	// render
-	bool render_init(IRenderer* r);
+	void set_renderer(IRenderer* r);
 	bool render_destroy();
 	void on_render_finished();
+	void on_frame_ready();
 
 	bool load_font(const char* path, float font_height, font_t& font);
-	bool bind_texture(const char* path);
+	bool bind_texture(const char* path, bool wrap);
 
 	void render_text(const font_t& font, float x, float y, float w, float h, const char* text,
 					 int align, unsigned int col, float depth);
@@ -343,7 +372,11 @@ private:
 	bool render_caption(Rollout& r, int x, int y, int w, int h, int caption_y, int caption_height,
 						int area_header);
 
+	
+
 private:
+	bool render_init();
+
 	uint _width;
 	uint _height;
 	bool _left, _double_left;
@@ -405,15 +438,21 @@ private:
 
 	Rollouts _rollouts;
 
-	RenderQueue _rqueues[2];
-	RenderQueue *_rqueue, *_rqueue_display;
+	RenderQueue _rqueues[3];
+	RenderQueue *_rqueue, *_rqueue_display, *_rqueue_intermediate;
+
 	std::mutex _mutex;
 	IRenderer* _renderer;
+	bool _renderer_inited;
 	std::unordered_map<std::string, font_t*> _fonts;
 	std::unordered_map<std::string, texture_t> _textures;
 
 	texture_t _current_texture;
 	texture_t _white_texture;
+
+	bool _texture_wrap;
+
+	float _current_transform[16];
 
 	std::unordered_map<std::string, font_t*>::iterator _current_font;
 	bool _blend_texture;
@@ -426,6 +465,10 @@ private:
 
 	Rollout* _focus_rollout;
 	Rollout* _rollout_root;
+
+	std::vector<ui_state_t> _states;
+
+	std::string _sounds[SOUND_MAX];
 };
 }
 #endif // _IMGUI_H_

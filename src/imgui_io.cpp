@@ -53,7 +53,7 @@ template <typename T> bool serialize(T& t, Theme& v) {
 bool save_layout(Ui& ui, const char* filename) {
 	int res = save_object_to_file(filename, *ui.get_root_toolbar());
 	if (res != JSON_OK) {
-		LOG_ERROR("Saving layout file failed, error: %d", res);
+		IMGUI_LOG_ERROR("Saving layout file failed, error: %d", res);
 		return false;
 	}
 	return true;
@@ -62,7 +62,7 @@ bool load_layout(Ui& ui, const char* filename) {
 	Toolbar* root = new Toolbar(NULL);
 	int res = load_object_from_file(filename, *root);
 	if (res != JSON_OK) {
-		LOG_ERROR("Opening layout file failed, error: %d", res);
+		IMGUI_LOG_ERROR("Opening layout file failed, error: %d", res);
 		return false;
 	}
 	ui.set_root_toolbar(root);
@@ -71,7 +71,7 @@ bool load_layout(Ui& ui, const char* filename) {
 bool save_theme(const Theme& theme, const char* filename) {
 	int res = save_object_to_file(filename, const_cast<Theme&>(theme)); //OMG const_cast
 	if (res != JSON_OK) {
-		LOG_ERROR("Saving theme file failed, error: %d", res);
+		IMGUI_LOG_ERROR("Saving theme file failed, error: %d", res);
 		return false;
 	}
 	return true;
@@ -79,7 +79,7 @@ bool save_theme(const Theme& theme, const char* filename) {
 bool load_theme(Theme& theme, const char* filename) {
 	int res = load_object_from_file(filename, theme);
 	if (res != JSON_OK) {
-		LOG_ERROR("Opening theme file failed, error: %d", res);
+		IMGUI_LOG_ERROR("Opening theme file failed, error: %d", res);
 		return false;
 	}
 	return true;
