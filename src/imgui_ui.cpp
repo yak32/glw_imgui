@@ -1,3 +1,4 @@
+
 // glw_imgui
 // Copyright (C) 2016 Iakov Sumygin - BSD license
 
@@ -51,8 +52,8 @@ Ui::Ui(uint mode)
 	  _focus_bottom(0), _inside_scroll_area(false), _scroll_top(0),
 	  _scroll_bottom(0), _platform(nullptr), _edit_buffer_id(0), _target_side(ROLLOUT_UNDEFINED),
 	  _target_rollout(NULL), _rollout_drag_div(), _toolbar_root(NULL), _rollout_last(NULL),
-	  _rqueue(nullptr), _rqueue_display(nullptr), _renderer(nullptr), _blend_texture(false),
-	  _depth(0), // ui depth (need to sorting windows properly, especially during moving rollouts)
+	  _rqueue(nullptr), _rqueue_display(nullptr), _rqueue_intermediate(nullptr), _renderer(nullptr), _renderer_inited(false),
+	  _blend_texture(false), _depth(0), // ui depth (need to sorting windows properly, especially during moving rollouts)
 	  _mode(mode), _atlas(UNDEFINED_TEXTURE), _focus_rollout(nullptr), _rollout_root(nullptr) {
 	memset(_edit_buffer, 0, sizeof(_edit_buffer));
 	memset(_drag_item, 0, sizeof(_drag_item));
@@ -76,6 +77,7 @@ Ui::Ui(uint mode)
 	_rollout_last = _toolbar_root;
 	_rqueue = &_rqueues[0];
 	_rqueue_display = &_rqueues[1];
+	_rqueue_intermediate = &_rqueues[2];
 	_current_texture.id = UNDEFINED_TEXTURE;
 	_white_texture.id = UNDEFINED_TEXTURE;
 	_current_font = _fonts.end();
@@ -90,7 +92,8 @@ Ui::~Ui() {
 }
 bool Ui::create(IPlatform* p, IRenderer* r) {
 	_platform = p;
-	return render_init(r);
+	set_renderer(r);
+	return true;
 }
 void Ui::destroy() {
 	if (_toolbar_root) {
@@ -102,8 +105,10 @@ void Ui::destroy() {
 	for (size_t i = 0; i < size; ++i)
 		delete _rollouts[i];
 
+	_rollouts.clear();
 	_rollout_root = nullptr;
 	render_destroy();
+	_renderer = nullptr; // prevent rendering after detruction
 }
 bool Ui::any_active() const {
 	return _active != 0;
@@ -147,18 +152,26 @@ void Ui::set_active(uint id) {
 void Ui::set_hot(uint id) {
 	if (_hot != id)
 		play_sound(SOUND_MOUSE_HOVER);
-
+#if defined(GLOW_ANDROID_BUILD) || defined(GLOW_IOS_BUILD)
+	_hot = id;
+#else
 	_hot_to_be = id;
+#endif
 }
+
 void Ui::play_sound(SOUNDS s) {
 	// nothing yet
+	_platform->play_sound(_sounds[s].c_str());
 }
+
 void Ui::set_focused(uint id) {
 	_focus = id;
 }
+
 void Ui::set_edit_buffer_id(uint id) {
 	_edit_buffer_id = id;
 }
+
 bool Ui::button_logic(uint id, bool over) {
 	if (_options & INPUT_DISABLED)
 		return false;
@@ -191,6 +204,7 @@ bool Ui::button_logic(uint id, bool over) {
 			set_hot(id);
 		if (key_released(KEY_MOUSE_LEFT)) {
 			if (is_item_hot(id)) {
+				printf("mouse %d, %d\n", _mx, _my);
 				res = true;
 			}
 			clear_active();
@@ -347,11 +361,7 @@ bool Ui::update_input(int mx, int my, int scroll, uint character, uint keys_stat
 
 bool Ui::begin_frame(uint width, uint height, int mx, int my, int scroll, uint character,
 					 uint keys_state) {
-	{
-		std::lock_guard<std::mutex> lock(_mutex);
-		if (_rqueue->ready_to_render())
-			return false;
-	}
+
 
 	_width = width;
 	_height = height;
@@ -412,18 +422,34 @@ void Ui::end_frame() {
 		set_cursor(CURSOR_DEFAULT); // restore to default cursor only of left button is not pressed
 
 	clear_input();
-	_rqueue->on_frame_finished();
+	on_frame_ready();
 }
+
+const gfx_cmd* Ui::get_render_queue(uint& size) {
+	size = _rqueue_display->get_size();
+	return _rqueue_display->get_queue();
+}
+
+void Ui::on_frame_ready(){
+	_rqueue->on_frame_finished();
+
+	std::lock_guard<std::mutex> lock(_mutex);
+
+	// submit ready frame for rendering
+	std::swap(_rqueue, _rqueue_intermediate);
+	_rqueue->reset_gfx_cmd_queue();
+}
+
 void Ui::on_render_finished() {
 	std::lock_guard<std::mutex> lock(_mutex);
-	if (_rqueue->ready_to_render()) {
-		// we can swap buffers
-		_rqueue->prepare_render();
-		_rqueue_display->on_frame_finished();
-		std::swap(_rqueue, _rqueue_display); // swap render buffers to display new queue
-		_rqueue->reset_gfx_cmd_queue();		 // former display queue can be reset
+
+	// swap buffers
+	if (_rqueue_intermediate->ready_to_render()) {
+		std::swap(_rqueue_display, _rqueue_intermediate);
+		_rqueue_intermediate->reset_gfx_cmd_queue();
 	}
 }
+
 void Ui::cleanup() {
 	_rollouts.clear();
 	clear_toolbars(_toolbar_root);
@@ -454,7 +480,7 @@ const int Ui::area_header() const {
 	return _item_height * 2;
 }
 const int Ui::toolbar_header() const {
-	return _item_height / 4;
+	return 0;
 }
 const int Ui::default_round() const {
 	return _item_height / 5;
@@ -576,6 +602,10 @@ bool Ui::begin_rollout(Rollout* pr, bool focused) {
 		_search_next_focus = true;
 	}
 	return ret_val;
+}
+
+void Ui::set_sound(SOUNDS s, const char* sound) {
+	_sounds[s] = sound;
 }
 
 bool Ui::render_caption(Rollout& r, int x, int y, int w, int h, int caption_y, int caption_height, int area_header){
@@ -915,7 +945,7 @@ void Ui::end_rollout() {
 		}
 	}
 	_inside_current_scroll = false;
-	_widget_id = 0;
+	//_widget_id = 0;
 	_row = 0;
 	_rqueue->set_alpha(255);
 }
@@ -937,9 +967,9 @@ bool Ui::start_control(bool enabled, int& x, int& y, int& w, int& h, uint& id, b
 	w = _widget_w;
 	h = _item_height;
 	if (!_row)
-		_widget_y -= _item_height + default_spacing();
+		_widget_y -= _item_height + _item_padding_top;
 	else
-		_widget_x += w + default_spacing();
+		_widget_x += w + _item_padding_left;
 
 	if (_widget_id > ROLLOUT_CONTROLS_COUNT && (y+h < _scroll_bottom || y > _scroll_top))
 		return false;
@@ -1000,7 +1030,6 @@ bool Ui::button(const char* text, bool enabled) {
 	_rqueue->add_text(x, y, w, h, _text_align, text, text_color_hot(id, enabled));
 	return res;
 }
-
 bool Ui::button(const char* text, int x, int y, int w, int h, bool enabled) {
 	if (!_alpha)
 		return false; // rollout is invisible
@@ -1017,42 +1046,6 @@ bool Ui::button(const char* text, int x, int y, int w, int h, bool enabled) {
 	_rqueue->add_text(x, y, _widget_w, _item_height, _text_align, text, text_color(id, enabled));
 	return res;
 }
-
-bool Ui::graph(const float* values, unsigned int size, unsigned int height, float minimum_value, float maximum_value, bool enabled) {
-	int x, y, w, h;
-	uint id;
-	bool over, was_focused;
-
-	if (!values){
-		assert(false && "Ui::graph(): values are null");
-		return false;
-	}
-
-	uint old_item_height = _item_height;
-	_item_height = height;
-
-	if (!start_control(enabled, x, y, w, h, id, over, was_focused)){
-		_item_height = old_item_height;
-		return false;
-	}
-
-	bool res = enabled && button_logic(id, over);
-	
-	float scale_vert = (float)h/(maximum_value-minimum_value);
-	float scale_horz = (float)w/size;
-	int y_start = -(int)(minimum_value * scale_vert);
-
-	for (unsigned int i=0;i<size;++i){
-		float v = values[i];
-		int xx = (unsigned int)(i*scale_horz);
-		int yy = (unsigned int)(v*scale_vert);
-		_rqueue->add_rect(x+xx, y, ceil(scale_horz), yy+y_start, button_color(id));
-		//_rqueue->add_line(x+xx1, y+yy1, x+xx2, y+yy1, button_color(id));
-	}
-	_item_height = old_item_height;
-	return res;
-}
-
 bool Ui::system_button(uint id, const char* text, int x, int y, int w, int h, bool enabled) {
 	bool over = enabled && in_rect(x, y, w, h);
 	bool res = enabled && button_logic(id, over);
@@ -1175,6 +1168,11 @@ bool Ui::file_item(const char* text, char slash, bool selected, bool enabled) {
 	return res;
 }
 
+bool Ui::transformation(const float matrix[16]) {
+	_rqueue->add_transform(matrix);
+	return true;
+}
+
 bool Ui::item_dropped(char* text, uint buffer_len, int& mouse_x, int& mouse_y) {
 	if (!text || !buffer_len) {
 		assert(false);
@@ -1281,9 +1279,11 @@ void Ui::row(uint count) {
 void Ui::set_widget_width(int width) {
 	_widget_w = width;
 }
+
 int Ui::get_widget_width() const {
 	return _widget_w;
 }
+
 void Ui::end_row() {
 	// restore widget width
 	if (_row == 1) {
@@ -1293,6 +1293,7 @@ void Ui::end_row() {
 	}
 	_row--;
 }
+
 bool Ui::collapse(const char* text, bool checked, bool enabled) {
 	int x, y, w, h;
 	uint id;
@@ -1434,24 +1435,40 @@ bool Ui::color_edit(const char* text, color clr, bool enabled, bool is_property)
 
 	return focused;
 }
-void Ui::rectangle(int height, uint color) {
+bool Ui::rectangle(int height, uint color, bool enabled) {
+	if (height <= 0)
+		return false;
+
 	int x, y, w, h;
 	uint id;
 	bool over, was_focused;
-	int button_height = _item_height;
+	uint button_height = _item_height;
 	_item_height = height;
-	if (!start_control(false, x, y, w, h, id, over, was_focused)){
-		_item_height = button_height;
-		return;
-	}
 
+	if (!start_control(false, x, y, w, h, id, over, was_focused))
+		return false;
+
+	bool res = false;
+	if (enabled) {
+		res = button_logic(id, over);
+	}
 	_rqueue->add_rect(x, y, w, h, color);
 	_item_height = button_height;
+	return res;
 }
-void Ui::rectangle(int x, int y, int width, int height, uint color) {
+
+bool Ui::rectangle(int x, int y, int width, int height, uint color, bool enabled) {
 	if (y + height < 0 || y > (int)_height || x + width < 0 || x > (int)_width)
-		return;
+		return false;
+
+	bool res = false;
+	if (enabled) {
+		uint id = get_control_id(_widget_id++);
+		bool over = in_rect(x, y, width, height);
+		res = button_logic(id, over);
+	}
 	_rqueue->add_rect(x, y, width, height, color);
+	return res;
 }
 
 void Ui::triangle(int x1, int y1, int x2, int y2, int x3, int y3, uint color) {
@@ -1468,7 +1485,7 @@ void Ui::label(const char* text) {
 		_widget_y -= _item_height;
 	else
 		_widget_x += _widget_w + default_spacing();
-	if (_widget_id > 10 && (y < _scroll_bottom || y > _scroll_top))
+	if (_widget_id > 10 && (y < _scroll_bottom-_padding_bottom || y > _scroll_top))
 		return;
 	// _rqueue->add_text(x, y, _text_align, text, RGBA(255,255,255,255));
 	_rqueue->add_text(x, y, _widget_w, _item_height, _text_align, text, _theme.text_color);
@@ -1602,9 +1619,10 @@ bool Ui::progress(float val, float vmin, float vmax, float vinc, uint color, boo
 	if (!start_control(enabled, x, y, w, h, id, over, was_focused))
 		return false;
 
-	_rqueue->add_rounded_rect(x, y, w, h, default_round(), RGBA(255, 255, 255, 64));
+	_rqueue->add_rect(x, y, w, h, RGBA(0, 0, 0, 255));
+	_rqueue->add_rect(x+2, y+2, w-4, h-4, RGBA(255, 255, 255, 64));
 
-	const int range = w;
+	const int range = w-4;
 	float u = (val - vmin) / (vmax - vmin);
 	if (u < 0)
 		u = 0;
@@ -1617,13 +1635,15 @@ bool Ui::progress(float val, float vmin, float vmax, float vinc, uint color, boo
 	// RGBA(255,255,255,255));
 	// else
 	if (m > 0)
-		_rqueue->add_rounded_rect(x, y, m, _item_height, default_round(), color);
+		_rqueue->add_rect(x+2, y+2, m, _item_height-4, color);
 
 	return true;
 }
-void Ui::set_options(uint _options) {
-	_render_options = _options;
+uint Ui::set_options(uint options) {
+	uint ret = _render_options;
+	_render_options = options;
 	_rqueue->set_render_options(_render_options);
+	return ret;
 }
 void Ui::indent() {
 	_widget_x += intend_size();
@@ -1653,10 +1673,10 @@ void Ui::separator(bool draw_line) {
 			_rqueue->add_rect(x, y, w, h, _theme.button_color);
 	}
 }
-void Ui::draw_text(int x, int y, int align, const char* text, uint color) {
+void Ui::draw_text(int x, int y, int align, const char* text, uint color, int width) {
 	if (_widget_id > 10 && (y < _scroll_bottom || y > _scroll_top))
 		return;
-	_rqueue->add_text(x, y, _widget_w, _item_height, align, text, color);
+	_rqueue->add_text(x, y, width? width: _widget_w, _item_height, align, text, color);
 }
 // return previous button height
 uint Ui::set_item_height(uint button_height) {
@@ -1673,6 +1693,9 @@ uint Ui::set_item_height(uint button_height) {
 uint Ui::get_item_height() const {
 	return _item_height;
 }
+uint Ui::get_item_width() const {
+	return _widget_w;
+}
 void Ui::set_padding(int left, int top, int right, int bottom) {
 	_padding_left = left;
 	_padding_top = top;
@@ -1684,6 +1707,12 @@ void Ui::set_item_padding(int left, int top, int right, int bottom) {
 	_item_padding_top = top;
 	_item_padding_right = right;
 	_item_padding_bottom = bottom;
+}
+void Ui::get_item_padding(int& left, int& top, int& right, int& bottom) const {
+	left = _item_padding_left;
+	top = _item_padding_top;
+	right = _item_padding_right;
+	bottom = _item_padding_bottom;
 }
 void Ui::set_property_width(float w) {
 	_property_width = w;
@@ -1712,21 +1741,22 @@ bool Ui::active_text(int x, int y, int align, const char* text, uint color, bool
 
 	return _left && is_item_hot(id);
 }
-bool Ui::texture(const char* path, const frect& rc, bool blend) {
-	_rqueue->add_texture(path, rc, blend);
+bool Ui::texture(const char* path, const frect& rc, bool blend, bool wrap) {
+	_rqueue->add_texture(path, rc, blend, wrap);
 	return true;
 }
-bool Ui::texture(const char* path) {
+
+bool Ui::texture(const char* path, bool wrap) {
 	frect rc;
 	rc.top = rc.left = 0.0f;
 	rc.right = rc.bottom = 1.0f;
-	_rqueue->add_texture(path, rc, false);
+	_rqueue->add_texture(path, rc, false, wrap);
 	return true;
 }
 void Ui::end_texture() {
 	frect r;
 	r.bottom = r.top = r.left = r.right = 0;
-	_rqueue->add_texture(0, r, false);
+	_rqueue->add_texture(0, r, false, false);
 }
 bool Ui::font(const char* path, float height) {
 	_rqueue->add_font(path, height);
@@ -1809,6 +1839,7 @@ bool Ui::clear_focus() {
 	_search_next_focus = false;
 	return true;
 }
+
 void Ui::get_input(int* mouse_x, int* mouse_y, uint* keys_state, uint* character,
 				   bool& left_pressed, bool& left_released) const {
 	*keys_state = _keys_state;
@@ -1819,16 +1850,15 @@ void Ui::get_input(int* mouse_x, int* mouse_y, uint* keys_state, uint* character
 	left_pressed = key_pressed(KEY_MOUSE_LEFT);
 	left_released = key_released(KEY_MOUSE_LEFT);
 }
-const gfx_cmd* Ui::get_render_queue(uint& size) {
-	size = _rqueue_display->get_size();
-	return _rqueue_display->get_queue();
-}
+
 Toolbar* Ui::get_root_toolbar() {
 	return _toolbar_root;
 }
+
 Rollout* Ui::get_root_rollout(){
 	return _rollout_root;
 }
+
 void Ui::set_root_toolbar(Toolbar* t) {
 	clear_toolbars(_toolbar_root); // remove current root toolbars
 	delete (_toolbar_root);
@@ -1941,8 +1971,75 @@ color_t Ui::get_color(ColorScheme id) const {
 			assert(false && "color is undefined");
 	};
 	return 0;
-
 }
+
+void Ui::push_state(){
+
+	ui_state_t s;
+
+	s.width = _width;
+	s.height = _height;
+	s.scroll = _scroll;
+	s.item_height = _item_height;
+	s.options = _options;
+	s.alpha = _alpha;
+	s.text_align = _text_align;
+	s.padding_left = _padding_left;
+	s.padding_right = _padding_right;
+	s.padding_top = _padding_top;
+	s.padding_bottom = _padding_bottom;
+	s.item_padding_left = _item_padding_left;
+	s.item_padding_right = _item_padding_right;
+	s.item_padding_top = _item_padding_top;
+	s.item_padding_bottom = _item_padding_bottom;
+	s.property_width = _property_width;
+	s.scroll_right = _scroll_right;
+	s.scroll_area_top = _scroll_area_top;
+	s.focus_top = _focus_top;
+	s.focus_bottom = _focus_bottom;
+	s.scroll_top = _scroll_top;
+	s.scroll_bottom = _scroll_bottom;
+	s.depth = _depth;
+	s.mode = _mode;
+
+	_states.push_back(s);
+};
+
+bool Ui::pop_state(){
+
+	if (_states.empty())
+		return false;
+
+	ui_state_t s = _states.back();
+	_width = s.width;
+	_height = s.height;
+	_scroll = s.scroll;
+	_item_height = s.item_height;
+	_options = s.options;
+	_alpha = s.alpha;
+	_text_align = s.text_align;
+	_padding_left = s.padding_left;
+	_padding_right = s.padding_right;
+	_padding_top = s.padding_top;
+	_padding_bottom = s.padding_bottom;
+	_item_padding_left = s.item_padding_left;
+	_item_padding_right = s.item_padding_right;
+	_item_padding_top = s.item_padding_top;
+	_item_padding_bottom = s.item_padding_bottom;
+	_property_width = s.property_width;
+	_scroll_right = s.scroll_right;
+	_scroll_area_top = s.scroll_area_top;
+	_focus_top = s.focus_top;
+	_focus_bottom = s.focus_bottom;
+	_scroll_top = s.scroll_top;
+	_scroll_bottom = s.scroll_bottom;
+	_depth = s.depth;
+	_mode = s.mode;
+
+	_states.pop_back();
+	return true;
+}
+
 }
 
 #ifdef _MSC_VER

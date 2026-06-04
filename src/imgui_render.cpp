@@ -74,20 +74,23 @@ inline void set(render_vertex_3d_t* v, float x, float y, float u, float vv, unsi
 	v->clr = col;
 }
 
-void draw_rect(IRenderer* r, float x, float y, float w, float h, float texture_x, float texture_y,
+void draw_rect(IRenderer* r, float transform[16], float x, float y, float w, float h, float texture_x, float texture_y,
 			   float texture_width, float texture_height, unsigned int col, float depth,
 			   bool flip_texture);
-
-void draw_line(IRenderer* r, float x1, float y1, float x2, float y2, unsigned int col, float depth);
 
 void draw_rounded_rect(IRenderer* render, float x, float y, float w, float h, float r, float fth,
 					   unsigned int col, float depth);
 void render_mesh(IRenderer* renderer, const float* coords, float txt_shift_x, float txt_shift_y,
 				 float txt_scale_x, float txt_scale_y, unsigned numCoords, float r,
 				 unsigned int col, float depth);
-bool Ui::render_init(IRenderer* r) {
-	_renderer = r;
 
+void Ui::set_renderer(IRenderer* r) {
+	_renderer = r;
+}
+bool Ui::render_init() {
+	assert(_renderer && "renderer is not set");
+
+	IRenderer* r = _renderer;
 	_texture_atlas = new TextureAtlas;
 
 	for (unsigned i = 0; i < CIRCLE_VERTS; ++i) {
@@ -98,7 +101,7 @@ bool Ui::render_init(IRenderer* r) {
 
 	unsigned int white = 0xffffffff;
 
-	_white_texture = {0};
+	_white_texture.id = UNDEFINED_TEXTURE;
 	_white_texture.width = 0.0f;
 	_white_texture.height = 0.0f;
 
@@ -122,6 +125,7 @@ bool Ui::render_init(IRenderer* r) {
 	_white_texture.id = r->create_texture(1, 1, 4, &white);
 	_white_texture.width = 1.0f;
 	_white_texture.height = 1.0f;
+
 	return _white_texture.id != UNDEFINED_TEXTURE;
 }
 bool Ui::render_destroy() {
@@ -144,9 +148,10 @@ bool Ui::render_destroy() {
 	_fonts.clear();
 	return true;
 }
-bool Ui::bind_texture(const char* path) {
+bool Ui::bind_texture(const char* path, bool wrap) {
 	auto it_texture = _textures.find(path);
 	if (it_texture != _textures.end()) {
+		_texture_wrap = wrap;
 		_current_texture = it_texture->second;
 		return true;
 	};
@@ -154,60 +159,74 @@ bool Ui::bind_texture(const char* path) {
 
 	texture_t texture;
 	texture.id = UNDEFINED_TEXTURE;
+
 	if (_mode & MODE_BATCH_DRAW_CALLS) {
 		// put image into atlas
-		int width, height, channels;
-		unsigned int x, y;
-		unsigned char* image = r->load_image(path, &width, &height, &channels);
-		if (image && channels == 4) {
-			_texture_atlas->add_box(width, height, &x, &y);
-			r->copy_sub_texture(_atlas, x, y, width, height, image);
+		//int width, height, channels;
+		//unsigned int x, y;
+		//if (image && channels == 4) {
+		//	_texture_atlas->add_box(width, height, &x, &y);
+		//	r->copy_sub_texture(_atlas, x, y, width, height, image);
 
-			texture.x = (float)x / TEXTURE_ATLAS_SIZE;
-			texture.y = (float)y / TEXTURE_ATLAS_SIZE;
-			texture.width = (float)width / TEXTURE_ATLAS_SIZE;
-			texture.height = (float)height / TEXTURE_ATLAS_SIZE;
-		}
+		//	texture.x = (float)x / TEXTURE_ATLAS_SIZE;
+		//	texture.y = (float)y / TEXTURE_ATLAS_SIZE;
+		//	texture.width = (float)width / TEXTURE_ATLAS_SIZE;
+		//	texture.height = (float)height / TEXTURE_ATLAS_SIZE;
+		//}
 	}
 	else {
-		int width, height, channels;
-		unsigned char* image = r->load_image(path, &width, &height, &channels);
-		if (!image){
-			IMGUI_LOG_ERROR("failed to load texture");
-			return false;
-		}
-		texture.id = r->create_texture(width, height, channels, image);
+		texture.id = r->load_texture(path);
 		texture.x = 0.0f;
 		texture.y = 0.0f;
 		texture.width = 1.0f;
 		texture.height = 1.0f;
 	}
-	_textures[path] = texture;
+	if (texture.id != UNDEFINED_TEXTURE)
+		_textures[path] = texture;
+
 	_current_texture = texture;
+	_texture_wrap = wrap;
 	return texture.id != UNDEFINED_TEXTURE;
 }
 void Ui::render_draw(bool transparency) {
 	if (!_renderer)
-		return; // not yet initialized
+		return;
 
 	IRenderer* r = _renderer;
 	r->begin(_width, _height);
 
 	uint size;
 	const gfx_cmd* cmd = get_render_queue(size);
+
+	if (size) {
+		if (!_renderer_inited) {
+			render_init();
+			_renderer_inited = true;
+			return; // not yet initialized
+		}
+	}
+
 	_current_texture = _white_texture;
+	_texture_wrap = true;
+
+	// set default transform to identity matrix
+	for (int i = 0; i < 16; ++i)
+		_current_transform[i] = 0.0f;
+
+	for (int i = 0; i < 4; ++i)
+		_current_transform[i*4+i] = 1.0f;
 
 	bool bind_font = true;
-	for (int i = 0; i < size; ++i, ++cmd) {
+	for (unsigned int i = 0; i < size; ++i, ++cmd) {
 		switch (cmd->type) {
 		case GFX_CMD_RECT:
-			r->bind_texture(_current_texture.id);
+			r->bind_texture(_current_texture.id, _texture_wrap);
 			r->set_blend_mode(BLEND_RECT);
 			// if (!g_blend_texture)
 			//	r->set_state(RS_BLEND, RF_FALSE);
 
 			if (cmd->rect.r == 0) {
-				draw_rect(r, (float)cmd->rect.x, (float)cmd->rect.y, (float)cmd->rect.w,
+				draw_rect(r, _current_transform, (float)cmd->rect.x, (float)cmd->rect.y, (float)cmd->rect.w,
 						  (float)cmd->rect.h, _current_texture.x, _current_texture.y,
 						  _current_texture.width, _current_texture.height, cmd->col, _depth, false);
 			}
@@ -217,20 +236,10 @@ void Ui::render_draw(bool transparency) {
 			}
 			break;
 
-		case GFX_CMD_LINE:
-			r->bind_texture(_current_texture.id);
-			r->set_blend_mode(BLEND_RECT);
-			// if (!g_blend_texture)
-			//	r->set_state(RS_BLEND, RF_FALSE);
-
-			draw_line(r, (float)cmd->line.x1, (float)cmd->line.y1, (float)cmd->line.x2,
-							  (float)cmd->line.y2, cmd->col, _depth);
-			break;
-
-
 		case GFX_CMD_TRIANGLE:
 			r->set_blend_mode(BLEND_RECT);
-			r->bind_texture(_white_texture.id);
+			r->bind_texture(_white_texture.id, _texture_wrap);
+
 			if (cmd->flags == 1) {
 				const float verts[3 * 2] = {
 					(float)cmd->rect.x,
@@ -273,17 +282,34 @@ void Ui::render_draw(bool transparency) {
 			break;
 
 		case GFX_CMD_TEXT:
-			r->bind_texture(_current_font->second->id);
-			r->set_blend_mode(BLEND_TEXT);
-			render_text(*_current_font->second, cmd->text.x, cmd->text.y, cmd->text.width,
-						cmd->text.height, cmd->text.text, cmd->text.align, cmd->col, _depth);
+			if (_current_font != _fonts.end()){
+				r->bind_texture(_current_font->second->id, _texture_wrap);
+				r->set_blend_mode(BLEND_TEXT);
+				render_text(*_current_font->second, cmd->text.x, cmd->text.y, cmd->text.width,
+					cmd->text.height, cmd->text.text, cmd->text.align, cmd->col, _depth);
+			}
+			else{
+				// printf("GFX_CMD_TEXT is sent without setting a current font");
+			}
 			break;
 
 		case GFX_CMD_TEXTURE:
-			if (cmd->texture.path)
-				bind_texture(cmd->texture.path);
+			if (cmd->texture.path) {
+				bind_texture(cmd->texture.path, cmd->flags & 2);
+				_current_texture.x = cmd->texture.rc.left;
+				_current_texture.y = cmd->texture.rc.top;
+				_current_texture.width = cmd->texture.rc.right-cmd->texture.rc.left;
+				_current_texture.height = cmd->texture.rc.bottom-cmd->texture.rc.top;
+			}
 			else
 				_current_texture = _white_texture;
+
+			// manager
+			break;
+
+
+		case GFX_CMD_TRANSFORM:
+			memcpy(_current_transform, cmd->transform.matrix, sizeof(float)*16);
 			// manager
 			break;
 
@@ -397,30 +423,47 @@ void render_mesh(IRenderer* renderer, const float* coords, float txt_shift_x, fl
 	renderer->render_mesh(new_coords, k, true);
 }
 
-void draw_rect(IRenderer* r, float x, float y, float w, float h, float texture_x, float texture_y,
+void transform_point(float x, float y, float depth, float transform[16], float* res){
+	res[0] = x * transform[0] + y * transform[4] + depth * transform[8] + transform[12];
+	res[1] = x * transform[1] + y * transform[5] + depth * transform[9] + transform[13];
+	res[2] = x * transform[2] + y * transform[6] + depth * transform[10] + transform[14];
+}
+
+void draw_rect(IRenderer* r, float transform[16], float x, float y, float w, float h, float texture_x, float texture_y,
 			   float texture_width, float texture_height, unsigned int col, float depth,
 			   bool flip_texture) {
-	render_vertex_3d_t* v = &new_coords[0];
-	if (flip_texture) {
-		set(v++, x, y, texture_x, texture_y, col, depth);
-		set(v++, x + w, y, texture_x + texture_width, texture_y, col, depth);
-		set(v++, x + w, y + h, texture_x + texture_width, texture_y + texture_height, col, depth);
 
-		set(v++, x, y, texture_x, texture_y, col, depth);
-		set(v++, x + w, y + h, texture_x + texture_width, texture_y + texture_height, col, depth);
-		set(v++, x, y + h, texture_x, texture_y + texture_height, col, depth);
+	render_vertex_3d_t* v = &new_coords[0];
+
+	float v1[3]; transform_point(x, y, depth, transform, v1);
+	float v2[3]; transform_point(x+w, y, depth, transform, v2);
+	float v3[3]; transform_point(x+w, y+h, depth, transform, v3);
+	float v4[3]; transform_point(x, y+h, depth, transform, v4);
+
+	if (flip_texture) {
+		set(v++, v1[0], v1[1], texture_x, texture_y, col, v1[2]);
+		set(v++, v2[0], v2[1], texture_x + texture_width, texture_y, col, v2[2]);
+		set(v++, v3[0], v3[1], texture_x + texture_width, texture_y + texture_height, col, v3[2]);
+
+		set(v++, v1[0], v1[1], texture_x, texture_y, col, v1[2]);
+		set(v++, v3[0], v3[1], texture_x + texture_width, texture_y + texture_height, col, v3[2]);
+		set(v++, v4[0], v4[1], texture_x, texture_y + texture_height, col, v4[2]);
+
 		r->render_mesh(new_coords, 6, true);
 	}
 	else {
-		set(v++, x, y, texture_x, texture_y + texture_height, col, depth);
-		set(v++, x + w, y, texture_x + texture_width, texture_y + texture_height, col, depth);
-		set(v++, x + w, y + h, texture_x + texture_width, texture_y, col, depth);
+		set(v++, v1[0], v1[1], texture_x, texture_y + texture_height, col, v1[2]);
+		set(v++, v2[0], v2[1], texture_x + texture_width, texture_y + texture_height, col, v2[2]);
+		set(v++, v3[0], v3[1], texture_x + texture_width, texture_y, col, v3[2]);
 
-		set(v++, x, y, texture_x, texture_y + texture_height, col, depth);
-		set(v++, x + w, y + h, texture_x + texture_width, texture_y, col, depth);
-		set(v++, x, y + h, texture_x, texture_y, col, depth);
+		set(v++, v1[0], v1[1], texture_x, texture_y + texture_height, col, v1[2]);
+		set(v++, v3[0], v3[1], texture_x + texture_width, texture_y, col, v3[2]);
+		set(v++, v4[0], v4[1], texture_x, texture_y, col, v4[2]);
+
 		r->render_mesh(new_coords, 6, true);
 	}
+	//r->draw_rect(transform, x, y, w, h, texture_x, texture_y,
+	//		   texture_width, texture_height,  col, depth);
 }
 void draw_ellipse(IRenderer* r, float x, float y, float w, float h, float fth, unsigned int col,
 				  float depth) {
@@ -458,19 +501,6 @@ void draw_rounded_rect(IRenderer* render, float x, float y, float w, float h, fl
 	*v++ = x + w - r + cverts[0] * r;
 	*v++ = y + r + cverts[1] * r;
 	render_mesh(render, verts, x, y, w, h, (n + 1) * 4, fth, col, depth);
-}
-
-void draw_line(IRenderer* render, float x0, float y0, float x1, float y1, unsigned int col, float depth) {
-	
-	render_vertex_3d_t* v = new_coords;
-	
-	// triangles
-	set(v++, x0, y0, 0, 0, col, depth);
-	set(v++, x1, y1, 0, 0, col, depth);
-	set(v++, x1, y1, 0, 0, col, depth);
-	set(v++, x0, y0, 0, 0, col, depth);
-	unsigned int k = (int)(v - new_coords);
-	render->render_mesh(new_coords, k, true);
 }
 void draw_line(IRenderer* render, float x0, float y0, float x1, float y1, float r, float fth,
 			   unsigned int col, float depth) {
@@ -584,7 +614,7 @@ float get_text_length(const stbtt_bakedchar* chardata, const char* text) {
 }
 void Ui::render_text(const font_t& font, float x, float y, float w, float h, const char* text,
 					 int align, unsigned int col, float depth) {
-	if (!text)
+	if (!text || strlen(text) == 0)
 		return;
 
 	if (align == ALIGN_CENTER)

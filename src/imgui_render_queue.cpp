@@ -29,12 +29,6 @@ void set_gfx_rect(gfx_rect& r, int x, int y, int w, int h, int _r = 0) {
 	r.h = (short)h;
 	r.r = (short)_r;
 }
-void set_gfx_line(gfx_line& r, int x1, int y1, int x2, int y2) {
-	r.x1 = (short)x1;
-	r.y1 = (short)y1;
-	r.x2 = (short)x2;
-	r.y2 = (short)y2;
-}
 unsigned int apply_alpha_state(unsigned int color, unsigned int alpha) {
 	int a = ((color >> 24) * alpha) >> 8;
 	color &= 0x00ffffff;
@@ -44,7 +38,7 @@ unsigned char get_alpha(unsigned int color) {
 	return (unsigned char)(color >> 24);
 }
 
-RenderQueue::RenderQueue() : _size(0), _mem_size(0), _ready_to_render(false) {
+RenderQueue::RenderQueue() : _size(0), _ready_to_render(false) {
 	_render_options = 0;
 	_alpha = 255;
 	// _render_options(RENDER_OPTIONS_NONROUNDED_RECT)
@@ -52,7 +46,7 @@ RenderQueue::RenderQueue() : _size(0), _mem_size(0), _ready_to_render(false) {
 void RenderQueue::set_render_options(unsigned int options) {
 	_render_options = options;
 }
-// to support multithreaded rendering, 2 render queue is added
+// to support multithreaded rendering, 3 render queue is added
 // one is used for rendering, another for logic. buffers are swapped
 // after rendering is finished
 bool RenderQueue::ready_to_render() const {
@@ -65,16 +59,13 @@ unsigned int RenderQueue::get_alpha() const{
 	return _alpha;
 }
 void RenderQueue::on_frame_finished() {
-	if (_size != GFXCMD_QUEUE_SIZE) {
-		_mem_size = _size;
-		_size = GFXCMD_QUEUE_SIZE; // prevent queue update	during next frame
-		_ready_to_render = true;
-	}
+	_ready_to_render = true;
 }
+
 void RenderQueue::prepare_render() {
-	_size = _mem_size;
 	_ready_to_render = false;
 }
+
 const char* RenderQueue::alloc_text(const char* text) {
 	unsigned len = (unsigned)strlen(text) + 1;
 	if (_text_pool_size + len >= TEXT_POOL_SIZE)
@@ -84,11 +75,13 @@ const char* RenderQueue::alloc_text(const char* text) {
 	_text_pool_size += len;
 	return dst;
 }
+
 void RenderQueue::reset_gfx_cmd_queue() {
-	_mem_size = _size = 0;
+	_size = 0;
 	_text_pool_size = 0;
 	_ready_to_render = false;
 }
+
 void RenderQueue::add_scissor(int x, int y, int w, int h) {
 	if (_size >= GFXCMD_QUEUE_SIZE)
 		return;
@@ -121,17 +114,6 @@ void RenderQueue::add_rounded_rect(int x, int y, int w, int h, int r, unsigned i
 		set_gfx_rect(cmd.rect, x, y, w, h);
 	else
 		set_gfx_rect(cmd.rect, x, y, w, h, r);
-}
-void RenderQueue::add_line(int x1, int y1, int x2, int y2, unsigned int color){
-	if (_size >= GFXCMD_QUEUE_SIZE)
-		return;
-
-	gfx_cmd& cmd = _queue[_size++];
-	cmd.type = GFX_CMD_LINE;
-	cmd.flags = 0;
-	cmd.col = apply_alpha_state(color, _alpha);
-
-	set_gfx_line(cmd.line, x1, y1, x2, y2);
 }
 void RenderQueue::add_triangle(int x, int y, int w, int h, int flags, unsigned int color) {
 	if (_size >= GFXCMD_QUEUE_SIZE)
@@ -167,13 +149,25 @@ void RenderQueue::add_text(int x, int y, int width, int height, int align, const
 	cmd.text.align = (short)align;
 	cmd.text.text = alloc_text(text);
 }
-void RenderQueue::add_texture(const char* path, const frect& rc, bool blend) {
+
+void RenderQueue::add_transform(const float matrix[16]) {
+	if (_size >= GFXCMD_QUEUE_SIZE)
+		return;
+
+	gfx_cmd& cmd = _queue[_size++];
+	cmd.type = GFX_CMD_TRANSFORM;
+	cmd.flags = 0;
+	memcpy(cmd.transform.matrix, matrix, sizeof(float)*16);
+}
+
+void RenderQueue::add_texture(const char* path, const frect& rc, bool blend, bool wrap) {
 	if (_size >= GFXCMD_QUEUE_SIZE)
 		return;
 
 	gfx_cmd& cmd = _queue[_size++];
 	cmd.type = GFX_CMD_TEXTURE;
 	cmd.flags = blend ? 1 : 0;
+	cmd.flags |= wrap ? 2 : 0;
 	cmd.texture.path = path ? alloc_text(path) : 0;
 	cmd.texture.rc.left = rc.left;
 	cmd.texture.rc.right = rc.right;
