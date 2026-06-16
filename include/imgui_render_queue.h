@@ -105,6 +105,11 @@ struct RenderQueue {
 	void add_transform(const float matrix[16]);
 	const gfx_cmd* get_queue() const;
 	unsigned int get_size() const;
+	unsigned int get_text_pool_size() const;
+
+	// Thread-safe handoff: copy cmds + text pool and rebase string pointers into out.text.
+	unsigned int snapshot_for_render(gfx_cmd* out_cmds, unsigned max_cmds, char* out_text,
+									 unsigned max_text) const;
 
 	bool ready_to_render() const;
 	void set_alpha(unsigned int alpha);
