@@ -184,6 +184,43 @@ void RenderQueue::add_font(const char* path, float height) {
 	cmd.font.path = path ? alloc_text(path) : 0;
 	cmd.font.height = height;
 }
+unsigned int RenderQueue::get_text_pool_size() const {
+	return _text_pool_size;
+}
+
+unsigned int RenderQueue::snapshot_for_render(gfx_cmd* out_cmds, unsigned max_cmds, char* out_text,
+											  unsigned max_text) const {
+	const unsigned int n = _size < max_cmds ? _size : max_cmds;
+	if (!n || !out_cmds || !out_text || max_text < 2)
+		return 0;
+
+	memcpy(out_cmds, _queue, n * sizeof(gfx_cmd));
+	const unsigned int text_bytes = _text_pool_size < max_text - 1 ? _text_pool_size : max_text - 1;
+	memcpy(out_text, _text_pool, text_bytes);
+	out_text[text_bytes] = '\0';
+
+	for (unsigned int i = 0; i < n; ++i) {
+		gfx_cmd& c = out_cmds[i];
+		switch (c.type) {
+		case GFX_CMD_TEXT:
+			if (c.text.text)
+				c.text.text = out_text + (c.text.text - _text_pool);
+			break;
+		case GFX_CMD_TEXTURE:
+			if (c.texture.path)
+				c.texture.path = out_text + (c.texture.path - _text_pool);
+			break;
+		case GFX_CMD_FONT:
+			if (c.font.path)
+				c.font.path = out_text + (c.font.path - _text_pool);
+			break;
+		default:
+			break;
+		}
+	}
+	return n;
+}
+
 const gfx_cmd* RenderQueue::get_queue() const {
 	return _queue;
 }

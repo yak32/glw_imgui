@@ -188,21 +188,64 @@ bool Ui::bind_texture(const char* path, bool wrap) {
 	_texture_wrap = wrap;
 	return texture.id != UNDEFINED_TEXTURE;
 }
+
+bool Ui::ensure_renderer_ready() {
+	if (_renderer_inited)
+		return true;
+	if (!_renderer)
+		return false;
+	_renderer_inited = render_init();
+	return _renderer_inited;
+}
+
+bool Ui::bind_font(const char* path, float height) {
+	if (!path)
+		return false;
+
+	char font_key_buf[256];
+	snprintf(font_key_buf, sizeof(font_key_buf), "%s:%g", path, (double)height);
+	const std::string font_key(font_key_buf);
+
+	auto found = _fonts.find(font_key);
+	if (found != _fonts.end()) {
+		_current_font = found;
+		return true;
+	}
+
+	font_t* f = new font_t;
+	if (!load_font(path, height, *f)) {
+		delete f;
+		return false;
+	}
+
+	auto inserted = _fonts.emplace(font_key, f);
+	_current_font = inserted.first;
+	return true;
+}
+
 void Ui::render_draw(bool transparency) {
 	if (!_renderer)
 		return;
 
+	gfx_cmd local_cmds[GFXCMD_QUEUE_SIZE];
+	char local_text[TEXT_POOL_SIZE];
+
+	uint size = 0;
+	const gfx_cmd* cmd = nullptr;
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+		size = _rqueue_display->snapshot_for_render(local_cmds, GFXCMD_QUEUE_SIZE, local_text,
+													TEXT_POOL_SIZE);
+		cmd = local_cmds;
+	}
+
 	IRenderer* r = _renderer;
 	r->begin(_width, _height);
-
-	uint size;
-	const gfx_cmd* cmd = get_render_queue(size);
 
 	if (size) {
 		if (!_renderer_inited) {
 			render_init();
 			_renderer_inited = true;
-			return; // not yet initialized
 		}
 	}
 
@@ -216,7 +259,6 @@ void Ui::render_draw(bool transparency) {
 	for (int i = 0; i < 4; ++i)
 		_current_transform[i*4+i] = 1.0f;
 
-	bool bind_font = true;
 	for (unsigned int i = 0; i < size; ++i, ++cmd) {
 		switch (cmd->type) {
 		case GFX_CMD_RECT:
@@ -314,27 +356,19 @@ void Ui::render_draw(bool transparency) {
 			break;
 
 		case GFX_CMD_FONT:
-			if (cmd->font.path) {
-				char font_name[256];
-				snprintf(font_name, sizeof(font_name), "%s:%f", cmd->font.path, cmd->font.height);
-				auto font = _fonts.find(font_name);
-				if (font != _fonts.end())
-					_current_font = font;
-				else {
-					font_t* f = new font_t;
-					if (load_font(cmd->font.path, cmd->font.height, *f)) {
-						_fonts[font_name] = f;
-						_current_font = _fonts.find(font_name); // TODO: IMPROVE
-					}
-					else
-						delete f;
-				}
-			}
+			if (cmd->font.path)
+				bind_font(cmd->font.path, cmd->font.height);
 			break;
 		}
 	}
 	r->end();
-	on_render_finished();
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+		if (_rqueue_intermediate->ready_to_render()) {
+			std::swap(_rqueue_display, _rqueue_intermediate);
+			_rqueue_intermediate->reset_gfx_cmd_queue();
+		}
+	}
 }
 
 // simple drawing, without any alpha blending
@@ -548,7 +582,6 @@ bool Ui::load_font(const char* path, float font_height, font_t& font) {
 	void* file_buffer = _platform->load_file(path, file_size);
 	if (!file_buffer) {
 		printf("failed to load file %s\n", path);
-		assert(false && "failed to load file");
 		return false;
 	}
 	void* bmap = malloc(512 * 512);
@@ -561,7 +594,7 @@ bool Ui::load_font(const char* path, float font_height, font_t& font) {
 
 	// create texture
 	unsigned int texture = _renderer->create_texture(512, 512, 1, bmap);
-	if (texture == 0xffffffff)
+	if (texture == 0 || texture == UNDEFINED_TEXTURE)
 		return false;
 
 	free(bmap);

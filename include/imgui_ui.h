@@ -302,6 +302,9 @@ public:
 	void play_sound(SOUNDS s);
 	void render_draw(bool transparency);
 
+	bool ensure_renderer_ready();
+	bool bind_font(const char* path, float height);
+
 	void push_state();
 	bool pop_state();
 
