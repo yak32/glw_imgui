@@ -1674,8 +1674,8 @@ void Ui::separator(bool draw_line) {
 	}
 }
 void Ui::draw_text(int x, int y, int align, const char* text, uint color, int width) {
-	if (_widget_id > 10 && (y < _scroll_bottom || y > _scroll_top))
-		return;
+	//if (_widget_id > 10 && (y < _scroll_bottom || y > _scroll_top))
+	//	return;
 	_rqueue->add_text(x, y, width? width: _widget_w, _item_height, align, text, color);
 }
 // return previous button height

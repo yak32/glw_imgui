@@ -254,6 +254,10 @@ public:
 	bool color_edit(const char* text, color color, bool enabled = true, bool is_property = true);
 	bool item_dropped(char* text, uint buffer_len, int& mouse_x, int& mouse_y);
 	void draw_text(int x, int y, int align, const char* text, uint color, int width=0);
+	// Reset the scroll-clip so a standalone draw_text/draw_rect (e.g. a screen overlay drawn after a
+	// scroll-area panel) isn't culled by the previous panel's leftover clip bounds. end_rollout leaves
+	// _widget_id/_scroll_* set; clearing _widget_id disables the `_widget_id > 10` clip in draw_text.
+	void reset_clip() { _widget_id = 0; }
 	bool active_text(int x, int y, int align, const char* text, uint color, bool selected = false);
 
 	bool transformation(const float matrix[16]);
